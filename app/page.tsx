@@ -802,11 +802,11 @@ export default function AnimatedLandingPage() {
               <p className="text-gray-400">&copy; 2025 Все права защищены</p>
             </div>
             <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                Политика конфиденциальности
+              <a href="/terms" className="text-gray-400 hover:text-white transition-colors">
+                Пользовательское соглашение
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                Условия использования
+              <a href="/contacts" className="text-gray-400 hover:text-white transition-colors">
+                Контакты и реквизиты
               </a>
               <span className="text-gray-400">Работает на ChatGPT API</span>
             </div>
