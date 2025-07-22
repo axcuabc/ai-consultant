@@ -16,6 +16,7 @@ import {
   Gift,
 } from "lucide-react"
 import { useState } from "react"
+import Link from "next/link"
 
 export default function PaymentPage() {
   const [isProcessing, setIsProcessing] = useState(false)
@@ -134,14 +135,12 @@ export default function PaymentPage() {
       <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            <Button
-              variant="ghost"
-              onClick={() => (window.location.href = "/")}
-              className="flex items-center space-x-2"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Назад</span>
-            </Button>
+            <Link href="/">
+              <Button variant="ghost" className="flex items-center space-x-2">
+                <ArrowLeft className="w-5 h-5" />
+                <span>Назад</span>
+              </Button>
+            </Link>
 
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">

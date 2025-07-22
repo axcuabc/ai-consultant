@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Bot, CheckCircle, Download, MessageCircle, FileText, Play, Gift, Code } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
+import Link from "next/link"
 
 export default function PaymentSuccessPage() {
   const [paymentStatus, setPaymentStatus] = useState<"loading" | "success" | "error">("loading")
@@ -182,12 +183,11 @@ export default function PaymentSuccessPage() {
         </Card>
 
         <div className="text-center mt-8">
-          <Button
-            onClick={() => (window.location.href = "/")}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3"
-          >
-            Вернуться на главную
-          </Button>
+          <Link href="/">
+            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3">
+              Вернуться на главную
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
