@@ -167,4 +167,5 @@ export async function POST(request: NextRequest) {
 
 // Экспортируем конфигурацию для Vercel
 export const runtime = "nodejs"
-export const dynamic = "force_dynamic"
+export const dynamic = "force-dynamic"
+
