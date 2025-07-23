@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 
-const HUGGING_FACE_API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
+const HUGGING_FACE_API_URL =
+  "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
 const HUGGING_FACE_API_TOKEN = "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"
 
 async function queryHuggingFace(prompt: string): Promise<string> {
@@ -13,14 +14,31 @@ async function queryHuggingFace(prompt: string): Promise<string> {
       method: "POST",
       body: JSON.stringify({
         inputs: prompt,
+        parameters: {
+          max_new_tokens: 300,
+          temperature: 0.7,
+        },
       }),
     })
 
     const result = await response.json()
+
+    // Если модель возвращает строку
+    if (typeof result === "string") {
+      return result
+    }
+
+    // Если возвращает объект с текстом
+    if (result?.generated_text) {
+      return result.generated_text
+    }
+
+    // Иногда возвращается массив с текстом
     if (Array.isArray(result) && result[0]?.generated_text) {
       return result[0].generated_text
     }
 
+    console.log("Hugging Face unexpected result:", result)
     return ""
   } catch (err) {
     console.error("Hugging Face error:", err)
@@ -30,27 +48,27 @@ async function queryHuggingFace(prompt: string): Promise<string> {
 
 const FALLBACK_RESPONSES = [
   "Извините, не удалось понять ваш вопрос. Попробуйте переформулировать.",
-  "Пожалуйста, уточните, что именно вы хотите подключить.",
+  "Пожалуйста, уточните, что именно вы хотите узнать.",
   "Если вы хотите установить ИИ на сайт, нажмите кнопку 'Купить доступ'.",
 ]
 
 function getRelevantResponse(message: string): string {
   const lower = message.toLowerCase()
   if (lower.includes("оплата") || lower.includes("купить")) {
-    return `После оплаты вы получите:
-- Готовый HTML-код для вставки на сайт
-- PDF-руководство по установке с пошаговыми инструкциями и скриншотами
-- Библиотеку промптов для настройки поведения ИИ
-- Видеоинструкции по всем этапам
-- Готовые шаблоны сообщений чат-бота и варианты стилизации
-
-Оформите покупку, чтобы получить всё это.`
+    return "Чтобы получить доступ к ИИ-консультанту, пожалуйста, оформите покупку через форму оплаты."
   }
   if (lower.includes("вход") || lower.includes("логин")) {
     return "Для входа используйте email, который вы указали при оплате. Сразу после оплаты доступ приходит автоматически."
   }
-  if (lower.includes("подключить") || lower.includes("код вставить")) {
-    return "Вы получите готовый код и подробное руководство, как вставить его на сайт. Это займёт всего пару минут!"
+  if (lower.includes("что я получу") || lower.includes("после оплаты")) {
+    return `После оплаты вы получите:
+
+1. HTML-код для вставки ИИ на сайт
+2. PDF-инструкцию по настройке
+3. Готовые промпты и шаблоны сообщений
+4. Видео-объяснение по установке
+
+Это полный комплект для интеграции ИИ на ваш сайт.`
   }
   return FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)]
 }
@@ -65,12 +83,18 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const systemPrompt = `
-Ты — вежливый, краткий и дружелюбный ИИ-консультант. 
-Твоя задача — отвечать пользователю на русском языке и побуждать к покупке доступа к ИИ-консультанту для сайтов.
-Если пользователь интересуется, что он получит, объясни это.
-Если он не понимает, как подключить — скажи, что получит PDF-инструкцию, код, видео, шаблоны.
-Не пиши слишком подробно, подталкивай к покупке, а не к самостоятельной реализации.`
+    const systemPrompt = `Ты дружелюбный и полезный AI-консультант, который помогает людям подключать ИИ на сайты.
+Отвечай кратко, ясно и по делу, как профессионал. Всегда говори на русском языке.
+
+Вот что получает пользователь после оплаты:
+
+1. HTML-код — фрагмент для вставки ИИ на сайт
+2. PDF-руководство — пошаговая инструкция по настройке
+3. Библиотека промптов — готовые фразы для разных ниш
+4. Видео-инструкция — разбор всего процесса
+5. Шаблоны сообщений чат-бота — как настроить ответы
+
+Если пользователь спрашивает “что я получу” — перечисли эти пункты.`
 
     const historyText = chatHistory
       .slice(-3)
@@ -82,7 +106,7 @@ export async function POST(request: NextRequest) {
     const aiResponse = await queryHuggingFace(fullPrompt)
 
     if (aiResponse && aiResponse.length > 10) {
-      return NextResponse.json({ response: aiResponse })
+      return NextResponse.json({ response: aiResponse.trim() })
     }
 
     const fallbackResponse = getRelevantResponse(message)
@@ -91,7 +115,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("API Route Error:", error)
 
-    const fallbackResponse = FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)]
+    const fallbackResponse =
+      FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)]
     return NextResponse.json({ response: fallbackResponse })
   }
 }
