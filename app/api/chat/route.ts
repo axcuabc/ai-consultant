@@ -1,48 +1,152 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server"
 
-// Ваш OpenRouter API-ключ
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "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";
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY
+const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-// URL OpenRouter Chat API
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+// Запасные ответы по теме ИИ-консультантов
+const FALLBACK_RESPONSES = [
+  "Отличный вопрос! Наш ИИ-консультант легко интегрируется на любой сайт. Просто скопируйте код и вставьте его перед закрывающим тегом </body>.",
+  "Да, это работает на всех популярных платформах: Tilda, WordPress, Wix, Squarespace. Настройка займет всего 5-10 минут!",
+  "Стоимость составляет 990 рублей за полный пакет. Это разовая оплата, никаких ежемесячных платежей.",
+  "У нас есть подробная видео-инструкция и PDF-гайд с пошаговыми скриншотами. Даже без навыков программирования вы легко справитесь!",
+  "ИИ-консультант работает 24/7, отвечает на вопросы клиентов, может записывать на консультации и рассказывать о ваших услугах.",
+  "Можно полностью настроить под ваш бренд - цвета, шрифты, стиль сообщений. Все инструкции включены в пакет.",
+  "Для работы вам понадобится только API-ключ OpenAI. Обычно это стоит 300-1500₽ в месяц в зависимости от количества сообщений.",
+  "Консультант может работать на русском, английском и других языках. Настраивается через промпты.",
+  "Да, можно добавить на несколько сайтов. Код универсальный и работает везде.",
+  "Поддержка включена! Поможем с настройкой через Telegram или email в течение 30 дней после покупки.",
+]
 
-export async function POST(req: NextRequest) {
+// Функция для получения релевантного ответа на основе ключевых слов
+function getRelevantResponse(message: string): string {
+  const lowerMessage = message.toLowerCase()
+
+  if (lowerMessage.includes("цена") || lowerMessage.includes("стоимость") || lowerMessage.includes("сколько")) {
+    return "Стоимость составляет 990 рублей за полный пакет. Это разовая оплата, никаких ежемесячных платежей. Вы получаете код, инструкции, видео и поддержку."
+  }
+
+  if (lowerMessage.includes("tilda") || lowerMessage.includes("wordpress") || lowerMessage.includes("сайт")) {
+    return "Да, наш код работает на всех популярных платформах: Tilda, WordPress, Wix, Squarespace и обычных HTML сайтах. Просто вставьте код - и всё готово!"
+  }
+
+  if (lowerMessage.includes("настрой") || lowerMessage.includes("установ") || lowerMessage.includes("как")) {
+    return "Настройка очень простая! Скопируйте наш HTML-код и вставьте его на сайт перед закрывающим тегом </body>. У нас есть подробная видео-инструкция и PDF-гайд."
+  }
+
+  if (lowerMessage.includes("программирован") || lowerMessage.includes("код") || lowerMessage.includes("сложно")) {
+    return "Никаких навыков программирования не нужно! Если умеете копировать и вставлять текст - справитесь легко. Всё объяснено пошагово с картинками."
+  }
+
+  if (lowerMessage.includes("работа") || lowerMessage.includes("функци") || lowerMessage.includes("возможност")) {
+    return "ИИ-консультант работает 24/7, отвечает на вопросы клиентов, может записывать на консультации, рассказывать о ваших услугах. Полностью настраивается под ваш бизнес."
+  }
+
+  if (lowerMessage.includes("дизайн") || lowerMessage.includes("внешний вид") || lowerMessage.includes("цвет")) {
+    return "Да, можно полностью кастомизировать! Меняйте цвета, шрифты, расположение под ваш бренд. В пакете есть готовые стили и инструкции по настройке."
+  }
+
+  if (lowerMessage.includes("поддержка") || lowerMessage.includes("помощь") || lowerMessage.includes("вопрос")) {
+    return "Конечно поможем! Поддержка включена в стоимость. Обращайтесь в Telegram или на email - ответим быстро и поможем с любыми вопросами."
+  }
+
+  // Возвращаем случайный ответ если не нашли ключевых слов
+  return FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)]
+}
+
+async function queryOpenRouter(prompt: string): Promise<string | null> {
+  if (!OPENROUTER_API_KEY) {
+    console.log("OpenRouter API key not configured")
+    return null
+  }
+
   try {
-    const { messages } = await req.json();
-    if (!Array.isArray(messages)) {
-      return NextResponse.json({ error: "Invalid format: messages should be an array" }, { status: 400 });
-    }
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 секунд таймаут
 
     const response = await fetch(OPENROUTER_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+        "X-Title": "AI-Consultant",
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-r1:free",
-        messages,
-        stream: false,
+        model: "deepseek/deepseek-chat", // Бесплатная модель DeepSeek
+        messages: [
+          {
+            role: "system",
+            content: `Ты профессиональный консультант по ИИ-решениям для сайтов. 
+            Отвечай кратко, дружелюбно и по существу на русском языке.
+            Помогаешь с вопросами о настройке ИИ-консультантов на сайты.
+            Стоимость продукта: 990 рублей за полный пакет.
+            Включает: HTML код, PDF инструкции, видео-гайд, библиотеку промптов, поддержку.
+            Работает на всех платформах: Tilda, WordPress, Wix и других.`,
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        max_tokens: 200,
+        temperature: 0.7,
       }),
-    });
+      signal: controller.signal,
+    })
+
+    clearTimeout(timeoutId)
 
     if (!response.ok) {
-      const text = await response.text();
-      console.error("OpenRouter error:", response.status, text);
-      return NextResponse.json({ error: `API error: ${text}` }, { status: 502 });
+      console.log(`OpenRouter API returned status: ${response.status}`)
+      return null
     }
 
-    const payload = await response.json();
-    const aiMessage = payload.choices?.[0]?.message?.content;
+    const data = await response.json()
 
-    if (!aiMessage) {
-      console.error("No message in response:", payload);
-      return NextResponse.json({ error: "Empty response from AI" }, { status: 500 });
+    if (data.choices && data.choices[0]?.message?.content) {
+      return data.choices[0].message.content.trim()
     }
 
-    return NextResponse.json({ response: aiMessage });
-  } catch (err) {
-    console.error("Request failed:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return null
+  } catch (error) {
+    console.error("OpenRouter API Error:", error)
+    return null
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const { message, chatHistory = [] } = await request.json()
+
+    if (!message || typeof message !== "string") {
+      return NextResponse.json({
+        response: "Пожалуйста, напишите ваш вопрос!",
+      })
+    }
+
+    // Сначала пробуем получить релевантный ответ на основе ключевых слов
+    const keywordResponse = getRelevantResponse(message)
+
+    // Если это не общий ответ, возвращаем его
+    if (!FALLBACK_RESPONSES.includes(keywordResponse)) {
+      return NextResponse.json({ response: keywordResponse })
+    }
+
+    // Пробуем использовать OpenRouter для более сложных вопросов
+    const aiResponse = await queryOpenRouter(message)
+
+    // Если AI ответил, используем его ответ, иначе - заготовленный
+    const finalResponse = aiResponse && aiResponse.length > 10 ? aiResponse : keywordResponse
+
+    return NextResponse.json({ response: finalResponse })
+  } catch (error) {
+    console.error("API Route Error:", error)
+
+    // В случае любой ошибки возвращаем случайный заготовленный ответ
+    const fallbackResponse = FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)]
+    return NextResponse.json({ response: fallbackResponse })
+  }
+}
+
+export const runtime = "nodejs"
+export const dynamic = "force_dynamic"
