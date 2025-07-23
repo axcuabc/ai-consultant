@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-const YOOMONEY_SECRET_KEY = process.env.YOOMONEY_SECRET_KEY || "your-secret-key"
+const YOOMONEY_SECRET_KEY = process.env.YOOMONEY_SECRET_KEY || "live_Wqi-16m0asKUJ_lyEcaOomQOa5GjEBzssQ0l4vuivgA"
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get("x-yookassa-signature")
 
     // Проверяем подпись webhook (для безопасности)
-    if (signature && YOOMONEY_SECRET_KEY !== "your-secret-key") {
+    if (signature && YOOMONEY_SECRET_KEY !== "live_Wqi-16m0asKUJ_lyEcaOomQOa5GjEBzssQ0l4vuivgA") {
       // Простая проверка подписи без crypto модуля
       console.log("Webhook signature check skipped for Vercel compatibility")
     }
