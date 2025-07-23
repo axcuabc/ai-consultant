@@ -48,33 +48,6 @@ async function queryHuggingFace(prompt: string): Promise<string> {
   }
 }
 
-const FALLBACK_RESPONSES = [
-  "Извините, не удалось понять ваш вопрос. Попробуйте переформулировать.",
-  "Пожалуйста, уточните, что именно вы хотите узнать.",
-  "Если вы хотите установить ИИ на сайт, нажмите кнопку 'Купить доступ'.",
-]
-
-function getRelevantResponse(message: string): string {
-  const lower = message.toLowerCase()
-  if (lower.includes("оплата") || lower.includes("купить")) {
-    return "Чтобы получить доступ к ИИ-консультанту, пожалуйста, оформите покупку через форму оплаты."
-  }
-  if (lower.includes("вход") || lower.includes("логин")) {
-    return "Для входа используйте email, который вы указали при оплате. Сразу после оплаты доступ приходит автоматически."
-  }
-  if (lower.includes("что я получу") || lower.includes("после оплаты")) {
-    return `После оплаты вы получите:
-
-1. HTML-код для вставки ИИ на сайт
-2. PDF-инструкцию по настройке
-3. Готовые промпты и шаблоны сообщений
-4. Видео-объяснение по установке
-
-Это полный комплект для интеграции ИИ на ваш сайт.`
-  }
-  return FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)]
-}
-
 export async function POST(request: NextRequest) {
   try {
     const { message, chatHistory = [] } = await request.json()
@@ -111,14 +84,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ response: aiResponse.trim() })
     }
 
-    const fallbackResponse = getRelevantResponse(message)
-
-    return NextResponse.json({ response: fallbackResponse })
+    // Если модель не ответила — вернуть универсальное сообщение об ошибке
+    return NextResponse.json({
+      response: "Извините, я временно не могу ответить. Попробуйте повторить позже.",
+    })
   } catch (error) {
     console.error("API Route Error:", error)
-
-    const fallbackResponse =
-      FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)]
-    return NextResponse.json({ response: fallbackResponse })
+    return NextResponse.json({
+      response: "Извините, произошла ошибка. Пожалуйста, попробуйте позже.",
+    })
   }
 }
