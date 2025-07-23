@@ -75,4 +75,4 @@ export async function POST(request: NextRequest) {
 }
 
 export const runtime = "nodejs"
-export const dynamic = "force-dynamic"
+export const dynamic = "force_dynamic"
