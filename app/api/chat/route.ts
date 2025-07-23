@@ -1,3 +1,80 @@
+import { NextRequest, NextResponse } from "next/server"
+
+const HUGGING_FACE_API_URL =
+  "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
+const HUGGING_FACE_API_TOKEN = "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"
+
+async function queryHuggingFace(prompt: string): Promise<string> {
+  try {
+    const response = await fetch(HUGGING_FACE_API_URL, {
+      headers: {
+        Authorization: `Bearer ${HUGGING_FACE_API_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        inputs: prompt,
+        parameters: {
+          max_new_tokens: 300,
+          temperature: 0.7,
+        },
+      }),
+    })
+
+    if (!response.ok) {
+      console.error(`Hugging Face API error: ${response.status} ${response.statusText}`)
+      return ""
+    }
+
+    const result = await response.json()
+
+    if (typeof result === "string") {
+      return result
+    }
+
+    if (result?.generated_text) {
+      return result.generated_text
+    }
+
+    if (Array.isArray(result) && result[0]?.generated_text) {
+      return result[0].generated_text
+    }
+
+    console.log("Hugging Face unexpected result:", result)
+    return ""
+  } catch (err) {
+    console.error("Hugging Face fetch error:", err)
+    return ""
+  }
+}
+
+const FALLBACK_RESPONSES = [
+  "Извините, не удалось понять ваш вопрос. Попробуйте переформулировать.",
+  "Пожалуйста, уточните, что именно вы хотите узнать.",
+  "Если вы хотите установить ИИ на сайт, нажмите кнопку 'Купить доступ'.",
+]
+
+function getRelevantResponse(message: string): string {
+  const lower = message.toLowerCase()
+  if (lower.includes("оплата") || lower.includes("купить")) {
+    return "Чтобы получить доступ к ИИ-консультанту, пожалуйста, оформите покупку через форму оплаты."
+  }
+  if (lower.includes("вход") || lower.includes("логин")) {
+    return "Для входа используйте email, который вы указали при оплате. Сразу после оплаты доступ приходит автоматически."
+  }
+  if (lower.includes("что я получу") || lower.includes("после оплаты")) {
+    return `После оплаты вы получите:
+
+1. HTML-код для вставки ИИ на сайт
+2. PDF-инструкцию по настройке
+3. Готовые промпты и шаблоны сообщений
+4. Видео-объяснение по установке
+
+Это полный комплект для интеграции ИИ на ваш сайт.`
+  }
+  return FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)]
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { message, chatHistory = [] } = await request.json()
@@ -30,14 +107,10 @@ export async function POST(request: NextRequest) {
 
     const aiResponse = await queryHuggingFace(fullPrompt)
 
-    console.log("Ответ от модели HF:", aiResponse) // Логируем для отладки
-
-    // Если модель дала более 5 символов — отдаём её ответ
     if (aiResponse && aiResponse.trim().length > 5) {
       return NextResponse.json({ response: aiResponse.trim() })
     }
 
-    // Если нет — fallback
     const fallbackResponse = getRelevantResponse(message)
 
     return NextResponse.json({ response: fallbackResponse })
