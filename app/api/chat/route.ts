@@ -1,9 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY
+// Твой API-ключ OpenRouter (лучше хранить в .env.local)
+const OPENROUTER_API_KEY = "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"
+
+// URL OpenRouter
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-// Запасные ответы по теме ИИ-консультантов
+// Запасные ответы
 const FALLBACK_RESPONSES = [
   "Отличный вопрос! Наш ИИ-консультант легко интегрируется на любой сайт. Просто скопируйте код и вставьте его перед закрывающим тегом </body>.",
   "Да, это работает на всех популярных платформах: Tilda, WordPress, Wix, Squarespace. Настройка займет всего 5-10 минут!",
@@ -17,7 +20,7 @@ const FALLBACK_RESPONSES = [
   "Поддержка включена! Поможем с настройкой через Telegram или email в течение 30 дней после покупки.",
 ]
 
-// Функция для получения релевантного ответа на основе ключевых слов
+// Функция для релевантных ответов по ключевым словам (оставь без изменений)
 function getRelevantResponse(message: string): string {
   const lowerMessage = message.toLowerCase()
 
@@ -49,30 +52,38 @@ function getRelevantResponse(message: string): string {
     return "Конечно поможем! Поддержка включена в стоимость. Обращайтесь в Telegram или на email - ответим быстро и поможем с любыми вопросами."
   }
 
+  if (lowerMessage.includes("привет") || lowerMessage.includes("здравствуй") || lowerMessage.includes("добро")) {
+    return "Привет! Я ваш ИИ-консультант. Помогу с любыми вопросами о настройке искусственного интеллекта на сайты. О чем хотите узнать?"
+  }
+
+  if (lowerMessage.includes("спасибо") || lowerMessage.includes("благодар")) {
+    return "Пожалуйста! Рад помочь. Если есть еще вопросы - обращайтесь. Готов ответить на всё о настройке ИИ-консультантов!"
+  }
+
   // Возвращаем случайный ответ если не нашли ключевых слов
   return FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)]
 }
 
 async function queryOpenRouter(prompt: string): Promise<string | null> {
   if (!OPENROUTER_API_KEY) {
-    console.log("OpenRouter API key not configured")
+    console.log("OpenRouter API key not configured, using fallback responses")
     return null
   }
 
   try {
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 секунд таймаут
+    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 секунд таймаут
 
     const response = await fetch(OPENROUTER_URL, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+        "HTTP-Referer": "https://ai-consultant-six.vercel.app",
         "X-Title": "AI-Consultant",
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-chat", // Бесплатная модель DeepSeek
+        model: "deepseek/deepseek-chat",
         messages: [
           {
             role: "system",
@@ -81,14 +92,15 @@ async function queryOpenRouter(prompt: string): Promise<string | null> {
             Помогаешь с вопросами о настройке ИИ-консультантов на сайты.
             Стоимость продукта: 990 рублей за полный пакет.
             Включает: HTML код, PDF инструкции, видео-гайд, библиотеку промптов, поддержку.
-            Работает на всех платформах: Tilda, WordPress, Wix и других.`,
+            Работает на всех платформах: Tilda, WordPress, Wix и других.
+            Отвечай максимум в 2-3 предложения.`,
           },
           {
             role: "user",
             content: prompt,
           },
         ],
-        max_tokens: 200,
+        max_tokens: 150,
         temperature: 0.7,
       }),
       signal: controller.signal,
@@ -98,6 +110,8 @@ async function queryOpenRouter(prompt: string): Promise<string | null> {
 
     if (!response.ok) {
       console.log(`OpenRouter API returned status: ${response.status}`)
+      const errorText = await response.text()
+      console.log("OpenRouter error response:", errorText)
       return null
     }
 
@@ -107,36 +121,44 @@ async function queryOpenRouter(prompt: string): Promise<string | null> {
       return data.choices[0].message.content.trim()
     }
 
+    console.log("No valid response from OpenRouter:", data)
     return null
   } catch (error) {
-    console.error("OpenRouter API Error:", error)
+    if (error.name === "AbortError") {
+      console.log("OpenRouter request timed out")
+    } else {
+      console.error("OpenRouter API Error:", error)
+    }
     return null
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, chatHistory = [] } = await request.json()
+    const body = await request.json()
+    const { message, chatHistory = [] } = body
 
-    if (!message || typeof message !== "string") {
+    if (!message || typeof message !== "string" || message.trim().length === 0) {
       return NextResponse.json({
         response: "Пожалуйста, напишите ваш вопрос!",
       })
     }
 
-    // Сначала пробуем получить релевантный ответ на основе ключевых слов
-    const keywordResponse = getRelevantResponse(message)
+    const trimmedMessage = message.trim()
 
-    // Если это не общий ответ, возвращаем его
+    // Сначала пробуем получить релевантный ответ на основе ключевых слов
+    const keywordResponse = getRelevantResponse(trimmedMessage)
+
+    // Если это специфический ответ (не из общих fallback), возвращаем его сразу
     if (!FALLBACK_RESPONSES.includes(keywordResponse)) {
       return NextResponse.json({ response: keywordResponse })
     }
 
     // Пробуем использовать OpenRouter для более сложных вопросов
-    const aiResponse = await queryOpenRouter(message)
+    const aiResponse = await queryOpenRouter(trimmedMessage)
 
-    // Если AI ответил, используем его ответ, иначе - заготовленный
-    const finalResponse = aiResponse && aiResponse.length > 10 ? aiResponse : keywordResponse
+    // Если AI ответил и ответ содержательный, используем его
+    const finalResponse = aiResponse && aiResponse.length > 20 ? aiResponse : keywordResponse
 
     return NextResponse.json({ response: finalResponse })
   } catch (error) {
@@ -149,4 +171,4 @@ export async function POST(request: NextRequest) {
 }
 
 export const runtime = "nodejs"
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic"
