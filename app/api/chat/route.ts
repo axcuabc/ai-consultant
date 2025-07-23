@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 
-const HUGGING_FACE_API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-large"
+const HUGGING_FACE_API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
 const HUGGING_FACE_API_TOKEN = "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"
 
 async function queryHuggingFace(prompt: string): Promise<string> {
