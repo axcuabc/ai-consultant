@@ -146,25 +146,20 @@ export async function POST(request: NextRequest) {
 
     const trimmedMessage = message.trim()
 
-    // Сначала пробуем получить релевантный ответ на основе ключевых слов
-    const keywordResponse = getRelevantResponse(trimmedMessage)
-
-    // Если это специфический ответ (не из общих fallback), возвращаем его сразу
-    if (!FALLBACK_RESPONSES.includes(keywordResponse)) {
-      return NextResponse.json({ response: keywordResponse })
-    }
-
-    // Пробуем использовать OpenRouter для более сложных вопросов
+    // Сперва пробуем использовать OpenRouter (нейросеть)
     const aiResponse = await queryOpenRouter(trimmedMessage)
 
-    // Если AI ответил и ответ содержательный, используем его
-    const finalResponse = aiResponse && aiResponse.length > 20 ? aiResponse : keywordResponse
+    // Если ответ получен от нейросети и он достаточно содержательный — используем его
+    if (aiResponse && aiResponse.length > 20) {
+      return NextResponse.json({ response: aiResponse })
+    }
 
-    return NextResponse.json({ response: finalResponse })
+    // Если нейросеть не ответила — пробуем релевантный шаблон
+    const keywordResponse = getRelevantResponse(trimmedMessage)
+    return NextResponse.json({ response: keywordResponse })
   } catch (error) {
     console.error("API Route Error:", error)
 
-    // В случае любой ошибки возвращаем случайный заготовленный ответ
     const fallbackResponse = FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)]
     return NextResponse.json({ response: fallbackResponse })
   }
