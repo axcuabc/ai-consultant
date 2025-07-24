@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 
 const YOOMONEY_SHOP_ID = process.env.YOOMONEY_SHOP_ID || "1128547"
 const YOOMONEY_SECRET_KEY = process.env.YOOMONEY_SECRET_KEY || "live_Wqi-16m0asKUJ_lyEcaOomQOa5GjEBzssQ0l4vuivgA"
-const YOOMONEY_API_URL = "https://ai-consultant-six.vercel.app/s"
+const YOOMONEY_API_URL = "https://ai-consultant-six.vercel.app/"
 
 export async function GET(request: NextRequest) {
   try {
