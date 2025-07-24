@@ -1,24 +1,44 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server"
 
-export async function POST(req: Request) {
-  const { payment_id } = await req.json();
+const YOOMONEY_SHOP_ID = process.env.YOOMONEY_SHOP_ID || "your-shop-id"
+const YOOMONEY_SECRET_KEY = process.env.YOOMONEY_SECRET_KEY || "your-secret-key"
+const YOOMONEY_API_URL = "https://api.yookassa.ru/v3/payments"
 
-  const secretKey = process.env.YOOMONEY_SECRET_KEY!;
-  const encodedAuth = Buffer.from(`${process.env.YOOMONEY_SHOP_ID}:${secretKey}`).toString("base64");
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const paymentId = searchParams.get("payment_id")
 
-  const res = await fetch(`https://api.yookassa.ru/v3/payments/${payment_id}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Basic ${encodedAuth}`,
-      "Content-Type": "application/json",
-    },
-  });
+    if (!paymentId) {
+      return NextResponse.json({ success: false, error: "Payment ID is required" }, { status: 400 })
+    }
 
-  const data = await res.json();
+    // Проверяем статус платежа через API ЮKassa
+    const response = await fetch(`${YOOMONEY_API_URL}/${paymentId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${YOOMONEY_SHOP_ID}:${YOOMONEY_SECRET_KEY}`).toString("base64")}`,
+      },
+    })
 
-  if (!res.ok) {
-    return NextResponse.json({ success: false, error: "Ошибка проверки платежа", details: data }, { status: 500 });
+    if (!response.ok) {
+      return NextResponse.json({ success: false, error: "Failed to check payment status" }, { status: 500 })
+    }
+
+    const paymentData = await response.json()
+
+    return NextResponse.json({
+      success: true,
+      status: paymentData.status,
+      amount: paymentData.amount,
+      description: paymentData.description,
+      metadata: paymentData.metadata,
+    })
+  } catch (error) {
+    console.error("Error checking payment:", error)
+    return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })
   }
-
-  return NextResponse.json({ success: true, status: data.status });
 }
+
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"

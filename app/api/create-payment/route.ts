@@ -1,43 +1,81 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server"
 
-export async function POST() {
-  const secretKey = process.env.YOOMONEY_SECRET_KEY!;
+// Конфигурация ЮMoney
+const YOOMONEY_SHOP_ID = process.env.YOOMONEY_SHOP_ID
+const YOOMONEY_SECRET_KEY = process.env.YOOMONEY_SECRET_KEY
+const YOOMONEY_API_URL = "https://api.yookassa.ru/v3/payments"
 
-  const encodedAuth = Buffer.from(`${secretKey}:`).toString("base64"); // Обрати внимание: только секретный ключ + :
+export async function POST(request: NextRequest) {
+  try {
+    const { amount, description, email } = await request.json()
 
-  const response = await fetch("https://api.yookassa.ru/v3/payments", {
-    method: "POST",
-    headers: {
-      "Authorization": `Basic ${encodedAuth}`,
-      "Idempotence-Key": `payment-${Date.now()}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+    if (!amount || !description || !email) {
+      return NextResponse.json({ success: false, error: "Отсутствуют обязательные параметры" }, { status: 400 })
+    }
+
+    if (!YOOMONEY_SHOP_ID || !YOOMONEY_SECRET_KEY) {
+      return NextResponse.json({ success: false, error: "ЮMoney не настроен" }, { status: 500 })
+    }
+
+    // Генерируем уникальный идентификатор платежа
+    const idempotenceKey = `payment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+
+    // Данные для создания платежа
+    const paymentData = {
       amount: {
-        value: "990.00",
+        value: amount.toString(),
         currency: "RUB",
       },
       confirmation: {
         type: "redirect",
-        return_url: "https://ai-consultant-six.vercel.app/success",
+        return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success`,
       },
       capture: true,
-      description: "Покупка AI-доступа",
+      description: description,
       metadata: {
-        product: "ai-access",
+        email: email,
+        product: "ai-consultant-package",
       },
-    }),
-  });
+    }
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ message: "Ошибка при чтении ответа" }));
-    console.error("ЮKassa API ошибка:", errorData);
-    return NextResponse.json(
-      { success: false, error: "Ошибка создания платежа в ЮKassa", details: errorData },
-      { status: 500 }
-    );
+    // Создаем платеж через API ЮKassa
+    const response = await fetch(YOOMONEY_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${Buffer.from(`${YOOMONEY_SHOP_ID}:${YOOMONEY_SECRET_KEY}`).toString("base64")}`,
+        "Idempotence-Key": idempotenceKey,
+      },
+      body: JSON.stringify(paymentData),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      console.error("ЮKassa API Error:", errorData)
+      return NextResponse.json({ success: false, error: "Ошибка создания платежа в ЮKassa" }, { status: 500 })
+    }
+
+    const paymentResult = await response.json()
+
+    // Сохраняем информацию о платеже (в реальном проекте - в базу данных)
+    console.log("Payment created:", {
+      paymentId: paymentResult.id,
+      email: email,
+      amount: amount,
+      status: paymentResult.status,
+    })
+
+    return NextResponse.json({
+      success: true,
+      paymentId: paymentResult.id,
+      paymentUrl: paymentResult.confirmation.confirmation_url,
+      status: paymentResult.status,
+    })
+  } catch (error) {
+    console.error("Error creating payment:", error)
+    return NextResponse.json({ success: false, error: "Внутренняя ошибка сервера" }, { status: 500 })
   }
-
-  const data = await response.json();
-  return NextResponse.json({ success: true, payment: data });
 }
+
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
