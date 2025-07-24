@@ -1,70 +1,37 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+import jwt from 'jsonwebtoken'
 
-const YOOMONEY_SECRET_KEY = process.env.YOOMONEY_SECRET_KEY || "live_Wqi-16m0asKUJ_lyEcaOomQOa5GjEBzssQ0l4vuivgA"
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.text()
-    const signature = request.headers.get("x-yookassa-signature")
+export async function POST(req: NextRequest) {
+  const body = await req.formData()
+  const label = body.get('label') as string
+  const email = body.get('email') as string
 
-    // Проверяем подпись webhook (для безопасности)
-    if (signature && YOOMONEY_SECRET_KEY !== "live_Wqi-16m0asKUJ_lyEcaOomQOa5GjEBzssQ0l4vuivgA") {
-      // Простая проверка подписи без crypto модуля
-      console.log("Webhook signature check skipped for Vercel compatibility")
-    }
-
-    const webhookData = JSON.parse(body)
-    const { event, object: payment } = webhookData
-
-    console.log("Webhook received:", { event, paymentId: payment.id, status: payment.status })
-
-    // Обрабатываем успешный платеж
-    if (event === "payment.succeeded" && payment.status === "succeeded") {
-      const email = payment.metadata?.email
-      const amount = Number.parseFloat(payment.amount.value)
-      const paymentId = payment.id
-
-      if (email && amount) {
-        // Вызываем функцию создания пользователя и сохранения покупки
-        try {
-          const response = await fetch(`${process.env.BASE_URL}/api/create-user-after-payment`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email,
-              amount,
-              payment_id: paymentId,
-            }),
-          })
-
-          const result = await response.json()
-
-          if (result.success) {
-            console.log(`✅ User and purchase processed successfully: ${email}`)
-          } else {
-            console.error(`❌ Failed to process user/purchase: ${result.error}`)
-          }
-        } catch (error) {
-          console.error("Error calling create-user-after-payment:", error)
-        }
-      } else {
-        console.error("Missing email or amount in payment metadata")
-      }
-    }
-
-    // Обрабатываем отмененный платеж
-    if (event === "payment.canceled") {
-      console.log(`Payment canceled: ${payment.id}`)
-    }
-
-    return NextResponse.json({ received: true })
-  } catch (error) {
-    console.error("Webhook processing error:", error)
-    return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 })
+  if (!email || !label) {
+    return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
   }
-}
 
-export const runtime = "nodejs"
-export const dynamic = 'force-dynamic'
+  const expiresAt = new Date()
+  expiresAt.setDate(expiresAt.getDate() + 30)
+
+  await supabase.from('purchases').insert([
+    {
+      email,
+      expires_at: expiresAt.toISOString(),
+    },
+  ])
+
+  const token = jwt.sign({ email }, process.env.JWT_SECRET!, {
+    expiresIn: '30d',
+  })
+
+  // Можно отправить email через Resend (если хочешь)
+  console.log(`✅ Оплата прошла. Email: ${email}. Токен: ${token}`)
+
+  return NextResponse.json({ success: true })
+}

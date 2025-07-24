@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 
 // Конфигурация ЮMoney
 const YOOMONEY_SHOP_ID = process.env.YOOMONEY_SHOP_ID || "1128547"
-const YOOMONEY_SECRET_KEY = process.env.YOOMONEY_SECRET_KEY || "live_Wqi-16m0asKUJ_lyEcaOomQOa5GjEBzssQ0l4vuivgA"
+const YOOMONEY_SECRET_KEY = process.env.YOOMONEY_SECRET_KEY || "live_GTCW56h0Yh718u6hSMK2i4uTdR9DMoQ1ZL9S-MV29wc"
 const YOOMONEY_API_URL = "https://api.yookassa.ru/v3/payments"
 
 

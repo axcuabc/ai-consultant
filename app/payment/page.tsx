@@ -23,41 +23,22 @@ export default function PaymentPage() {
   const [showSuccess, setShowSuccess] = useState(false)
   const [email, setEmail] = useState("")
 
-  const handleYooMoneyPayment = async () => {
-    if (!email) {
-      alert("Пожалуйста, введите email для получения материалов")
-      return
-    }
-
-    setIsProcessing(true)
-
-    try {
-      const response = await fetch("/api/create-payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: 990,
-          description: "ИИ-Консультант для сайта - Полный пакет материалов",
-          email: email,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (data.success && data.paymentUrl) {
-        // Перенаправляем на страницу оплаты ЮMoney
-        window.location.href = data.paymentUrl
-      } else {
-        throw new Error(data.error || "Ошибка создания платежа")
-      }
-    } catch (error) {
-      console.error("Ошибка при создании платежа:", error)
-      alert("Произошла ошибка. Попробуйте еще раз или обратитесь в поддержку.")
-      setIsProcessing(false)
-    }
+const handleYooMoneyPayment = () => {
+  if (!email) {
+    alert("Пожалуйста, введите email для получения материалов")
+    return
   }
+
+  setIsProcessing(true)
+
+  const shopId = "1128547" // ← сюда вставь свой ЮMoney ID
+  const baseUrl = "https://ai-consultant-six.vercel.app" // ← сюда вставь свой домен
+  const successUrl = `${baseUrl}/success`
+
+  const paymentUrl = `https://yoomoney.ru/quickpay/shop-widget?writer=seller&targets=Покупка+доступа&default-sum=990&button-text=11&payment-type-choice=on&successURL=${encodeURIComponent(successUrl)}&label=${encodeURIComponent(email)}&comment=Покупка+AI-доступа&quickpay=shop&account=${shopId}`
+
+  window.location.href = paymentUrl
+}
 
   if (showSuccess) {
     return (
