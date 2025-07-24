@@ -24,8 +24,8 @@ export default function PaymentPage() {
   const [email, setEmail] = useState("")
 
   const handleYooMoneyPayment = async () => {
-    if (!email) {
-      alert("Пожалуйста, введите email для получения материалов")
+    if (!email || !email.includes("@")) {
+      alert("Пожалуйста, введите корректный email")
       return
     }
 
@@ -35,20 +35,23 @@ export default function PaymentPage() {
       const response = await fetch("/api/create-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }), // отправляем только email
+        body: JSON.stringify({
+          amount: 990,
+          description: "ИИ-Консультант для сайта",
+          email,
+        }),
       })
 
       const data = await response.json()
 
       if (data.success && data.paymentUrl) {
-        // Перенаправляем на страницу оплаты с фиксированной суммой 990 руб
         window.location.href = data.paymentUrl
       } else {
         alert("Ошибка создания платежа: " + (data.error || "неизвестная ошибка"))
-        setIsProcessing(false)
       }
     } catch (error) {
       alert("Ошибка при оплате, попробуйте позже")
+    } finally {
       setIsProcessing(false)
     }
   }
@@ -61,7 +64,6 @@ export default function PaymentPage() {
             <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-10 h-10 text-white" />
             </div>
-
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Оплата успешно завершена!</h1>
             <p className="text-xl text-gray-600 mb-8">Спасибо за покупку! Ваши материалы готовы к скачиванию.</p>
 
@@ -73,7 +75,6 @@ export default function PaymentPage() {
                 </div>
                 <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">Скачать ZIP архив</Button>
               </Card>
-
               <Card className="p-4 bg-purple-50 border-purple-200">
                 <div className="flex items-center mb-3">
                   <Mail className="w-5 h-5 text-purple-600 mr-2" />
@@ -109,13 +110,15 @@ export default function PaymentPage() {
               >
                 Вернуться на главную
               </Button>
-              <Button
-                variant="outline"
-                className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 bg-transparent"
-              >
-                <MessageCircle className="w-4 h-4 mr-2" />
-                Поддержка в Telegram
-              </Button>
+              <a href="https://t.me/your_telegram_support" target="_blank" rel="noopener noreferrer">
+                <Button
+                  variant="outline"
+                  className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 bg-transparent"
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Поддержка в Telegram
+                </Button>
+              </a>
             </div>
           </CardContent>
         </Card>
@@ -125,7 +128,6 @@ export default function PaymentPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-      {/* Header */}
       <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
@@ -135,7 +137,6 @@ export default function PaymentPage() {
                 <span>Назад</span>
               </Button>
             </Link>
-
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <Bot className="w-5 h-5 text-white" />
@@ -236,7 +237,6 @@ export default function PaymentPage() {
                 </ol>
               </div>
 
-              {/* Payment Button */}
               <Button
                 onClick={handleYooMoneyPayment}
                 disabled={isProcessing || !email}
@@ -276,7 +276,6 @@ export default function PaymentPage() {
           </Card>
         </div>
 
-        {/* Trust Indicators */}
         <div className="mt-12 text-center">
           <div className="flex justify-center items-center space-x-8 text-gray-400">
             <div className="flex items-center">
