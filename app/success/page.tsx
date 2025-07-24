@@ -27,7 +27,14 @@ export default function PaymentSuccessPage() {
   const checkPaymentStatus = async (id: string) => {
     try {
       // Проверяем статус платежа
-      const response = await fetch(`/api/check-payment?payment_id=${id}`)
+const response = await fetch("/api/check-payment", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ payment_id: id }),
+});
+
       const data = await response.json()
 
       if (data.success && data.status === "succeeded") {

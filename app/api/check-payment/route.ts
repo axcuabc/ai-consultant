@@ -1,37 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import jwt from 'jsonwebtoken'
+import { NextResponse } from "next/server";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+export async function POST(req: Request) {
+  const { payment_id } = await req.json();
 
-export async function POST(req: NextRequest) {
-  const body = await req.formData()
-  const label = body.get('label') as string
-  const email = body.get('email') as string
+  const secretKey = process.env.YOOMONEY_SECRET_KEY!;
+  const encodedAuth = Buffer.from(`${process.env.YOOMONEY_SHOP_ID}:${secretKey}`).toString("base64");
 
-  if (!email || !label) {
-    return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
+  const res = await fetch(`https://api.yookassa.ru/v3/payments/${payment_id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Basic ${encodedAuth}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    return NextResponse.json({ success: false, error: "Ошибка проверки платежа", details: data }, { status: 500 });
   }
 
-  const expiresAt = new Date()
-  expiresAt.setDate(expiresAt.getDate() + 30)
-
-  await supabase.from('purchases').insert([
-    {
-      email,
-      expires_at: expiresAt.toISOString(),
-    },
-  ])
-
-  const token = jwt.sign({ email }, process.env.JWT_SECRET!, {
-    expiresIn: '30d',
-  })
-
-  // Можно отправить email через Resend (если хочешь)
-  console.log(`✅ Оплата прошла. Email: ${email}. Токен: ${token}`)
-
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ success: true, status: data.status });
 }
