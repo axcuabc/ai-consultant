@@ -18,22 +18,24 @@ export async function POST(request: NextRequest) {
     const idempotenceKey = `payment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
     // Данные для создания платежа
-    const paymentData = {
-      amount: {
-        value: amount.toString(),
-        currency: "RUB",
-      },
-      confirmation: {
-        type: "redirect",
-        return_url: `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/payment/success`,
-      },
-      capture: true,
-      description: description,
-      metadata: {
-        email: email,
-        product: "ai-consultant-package",
-      },
-    }
+const amount = 990; // фиксированная сумма в рублях
+
+const paymentData = {
+  amount: {
+    value: amount.toString(), // "990"
+    currency: "RUB",
+  },
+  confirmation: {
+    type: "redirect",
+    return_url: `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/payment/success`,
+  },
+  capture: true,
+  description: description,
+  metadata: {
+    email: email,
+    product: "ai-consultant-package",
+  },
+}
 
     // Создаем платеж через API ЮKassa
     const response = await fetch(YOOMONEY_API_URL, {
