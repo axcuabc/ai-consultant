@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Генерируем уникальный идентификатор платежа
-    const idempotenceKey = `payment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const idempotenceKey = `payment_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
 
     // Данные для создания платежа
 const amount = 990; // фиксированная сумма в рублях
