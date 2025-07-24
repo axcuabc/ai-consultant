@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Payment ID is required" }, { status: 400 })
     }
 
-    // Проверяем статус платежа через API ЮKassa
     const response = await fetch(`${YOOMONEY_API_URL}/${paymentId}`, {
       method: "GET",
       headers: {
@@ -22,6 +21,8 @@ export async function GET(request: NextRequest) {
     })
 
     if (!response.ok) {
+      const errorData = await response.json()
+      console.error("Ошибка проверки платежа:", errorData)
       return NextResponse.json({ success: false, error: "Failed to check payment status" }, { status: 500 })
     }
 
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
       metadata: paymentData.metadata,
     })
   } catch (error) {
-    console.error("Error checking payment:", error)
+    console.error("Ошибка проверки платежа:", error)
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })
   }
 }
