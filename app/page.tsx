@@ -187,7 +187,7 @@ export default function AnimatedLandingPage() {
             onClick={() => setChatOpen(true)}
             className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full w-16 h-16 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110"
           >
-            <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+
           </Button>
           <div className="absolute -top-12 right-0 bg-white rounded-lg shadow-lg p-3 max-w-48 animate-fade-in">
             <div className="absolute bottom-0 right-4 transform translate-y-1/2 rotate-45 w-2 h-2 bg-white"></div>
