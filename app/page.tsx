@@ -190,7 +190,6 @@ export default function AnimatedLandingPage() {
             <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
           </Button>
           <div className="absolute -top-12 right-0 bg-white rounded-lg shadow-lg p-3 max-w-48 animate-fade-in">
-            <p className="text-sm text-gray-700">Нужна помощь? Я онлайн!</p>
             <div className="absolute bottom-0 right-4 transform translate-y-1/2 rotate-45 w-2 h-2 bg-white"></div>
           </div>
         </div>
