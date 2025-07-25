@@ -36,7 +36,7 @@ export default function PaymentPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: 990,
+          amount: 20,
           description: "ИИ-Консультант для сайта",
           email,
         }),
