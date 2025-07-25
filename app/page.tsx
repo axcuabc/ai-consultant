@@ -27,7 +27,6 @@ import {
   Minimize2,
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
-import Link from "next/link"
 
 interface Message {
   id: string
@@ -179,23 +178,22 @@ export default function AnimatedLandingPage() {
   }
 
   return (
-  <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-    {/* Floating Chat Button */}
-    {!chatOpen && (
-      <div className="fixed bottom-6 right-6 z-50 animate-bounce">
-        <Button
-          onClick={() => setChatOpen(true)}
-          className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full w-16 h-16 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110"
-        >
-          <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
-        </Button>
-
-        <div className="absolute bottom-0 right-4 transform translate-y-1/2 rotate-45 w-2 h-2 bg-white"></div>
-      </div>
-    )}
-  </div>
-)
-
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+      {/* Floating Chat Button */}
+      {!chatOpen && (
+        <div className="fixed bottom-6 right-6 z-50 animate-bounce">
+          <Button
+            onClick={() => setChatOpen(true)}
+            className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full w-16 h-16 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110"
+          >
+            <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+          </Button>
+          <div className="absolute -top-12 right-0 bg-white rounded-lg shadow-lg p-3 max-w-48 animate-fade-in">
+            <p className="text-sm text-gray-700">Нужна помощь? Я онлайн!</p>
+            <div className="absolute bottom-0 right-4 transform translate-y-1/2 rotate-45 w-2 h-2 bg-white"></div>
+          </div>
+        </div>
+      )}
 
       {/* Chat Window */}
       {chatOpen && (
@@ -804,12 +802,12 @@ export default function AnimatedLandingPage() {
               <p className="text-gray-400">&copy; 2025 Все права защищены</p>
             </div>
             <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm">
-              <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
+              <a href="/terms" className="text-gray-400 hover:text-white transition-colors">
                 Пользовательское соглашение
-              </Link>
-              <Link href="/contacts" className="text-gray-400 hover:text-white transition-colors">
+              </a>
+              <a href="/contacts" className="text-gray-400 hover:text-white transition-colors">
                 Контакты и реквизиты
-              </Link>
+              </a>
               <span className="text-gray-400">Работает на ChatGPT API</span>
             </div>
           </div>
