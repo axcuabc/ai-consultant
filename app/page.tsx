@@ -393,23 +393,15 @@ export default function AnimatedLandingPage() {
               </div>
             </div>
 
-            <div className="relative animate-fade-in-right">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-3xl blur-3xl animate-pulse"></div>
-              <img
-                src="/images/hero-programmer.png"
-                alt="Современный программист за работой"
-                className="relative z-10 w-full h-auto rounded-2xl shadow-2xl"
-              />
-              <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-xl animate-float">
-                <div className="flex items-center space-x-3">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium text-gray-700">ИИ Ассистент активен</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+<div className="relative animate-fade-in-right">
+  <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-3xl blur-3xl animate-pulse"></div>
+  <img
+    src="/images/hero-programmer.png"
+    alt="Современный программист за работой"
+    className="relative z-10 w-full h-auto rounded-2xl shadow-2xl"
+  />
+</div>
+
 
       {/* How It Works Section */}
       <section id="how-it-works" className="py-16 px-4 bg-white">
