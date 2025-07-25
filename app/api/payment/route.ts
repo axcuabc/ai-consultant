@@ -20,7 +20,8 @@ export async function POST() {
         },
         confirmation: {
           type: "redirect",
-          return_url: "https://ai-consultant-six.vercel.app/success",
+          return_url: "https://ai-consultant-six.vercel.app/payment/success"
+
         },
         capture: true,
         description: "Покупка AI-доступа",
