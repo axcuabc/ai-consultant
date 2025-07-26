@@ -5,6 +5,7 @@ import type React from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import DemoConsultant from "@/components/DemoConsultant"
 import {
   Bot,
   Code,
@@ -411,51 +412,61 @@ export default function AnimatedLandingPage() {
         </div>
       </section>
 
-           {/* Demo Section */}
-      <section id="demo" className="py-16 px-4 bg-white">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Попробуйте прямо сейчас</h2>
-            <p className="text-xl text-gray-600">3 готовых ИИ-консультанта для разных ниш</p>
-          </div>
+import DemoConsultant from "@/components/DemoConsultant"
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                name: "Психолог Анна",
-                specialty: "Психологическая поддержка",
-                avatar: "👩‍⚕️",
-                color: "from-pink-500 to-rose-500",
-                prompt: "психолог",
-              },
-              {
-                name: "Диетолог Мария",
-                specialty: "Питание и здоровье",
-                avatar: "🥗",
-                color: "from-green-500 to-emerald-500",
-                prompt: "диетолог",
-              },
-              {
-                name: "Бизнес-коуч Игорь",
-                specialty: "Развитие бизнеса",
-                avatar: "💼",
-                color: "from-blue-500 to-indigo-500",
-                prompt: "бизнес-консультант",
-              },
-            ].map((consultant, index) => (
-              <DemoConsultant key={index} consultant={consultant} />
-            ))}
-          </div>
+{/* Demo Section */}
+<section id="demo" className="py-16 px-4 bg-white">
+  <div className="container mx-auto max-w-6xl">
+    <div className="text-center mb-16 animate-fade-in-up">
+      <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Попробуйте прямо сейчас</h2>
+      <p className="text-xl text-gray-600">3 готовых ИИ-консультанта для разных ниш</p>
+    </div>
 
-          <div className="text-center mt-12">
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 inline-block">
-              <p className="text-amber-800">
-                <strong>💡 Это демо-версия.</strong> В полной версии вы сможете настроить собственного консультанта
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div className="grid md:grid-cols-3 gap-6">
+      {[
+        {
+          name: "Психолог Анна",
+          specialty: "Психологическая поддержка",
+          avatar: "👩‍⚕️",
+          color: "from-pink-500 to-rose-500",
+          prompt: "психолог",
+        },
+        {
+          name: "Диетолог Мария",
+          specialty: "Питание и здоровье",
+          avatar: "🥗",
+          color: "from-green-500 to-emerald-500",
+          prompt: "диетолог",
+        },
+        {
+          name: "Бизнес-коуч Игорь",
+          specialty: "Развитие бизнеса",
+          avatar: "💼",
+          color: "from-blue-500 to-indigo-500",
+          prompt: "бизнес-консультант",
+        },
+      ].map((consultant, index) => (
+        <DemoConsultant
+          key={index}
+          name={consultant.name}
+          specialty={consultant.specialty}
+          avatar={consultant.avatar}
+          color={consultant.color}
+          prompt={consultant.prompt}
+        />
+      ))}
+    </div>
+
+    <div className="text-center mt-12">
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 inline-block">
+        <p className="text-amber-800">
+          <strong>💡 Это демо-версия.</strong> В полной версии вы сможете настроить собственного консультанта
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
 
 
       {/* How It Works Section */}
