@@ -412,8 +412,6 @@ export default function AnimatedLandingPage() {
         </div>
       </section>
 
-import DemoConsultant from "@/components/DemoConsultant"
-
 {/* Demo Section */}
 <section id="demo" className="py-16 px-4 bg-white">
   <div className="container mx-auto max-w-6xl">
