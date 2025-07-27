@@ -1,140 +1,205 @@
 "use client"
 
-import { useState } from "react"
+import type React from "react"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import DemoConsultant from "@/components/DemoConsultant"
 import {
-  Brain,
-  Zap,
-  Palette,
+  Bot,
   MessageCircle,
-  ArrowRight,
-  Play,
-  Check,
-  Users,
-  Shield,
-  Smartphone,
-  Monitor,
-  ChevronDown,
-  Mail,
+  Minimize2,
   Send,
 } from "lucide-react"
-import Link from "next/link"
+import { useState, useEffect, useRef } from "react"
 
-export default function HomePage() {
-  const [activeDemo, setActiveDemo] = useState(0)
-  const [openFaq, setOpenFaq] = useState<number | null>(null)
+interface Message {
+  id: string
+  text: string
+  isUser: boolean
+  timestamp: Date
+}
 
-  const demoConsultants = [
-    {
-      name: "Психолог Анна",
-      specialty: "Психологическая поддержка",
-      icon: "👩‍⚕️",
-      messages: 3,
-    },
-    {
-      name: "Диетолог Мария",
-      specialty: "Питание и здоровье",
-      icon: "🥗",
-      messages: 3,
-    },
-    {
-      name: "Бизнес-коуч Игорь",
-      specialty: "Развитие бизнеса",
-      icon: "💼",
-      messages: 3,
-    },
-  ]
+export default function AnimatedLandingPage() {
+  const [chatOpen, setChatOpen] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([{
+    id: "1",
+    text: "Привет! Я ваш ИИ-консультант по интеграции искусственного интеллекта на сайты. Помогу с любыми вопросами о настройке, стоимости и возможностях. О чем хотите узнать?",
+    isUser: false,
+    timestamp: new Date(),
+  }])
+  const [inputMessage, setInputMessage] = useState("")
+  const [isTyping, setIsTyping] = useState(false)
+  const [isOnline] = useState(true)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const templates = [
-    { icon: "🧠", name: "Психолог", desc: "Первичная поддержка, запись на терапию" },
-    { icon: "🥗", name: "Диетолог", desc: "Советы по питанию, составление меню" },
-    { icon: "💼", name: "Бизнес-консультант", desc: "Анализ бизнеса, стратегии роста" },
-    { icon: "👥", name: "HR-консультант", desc: "Подбор персонала, развитие команды" },
-    { icon: "💰", name: "Финансовый помощник", desc: "Планирование бюджета, инвестиции" },
-    { icon: "🇬🇧", name: "Репетитор английского", desc: "Обучение языку, проверка знаний" },
-    { icon: "🎨", name: "UX-исследователь", desc: "Анализ интерфейса, пользовательский опыт" },
-    { icon: "💪", name: "Фитнес-тренер", desc: "Программы тренировок, мотивация" },
-    { icon: "➕", name: "Создать свой", desc: "Настройте под любую специальность" },
-  ]
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
 
-  const useCases = [
-    {
-      title: "Фитнес-тренер",
-      category: "Здоровье и фитнес",
-      desc: "Отвечает на вопросы о тренировках и записывает на консультации",
-    },
-    {
-      title: "Психолог",
-      category: "Психическое здоровье",
-      desc: "Предоставляет первичную поддержку и записывает на терапию",
-    },
-    { title: "Стилист", category: "Мода и стиль", desc: "Помогает с вопросами стиля и записывает на встречи" },
-    { title: "Бизнес-консультант", category: "Бизнес", desc: "Квалифицирует лиды и объясняет пакеты услуг" },
-  ]
+  const sendMessage = async () => {
+    if (!inputMessage.trim()) return
 
-  const faqs = [
-    {
-      q: "Нужны ли мне навыки программирования для настройки?",
-      a: "Нет, программирование не требуется. Мы предоставляем готовый код и подробные инструкции для интеграции.",
-    },
-    {
-      q: "Будет ли это работать на моем сайте Tilda/WordPress?",
-      a: "Да, наш ИИ-консультант совместим с любыми платформами через простую интеграцию HTML-кода.",
-    },
-    {
-      q: "Нужно ли платить ежемесячно?",
-      a: "Первый месяц стоит 990₽, далее продление по 400₽/месяц. Без продления консультант продолжает работать, но нельзя менять настройки.",
-    },
-    {
-      q: "Как быстро я получу материалы?",
-      a: "Материалы отправляются мгновенно на email после успешной оплаты.",
-    },
-    {
-      q: "Могу ли я настроить внешний вид?",
-      a: "Да, вы можете полностью настроить дизайн, цвета и стиль консультанта под ваш бренд.",
-    },
-  ]
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: inputMessage,
+      isUser: true,
+      timestamp: new Date(),
+    }
+
+    const newMessages = [...messages, userMessage]
+    setMessages(newMessages)
+    setInputMessage("")
+    setIsTyping(true)
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: inputMessage,
+          chatHistory: messages.slice(-5),
+        }),
+      })
+      const data = await response.json()
+      const botResponse = data.response || "Извините, произошла ошибка. Попробуйте еще раз."
+
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "",
+        isUser: false,
+        timestamp: new Date(),
+      }
+
+      setMessages((prev) => [...prev, botMessage])
+
+      const words = botResponse.split(" ")
+      for (let i = 0; i < words.length; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 100 + Math.random() * 100))
+        setMessages((prev) => {
+          const updated = [...prev]
+          const lastMessage = updated[updated.length - 1]
+          if (!lastMessage.isUser) {
+            lastMessage.text = words.slice(0, i + 1).join(" ")
+          }
+          return updated
+        })
+      }
+    } catch (error) {
+      console.error("Ошибка отправки сообщения:", error)
+      setMessages((prev) => [...prev, {
+        id: (Date.now() + 1).toString(),
+        text: "Извините, произошла ошибка. Проверьте подключение к интернету.",
+        isUser: false,
+        timestamp: new Date(),
+      }])
+    } finally {
+      setIsTyping(false)
+    }
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage()
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Header */}
-      <header className="border-b border-white/10 backdrop-blur-sm bg-black/20">
-        <div className="container mx-auto px-4 py-4">
-          <nav className="flex items-center justify-between">
-            <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              ИИ Консультант
-            </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#how-it-works" className="text-white/80 hover:text-white transition-colors">
-                Как это работает
-              </a>
-              <a href="#templates" className="text-white/80 hover:text-white transition-colors">
-                Что входит
-              </a>
-              <a href="#pricing" className="text-white/80 hover:text-white transition-colors">
-                Цены
-              </a>
-              <a href="#faq" className="text-white/80 hover:text-white transition-colors">
-                Вопросы
-              </a>
-              <a href="#contact" className="text-white/80 hover:text-white transition-colors">
-                Контакты
-              </a>
-              <Link href="/login">
-                <Button
-                  variant="outline"
-                  className="border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10 bg-transparent"
-                >
-                  Войти
-                </Button>
-              </Link>
-            </div>
-          </nav>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+      {!chatOpen && (
+        <div className="fixed bottom-6 right-6 z-50 animate-bounce">
+          <Button
+            onClick={() => setChatOpen(true)}
+            className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full w-16 h-16 shadow-2xl hover:scale-110"
+          >
+            <MessageCircle className="w-6 h-6" />
+          </Button>
         </div>
-      </header>
+      )}
+
+      {chatOpen && (
+        <div className="fixed bottom-6 right-6 z-50 w-80 h-96 bg-white rounded-2xl shadow-2xl border animate-slide-up">
+          <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-2xl">
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                  <Bot className="w-5 h-5 text-blue-600" />
+                </div>
+                {isOnline && (
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
+                )}
+              </div>
+              <div>
+                <h3 className="font-semibold text-white">ИИ Консультант</h3>
+                <p className="text-xs text-blue-100">{isOnline ? "Онлайн" : "Оффлайн"}</p>
+              </div>
+            </div>
+            <Button onClick={() => setChatOpen(false)} variant="ghost" size="sm" className="text-white">
+              <Minimize2 className="w-4 h-4" />
+            </Button>
+          </div>
+
+          <div className="flex flex-col h-80">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                    className={`max-w-xs px-4 py-2 rounded-2xl ${
+                      message.isUser
+                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    <p className="text-sm">{message.text}</p>
+                  </div>
+                </div>
+              ))}
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="bg-gray-100 px-4 py-2 rounded-2xl">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+            <div className="p-4 border-t">
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Напишите сообщение..."
+                  className="flex-1 px-3 py-2 border rounded-full focus:outline-none focus:ring"
+                />
+                <Button
+                  onClick={sendMessage}
+                  disabled={!inputMessage.trim() || isTyping}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full w-10 h-10"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden">
