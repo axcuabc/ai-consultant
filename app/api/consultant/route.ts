@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 
 // Твой API-ключ OpenRouter (хранить в .env.local)
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || ""
+const OPENROUTER_API_KEY = "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"
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 // Запасные ответы
@@ -110,10 +110,11 @@ export async function POST(request: NextRequest) {
     const systemPrompt = SYSTEM_PROMPTS[type] || SYSTEM_PROMPTS["business"]
 
     // Пытаемся получить ответ от AI
-    const aiResponse = await queryOpenRouter(systemPrompt, message)
-    if (aiResponse && aiResponse.length > 20) {
-      return NextResponse.json({ response: aiResponse })
-    }
+const aiResponse = await queryOpenRouter(systemPrompt, message)
+if (aiResponse) {
+  return NextResponse.json({ response: aiResponse })
+}
+
 
     // Иначе релевантный шаблон
     const fallback = getRelevantResponse(message)
