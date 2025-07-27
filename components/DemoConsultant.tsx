@@ -1,17 +1,18 @@
 "use client"
 
 import React, { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 
 interface DemoConsultantProps {
   name: string
   specialty: string
   avatar: string
   type: "psychology" | "diet" | "business"
-  color: string // например "from-pink-500 to-rose-500"
+  color: string
 }
 
 export default function DemoConsultant({ name, specialty, avatar, type, color }: DemoConsultantProps) {
-  // Сообщения чата
   const [messages, setMessages] = useState([
     { text: `Привет! Я ${name}. ${specialty}. Чем могу помочь?`, isUser: false },
   ])
@@ -19,7 +20,6 @@ export default function DemoConsultant({ name, specialty, avatar, type, color }:
   const [isTyping, setIsTyping] = useState(false)
   const [messageCount, setMessageCount] = useState(0)
 
-  // Функция отправки сообщения
   const sendMessage = async () => {
     if (!input.trim() || messageCount >= 3) return
 
@@ -29,109 +29,113 @@ export default function DemoConsultant({ name, specialty, avatar, type, color }:
     setIsTyping(true)
     setMessageCount((prev) => prev + 1)
 
-    // Имитация ответа ИИ через таймаут
-    setTimeout(() => {
-      const responses = {
-        psychology: [
-          "Понимаю ваши переживания. Расскажите подробнее, что вас беспокоит?",
-          "Это действительно важный вопрос. Какие эмоции вы испытываете чаще всего?",
-          "Благодарю за доверие. Хотели бы записаться на личную консультацию для более глубокой работы?",
-        ],
-        diet: [
-          "Отличный вопрос о питании! Расскажите о ваших текущих пищевых привычках.",
-          "Для составления плана питания мне важно знать ваши цели и образ жизни.",
-          "Рекомендую записаться на персональную консультацию для составления индивидуального плана питания.",
-        ],
-        business: [
-          "Интересная бизнес-задача! Расскажите больше о вашей текущей ситуации.",
-          "Для анализа нужно понимать ваши ресурсы и цели. Какой у вас бюджет на развитие?",
-          "Предлагаю обсудить стратегию развития на индивидуальной консультации.",
-        ],
-      }
+    try {
+      const res = await fetch("/api/consultant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, message: input.trim() }),
+      })
+      const data = await res.json()
 
-      // Берём ответ по типу консультанта и номеру сообщения
-      const responseIndex = Math.min(messageCount, 2)
-      const response = responses[type][responseIndex]
-
-      setMessages((prev) => [...prev, { text: response, isUser: false }])
+      setMessages((prev) => [...prev, { text: data.response, isUser: false }])
+    } catch (e) {
+      setMessages((prev) => [...prev, { text: "Ошибка при обращении к серверу.", isUser: false }])
+    } finally {
       setIsTyping(false)
-    }, 1000 + Math.random() * 1000)
+    }
   }
 
   return (
-    <div className="flex flex-col rounded-lg shadow-md overflow-hidden h-96">
-      {/* Заголовок с градиентом */}
-      <div className={`bg-gradient-to-r ${color} p-4 text-white flex items-center space-x-3`}>
-        <div className="text-2xl">{avatar}</div>
-        <div>
-          <h3 className="font-bold">{name}</h3>
-          <p className="text-sm opacity-90">{specialty}</p>
+    <Card className="h-96 flex flex-col animate-fade-in-up shadow-xl rounded-2xl overflow-hidden">
+      <div className={`bg-gradient-to-r ${color} text-white p-4`}>
+        <div className="flex items-center space-x-3">
+          <div className="text-2xl">{avatar}</div>
+          <div>
+            <h3 className="font-bold">{name}</h3>
+            <p className="text-sm opacity-90">{specialty}</p>
+          </div>
         </div>
       </div>
 
-      {/* Окно сообщений */}
-      <div className="flex-1 p-4 overflow-y-auto bg-white">
+      <div className="flex-1 p-4 overflow-y-auto space-y-3">
         {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`mb-3 flex ${msg.isUser ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`inline-block p-2 rounded-lg text-sm max-w-[80%] ${
-                msg.isUser
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-100 text-gray-800"
-              }`}
-            >
-              {msg.text}
-            </div>
+          <div key={idx} className={`w-fit max-w-[80%] text-sm px-4 py-2 rounded-xl ${msg.isUser ? "ml-auto bg-blue-500 text-white" : "bg-gray-100 text-gray-800"}`}>
+            {msg.text}
           </div>
         ))}
-
-        {/* Индикация печати */}
         {isTyping && (
-          <div className="flex justify-start mb-3">
-            <div className="inline-block p-2 rounded-lg bg-gray-100">
-              <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-300"></div>
-              </div>
+          <div className="w-fit bg-gray-100 text-gray-800 text-sm px-4 py-2 rounded-xl">
+            <div className="flex space-x-1">
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Нижняя панель ввода */}
       {messageCount >= 3 ? (
-        <div className="p-4 bg-amber-50 border-t text-center">
-          <p className="text-sm text-amber-800 mb-2">Лимит сообщений достигнут</p>
-          <button
+        <div className="p-4 bg-amber-50 border-t">
+          <p className="text-sm text-amber-800 text-center mb-2">Лимит сообщений достигнут</p>
+          <Button
+            size="sm"
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600"
             onClick={() => (window.location.href = "/checkout")}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded hover:opacity-90 transition"
           >
             Получить полный доступ
-          </button>
+          </Button>
         </div>
       ) : (
-        <div className="p-4 border-t flex space-x-2">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-            placeholder="Напишите сообщение..."
-            className="flex-1 px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={isTyping}
-          />
-          <button
-            onClick={sendMessage}
-            disabled={!input.trim() || isTyping}
-            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold px-4 rounded-full transition"
-          >
-            →
-          </button>
+        <div className="p-4 border-t">
+          <div className="flex space-x-2">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+              placeholder="Напишите сообщение..."
+              className="flex-1 px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={isTyping}
+            />
+            <Button size="sm" onClick={sendMessage} disabled={!input.trim() || isTyping}>
+              →
+            </Button>
+          </div>
+          <p className="text-xs text-gray-500 mt-2 text-center">Осталось сообщений: {3 - messageCount}</p>
         </div>
       )}
-    </div>
+
+      <style jsx>{`
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in-up {
+          animation: fade-in-up 0.6s ease-out forwards;
+        }
+        .animate-bounce {
+          animation: bounce 1s infinite;
+        }
+        .delay-100 {
+          animation-delay: 0.1s;
+        }
+        .delay-200 {
+          animation-delay: 0.2s;
+        }
+        @keyframes bounce {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-5px);
+          }
+        }
+      `}</style>
+    </Card>
   )
 }
