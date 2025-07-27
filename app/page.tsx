@@ -422,35 +422,36 @@ export default function AnimatedLandingPage() {
 
     <div className="grid md:grid-cols-3 gap-6">
       {[
-        {
-          name: "Психолог Анна",
-          specialty: "Психологическая поддержка",
-          avatar: "👩‍⚕️",
-          color: "from-pink-500 to-rose-500",
-          prompt: "психолог",
-        },
-        {
-          name: "Диетолог Мария",
-          specialty: "Питание и здоровье",
-          avatar: "🥗",
-          color: "from-green-500 to-emerald-500",
-          prompt: "диетолог",
-        },
-        {
-          name: "Бизнес-коуч Игорь",
-          specialty: "Развитие бизнеса",
-          avatar: "💼",
-          color: "from-blue-500 to-indigo-500",
-          prompt: "бизнес-консультант",
-        },
-      ].map((consultant, index) => (
+  {
+    name: "Психолог Анна",
+    specialty: "Психологическая поддержка",
+    avatar: "👩‍⚕️",
+    color: "from-pink-500 to-rose-500",
+    prompt: "psychology",
+  },
+  {
+    name: "Диетолог Мария",
+    specialty: "Питание и здоровье",
+    avatar: "🥗",
+    color: "from-green-500 to-emerald-500",
+    prompt: "diet",
+  },
+  {
+    name: "Бизнес-коуч Игорь",
+    specialty: "Развитие бизнеса",
+    avatar: "💼",
+    color: "from-blue-500 to-indigo-500",
+    prompt: "business",
+  },
+]
+.map((consultant, index) => (
         <DemoConsultant
           key={index}
           name={consultant.name}
           specialty={consultant.specialty}
           avatar={consultant.avatar}
           color={consultant.color}
-          prompt={consultant.prompt}
+          type={consultant.prompt}
         />
       ))}
     </div>
