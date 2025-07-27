@@ -345,69 +345,125 @@ export default function AnimatedLandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section id="hero" className="pt-24 pb-16 px-4 overflow-hidden">
-        <div className="container mx-auto max-w-7xl">
+      <section className="relative py-20 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 blur-3xl"></div>
+        <div className="container mx-auto px-4 relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-fade-in-up">
-              <div className="flex flex-wrap gap-3 mb-6">
-                <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
-                  <Zap className="w-4 h-4 mr-1" />
-                  Без кода
+            <div className="space-y-8">
+              <div className="space-y-2">
+                <Badge className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white border-0">
+                  <Zap className="w-4 h-4 mr-2" />
+                  Без кода API готов
                 </Badge>
-                <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors">
-                  <Shield className="w-4 h-4 mr-1" />
-                  API готов
-                </Badge>
-                <Badge className="bg-green-100 text-green-700 hover:bg-green-200 transition-colors">
-                  <CheckCircle className="w-4 h-4 mr-1" />
+                <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 ml-2">
+                  <Palette className="w-4 h-4 mr-2" />
                   Визуальная настройка
                 </Badge>
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                Добавь ИИ-консультанта на свой сайт за{" "}
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-5xl lg:text-6xl font-bold text-white leading-tight">
+                Добавь{" "}
+                <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                  ИИ-консультанта
+                </span>{" "}
+                на свой сайт за{" "}
+                <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                   10 минут
                 </span>
               </h1>
 
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+              <p className="text-xl text-white/70 leading-relaxed">
                 Программирование не нужно. Мы сделаем всё за тебя. Начни сегодня.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   size="lg"
-                  className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                  className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white border-0"
                 >
-                  <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                  <Play className="w-5 h-5 mr-2" />
                   Попробовать демо
                 </Button>
                 <Button
                   size="lg"
-                  className="group bg-white text-gray-900 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                  onClick={() => (window.location.href = "/payment")}
+                  variant="outline"
+                  className="border-white/20 text-white hover:bg-white/10 bg-transparent"
                 >
                   Купить сейчас
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </div>
             </div>
 
-            <div className="relative animate-fade-in-right">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-3xl blur-3xl animate-pulse"></div>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 blur-3xl rounded-full"></div>
               <img
-                src="/images/hero-programmer.png"
-                alt="Современный программист за работой"
-                className="relative z-10 w-full h-auto rounded-2xl shadow-2xl"
+                src="/ai-hologram-consultant.png"
+                alt="Современный ИИ консультант"
+                className="relative z-10 w-full max-w-lg mx-auto rounded-2xl"
               />
-              <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-xl animate-float">
-                <div className="flex items-center space-x-3">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium text-gray-700">ИИ Ассистент активен</span>
+              <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg p-3 border border-cyan-400/30">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-white text-sm">ИИ Ассистент активен</span>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+            {/* Benefits Section */}
+      <section id="benefits" className="py-20 bg-black/20 relative overflow-hidden">
+        <img
+          src="/benefits-bg-pattern.png"
+          alt="Benefits Background"
+          className="absolute inset-0 w-full h-full object-cover opacity-5"
+        />
+        <div className="container mx-auto px-4 relative">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">Почему ИИ-консультант лучше живого сотрудника?</h2>
+            <p className="text-xl text-white/70">Современное решение для современного бизнеса</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {benefits.map((benefit, index) => (
+              <Card
+                key={index}
+                className="bg-black/40 border-white/10 backdrop-blur-sm hover:border-cyan-400/50 transition-all duration-500 hover:scale-105 hover:shadow-xl group"
+              >
+                <CardContent className="p-8 text-center">
+                  <div
+                    className={`w-16 h-16 bg-gradient-to-r ${benefit.gradient} rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}
+                  >
+                    <div className="text-white">{benefit.icon}</div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-cyan-400 transition-colors duration-300">
+                    {benefit.title}
+                  </h3>
+                  <p className="text-white/70 leading-relaxed">{benefit.desc}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="mt-16 text-center">
+            <Card className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-green-400/50 backdrop-blur-sm max-w-4xl mx-auto">
+              <CardContent className="p-8">
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <Star className="w-8 h-8 text-yellow-400" />
+                  <h3 className="text-2xl font-bold text-white">Экономия до 600,000₽ в год!</h3>
+                  <Star className="w-8 h-8 text-yellow-400" />
+                </div>
+                <p className="text-white/80 text-lg">
+                  Зарплата консультанта: 50,000₽/месяц × 12 = 600,000₽
+                  <br />
+                  ИИ-консультант: 990₽ + 400₽×11 = 5,390₽
+                  <br />
+                  <span className="text-green-400 font-bold">Ваша экономия: 594,610₽ в год!</span>
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -564,107 +620,6 @@ export default function AnimatedLandingPage() {
         </div>
       </section>
 
-      {/* Visual Preview Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Посмотри как это работает</h2>
-            <p className="text-xl text-gray-600">Как твой ИИ-консультант будет выглядеть на десктопе и мобильном</p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-fade-in-left">
-              <h3 className="text-2xl font-bold mb-6 flex items-center">
-                <Monitor className="w-8 h-8 mr-3 text-blue-600" />
-                Десктопная версия
-              </h3>
-              <div className="relative">
-                <img
-                  src="/images/desktop-chat.png"
-                  alt="ИИ чат на десктопе"
-                  className="rounded-xl shadow-2xl w-full hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute -bottom-4 -right-4 bg-white rounded-lg p-3 shadow-lg animate-bounce">
-                  <MessageCircle className="w-6 h-6 text-blue-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="animate-fade-in-right">
-              <h3 className="text-2xl font-bold mb-6 flex items-center">
-                <Smartphone className="w-8 h-8 mr-3 text-purple-600" />
-                Мобильная версия
-              </h3>
-              <div className="flex justify-center">
-                <div className="relative">
-                  <img
-                    src="/images/mobile-chat.png"
-                    alt="ИИ чат на мобильном"
-                    className="rounded-2xl shadow-2xl hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-4 right-4 bg-green-500 w-3 h-3 rounded-full animate-pulse"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Use Cases Section */}
-      <section className="py-16 px-4 bg-white">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Идеально для любого бизнеса</h2>
-            <p className="text-xl text-gray-600">Посмотри, как разные специалисты используют ИИ-консультантов</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                avatar: "/images/fitness-coach.png",
-                title: "Фитнес-тренер",
-                description: "Отвечает на вопросы о тренировках и записывает на консультации",
-                badge: "Здоровье и фитнес",
-              },
-              {
-                avatar: "/images/psychologist.png",
-                title: "Психолог",
-                description: "Предоставляет первичную поддержку и записывает на терапию",
-                badge: "Психическое здоровье",
-              },
-              {
-                avatar: "/images/stylist.png",
-                title: "Стилист",
-                description: "Помогает с вопросами стиля и записывает на встречи",
-                badge: "Мода и стиль",
-              },
-              {
-                avatar: "/images/business-consultant.png",
-                title: "Бизнес-консультант",
-                description: "Квалифицирует лиды и объясняет пакеты услуг",
-                badge: "Бизнес",
-              },
-            ].map((useCase, index) => (
-              <Card
-                key={index}
-                className="p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up border-0 bg-gradient-to-br from-white to-gray-50"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <CardContent className="p-0">
-                  <img
-                    src={useCase.avatar || "/placeholder.svg"}
-                    alt={useCase.title}
-                    className="w-20 h-20 rounded-full mx-auto mb-4 object-cover shadow-lg"
-                  />
-                  <Badge className="mb-3 bg-blue-100 text-blue-700">{useCase.badge}</Badge>
-                  <h3 className="font-bold text-lg mb-2 text-gray-900">{useCase.title}</h3>
-                  <p className="text-gray-600 text-sm">{useCase.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Pricing Section */}
       <section id="pricing" className="py-16 px-4 bg-gradient-to-br from-blue-50 to-purple-50">
@@ -746,9 +701,6 @@ export default function AnimatedLandingPage() {
                 </p>
                 <p>
                   ❌ <strong>Нельзя изменять настройки</strong> — промпт, внешний вид остаются прежними
-                </p>
-                <p>
-                  💡 <strong>Один консультант на пользователя</strong> — фокус на качестве, а не количестве
                 </p>
               </div>
             </div>
