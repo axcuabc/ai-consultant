@@ -356,7 +356,6 @@ export default function AnimatedLandingPage() {
                   Без кода API готов
                 </Badge>
                 <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 ml-2">
-                  <Palette className="w-4 h-4 mr-2" />
                   Визуальная настройка
                 </Badge>
               </div>
