@@ -436,7 +436,7 @@ const scrollToDemo = useCallback(() => {
                 alt="Современный программист за работой"
                 className="relative z-10 w-full h-auto rounded-2xl shadow-2xl"
               />
-              <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-xl animate-float">
+              <div className="absolute -bottom-10 -left-6 bg-white rounded-2xl p-4 shadow-xl animate-float">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                   <span className="text-sm font-medium text-gray-700">ИИ Ассистент активен</span>
@@ -748,7 +748,7 @@ const scrollToDemo = useCallback(() => {
                   </ul>
                   <Button
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                    onClick={() => (window.location.href = "/checkout")}
+                    onClick={() => (window.location.href = "/payment")}
                   >
                     Начать сейчас
                   </Button>
