@@ -369,11 +369,8 @@ export default function AnimatedLandingPage() {
                 </Badge>
               </div>
 
-              <h1 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                ИИ-консультант, который увеличивает продажи на 40% за 10 минут установки{" "}
-                <span className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                  за 10 минут установки
-                </span>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                ИИ-консультант, который увеличивает продажи на 40% за 10 минут установки
               </h1>
 
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
