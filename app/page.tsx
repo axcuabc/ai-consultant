@@ -42,12 +42,13 @@ interface Message {
   timestamp: Date
 }
 
-export default function AnimatedLandingPage() {
+export default function Page() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("")
   const [chatOpen, setChatOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
+    
     {
       id: "1",
       text: "Привет! Я ваш ИИ-консультант по интеграции искусственного интеллекта на сайты. Помогу с любыми вопросами о настройке, стоимости и возможностях. О чем хотите узнать?",
@@ -115,6 +116,7 @@ export default function AnimatedLandingPage() {
     setMessages(newMessages)
     setInputMessage("")
     setIsTyping(true)
+    
 
     // Добавляем задержку для реалистичности
     setTimeout(
@@ -184,19 +186,25 @@ export default function AnimatedLandingPage() {
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-      {/* Floating Chat Button */}
-      {!chatOpen && (
-        <div className="fixed bottom-6 right-6 z-50 animate-bounce">
-          <Button
-            onClick={() => setChatOpen(true)}
-            className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full w-16 h-16 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110"
-          >
-            <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
-          </Button>
-        </div>
-      )}
+return (
+  <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    {/* Floating Chat Button */}
+    {!chatOpen && (
+      <div className="fixed bottom-6 right-6 z-50 animate-bounce">
+        <Button
+          onClick={() => setChatOpen(true)}
+          className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full w-16 h-16 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110"
+        >
+          <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+        </Button>
+      </div>
+    )}
+
+    {/* Здесь можно добавить остальной интерфейс чата или страницу */}
+  </div>
+)
+}
+
 
       {/* Chat Window */}
       {chatOpen && (
