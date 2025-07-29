@@ -80,7 +80,7 @@ export default function DemoConsultant({ name, specialty, avatar, type, color }:
           <Button
             size="sm"
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600"
-            onClick={() => (window.location.href = "/checkout")}
+            onClick={() => (window.location.href = "/payment")}
           >
             Получить полный доступ
           </Button>
