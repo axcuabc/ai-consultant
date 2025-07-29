@@ -31,6 +31,7 @@ import {
   DollarSign,
   TrendingUp,
   Settings,
+  Link,
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 
@@ -337,10 +338,10 @@ export default function AnimatedLandingPage() {
 {mobileMenuOpen && (
   <div className="md:hidden py-4 border-t border-gray-200/50">
     {[ 
-    { id: "how-it-works", label: "Как это работает" },
-    { id: "benefits", label: "Выгоды" },
-    { id: "templates", label: "Шаблоны" },
-    { id: "pricing", label: "Цены" },
+      { id: "how-it-works", label: "Как это работает" },
+      { id: "whats-included", label: "Что входит" },
+      { id: "pricing", label: "Цены" },
+      { id: "contact", label: "Контакты" },
     ].map((item) => (
       <button
         key={item.id}
@@ -391,7 +392,8 @@ export default function AnimatedLandingPage() {
                 <p className="text-xl text-gray-600 leading-relaxed">
                   Работает 24/7, заменяет живого сотрудника и экономит до 600,000₽ в год. Без программирования.
                 </p>
-
+              </div>
+              
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   size="lg"
