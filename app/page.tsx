@@ -26,6 +26,12 @@ import {
   X,
   Send,
   Minimize2,
+  Clock,
+  Target,
+  DollarSign,
+  Shield,
+  TrendingUp,
+  Settings,
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 
