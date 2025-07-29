@@ -29,7 +29,6 @@ import {
   Clock,
   Target,
   DollarSign,
-  Shield,
   TrendingUp,
   Settings,
 } from "lucide-react"
