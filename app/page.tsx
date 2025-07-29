@@ -187,16 +187,16 @@ export default function AnimatedLandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       {/* Floating Chat Button */}
-{!chatOpen && (
-  <div className="fixed bottom-6 right-6 z-50 animate-bounce">
-    <Button
-      onClick={() => setChatOpen(true)}
-      className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full w-16 h-16 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110"
-    >
-      <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
-    </Button>
-  </div>
-)}
+      {!chatOpen && (
+        <div className="fixed bottom-6 right-6 z-50 animate-bounce">
+          <Button
+            onClick={() => setChatOpen(true)}
+            className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full w-16 h-16 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110"
+          >
+            <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+          </Button>
+        </div>
+      )}
 
       {/* Chat Window */}
       {chatOpen && (
@@ -301,24 +301,24 @@ export default function AnimatedLandingPage() {
               </div>
             </div>
 
-{/* Desktop Navigation */}
-<div className="hidden md:flex items-center space-x-8">
-  {[ 
-    { id: "how-it-works", label: "Как это работает" },
-    { id: "benefits", label: "Выгоды" },
-    { id: "templates", label: "Шаблоны" },
-    { id: "pricing", label: "Цены" },
-  ].map((item) => (
-    <button
-      key={item.id}
-      onClick={() => scrollToSection(item.id)}
-      className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-        activeSection === item.id ? "text-blue-600" : "text-gray-600"
-      }`}
-    >
-      {item.label}
-    </button>
-  ))}
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              {[
+                { id: "how-it-works", label: "Как это работает" },
+                { id: "benefits", label: "Выгоды" },
+                { id: "templates", label: "Шаблоны" },
+                { id: "pricing", label: "Цены" },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className={`text-sm font-medium transition-colors hover:text-blue-600 ${
+                    activeSection === item.id ? "text-blue-600" : "text-gray-600"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
 
   {/* Кнопка Войти для десктопа */}
   <Link href="/login">
