@@ -364,15 +364,15 @@ export default function AnimatedLandingPage() {
                 </Badge>
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                Добавь ИИ-консультанта на свой сайт за{" "}
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  10 минут
+              <h1 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                ИИ-консультант, который увеличивает продажи на 40% за 10 минут установки{" "}
+                <span className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
+                  за 10 минут установки
                 </span>
               </h1>
 
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Программирование не нужно. Мы сделаем всё за тебя. Начни сегодня.
+                Работает 24/7, заменяет живого сотрудника и экономит до 600,000₽ в год. Без программирования.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -408,6 +408,122 @@ export default function AnimatedLandingPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+            {/* How It Works Section */}
+      <section id="how-it-works" className="py-16 px-4 bg-white">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16 animate-fade-in-up">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Как это работает</h2>
+            <p className="text-xl text-gray-600">Запусти своего ИИ-консультанта в 3 простых шага</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                step: "01",
+                title: "Оплати - мгновенный доступ",
+                description: "Получите все материалы и инструкции сразу после оплаты",
+                icon: CreditCard,
+                color: "from-blue-500 to-blue-600",
+              },
+              {
+                step: "02",
+                title: "Вставь код на сайт",
+                description: "Скопируйте готовый код и вставьте на ваш сайт за 2 минуты",
+                icon: Code,
+                color: "from-purple-500 to-purple-600",
+              },
+              {
+                step: "03",
+                title: "ИИ-консультант помогает клиентам 24/7",
+                description: "Ваш ИИ начинает работать мгновенно и никогда не спит",
+                icon: Bot,
+                color: "from-green-500 to-green-600",
+              },
+            ].map((step, index) => (
+              <div
+                key={index}
+                className="relative group animate-fade-in-up"
+                style={{ animationDelay: `${index * 0.2}s` }}
+              >
+                <Card className="p-8 text-center hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-2 border-0 bg-gradient-to-br from-gray-50 to-white">
+                  <CardContent className="p-0">
+                    <div
+                      className={`w-16 h-16 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}
+                    >
+                      <step.icon className="w-8 h-8 text-white" />
+                    </div>
+                    <div className="text-sm font-bold text-gray-400 mb-2">{step.step}</div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">{step.title}</h3>
+                    <p className="text-gray-600">{step.description}</p>
+                  </CardContent>
+                </Card>
+
+                {index < 2 && (
+                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
+                    <ArrowRight className="w-8 h-8 text-gray-300" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+            {/* Benefits */}
+      <section id="benefits" className="py-20 relative z-10">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Преимущества ИИ-консультанта</h2>
+            <p className="text-xl text-gray-600">Почему ИИ лучше живого сотрудника</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: <Clock className="w-8 h-8" />,
+                title: "Работает 24/7",
+                desc: "Никаких выходных, отпусков или больничных. Ваши клиенты получают помощь в любое время.",
+              },
+              {
+                icon: <Target className="w-8 h-8" />,
+                title: "Не ошибается",
+                desc: "Всегда отвечает согласно настройкам. Никакого человеческого фактора или плохого настроения.",
+              },
+              {
+                icon: <DollarSign className="w-8 h-8" />,
+                title: "Стоит в 10 раз дешевле",
+                desc: "990₽/месяц против 50,000₽+ зарплаты консультанта. Окупается с первого клиента.",
+              },
+              {
+                icon: <Shield className="w-8 h-8" />,
+                title: "Повышает доверие",
+                desc: "Мгновенные ответы на вопросы увеличивают доверие клиентов и конверсию на 40%.",
+              },
+              {
+                icon: <TrendingUp className="w-8 h-8" />,
+                title: "Умнеет со временем",
+                desc: "Анализирует диалоги и становится лучше. Постоянное обновление базы знаний.",
+              },
+              {
+                icon: <Settings className="w-8 h-8" />,
+                title: "Легко настраивается",
+                desc: "Настройка за 10 минут без программирования. Готовые шаблоны для любой ниши.",
+              },
+            ].map((benefit, index) => (
+              <Card key={index} className="bg-white border-0 shadow-lg hover:shadow-xl transition-shadow">
+                <CardContent className="p-6 text-center">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="text-blue-600">{benefit.icon}</div>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{benefit.title}</h3>
+                  <p className="text-gray-600 text-sm">{benefit.desc}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -466,69 +582,6 @@ export default function AnimatedLandingPage() {
   </div>
 </section>
 
-
-
-      {/* How It Works Section */}
-      <section id="how-it-works" className="py-16 px-4 bg-white">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Как это работает</h2>
-            <p className="text-xl text-gray-600">Запусти своего ИИ-консультанта в 3 простых шага</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                step: "01",
-                title: "Покупка доступа",
-                description: "Получи мгновенный доступ ко всем материалам и руководствам по настройке",
-                icon: CreditCard,
-                color: "from-blue-500 to-blue-600",
-              },
-              {
-                step: "02",
-                title: "Копируй и вставляй код",
-                description: "Просто вставь наш фрагмент кода на свой сайт",
-                icon: Code,
-                color: "from-purple-500 to-purple-600",
-              },
-              {
-                step: "03",
-                title: "ИИ Ассистент работает",
-                description: "Твой ИИ-консультант начинает помогать клиентам 24/7",
-                icon: Bot,
-                color: "from-green-500 to-green-600",
-              },
-            ].map((step, index) => (
-              <div
-                key={index}
-                className="relative group animate-fade-in-up"
-                style={{ animationDelay: `${index * 0.2}s` }}
-              >
-                <Card className="p-8 text-center hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-2 border-0 bg-gradient-to-br from-gray-50 to-white">
-                  <CardContent className="p-0">
-                    <div
-                      className={`w-16 h-16 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}
-                    >
-                      <step.icon className="w-8 h-8 text-white" />
-                    </div>
-                    <div className="text-sm font-bold text-gray-400 mb-2">{step.step}</div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">{step.title}</h3>
-                    <p className="text-gray-600">{step.description}</p>
-                  </CardContent>
-                </Card>
-
-                {index < 2 && (
-                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
-                    <ArrowRight className="w-8 h-8 text-gray-300" />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Templates Section */}
       <section className="py-16 px-4 bg-white">
         <div className="container mx-auto max-w-6xl">
@@ -564,104 +617,66 @@ export default function AnimatedLandingPage() {
         </div>
       </section>
 
-      {/* Visual Preview Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Посмотри как это работает</h2>
-            <p className="text-xl text-gray-600">Как твой ИИ-консультант будет выглядеть на десктопе и мобильном</p>
+            {/* Comparison Table */}
+      <section className="py-20 relative z-10">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">ИИ vs Живой сотрудник</h2>
+            <p className="text-xl text-gray-600">Сравните и убедитесь в выгоде</p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-fade-in-left">
-              <h3 className="text-2xl font-bold mb-6 flex items-center">
-                <Monitor className="w-8 h-8 mr-3 text-blue-600" />
-                Десктопная версия
-              </h3>
-              <div className="relative">
-                <img
-                  src="/images/desktop-chat.png"
-                  alt="ИИ чат на десктопе"
-                  className="rounded-xl shadow-2xl w-full hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute -bottom-4 -right-4 bg-white rounded-lg p-3 shadow-lg animate-bounce">
-                  <MessageCircle className="w-6 h-6 text-blue-600" />
+          <div className="max-w-4xl mx-auto">
+            <Card className="bg-white shadow-xl border-0 overflow-hidden">
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Критерий</th>
+                        <th className="px-6 py-4 text-center text-sm font-semibold text-blue-600">ИИ-консультант</th>
+                        <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600">Живой сотрудник</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      <tr>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">Стоимость в год</td>
+                        <td className="px-6 py-4 text-center text-sm text-green-600 font-semibold">5,390₽</td>
+                        <td className="px-6 py-4 text-center text-sm text-red-600 font-semibold">600,000₽+</td>
+                      </tr>
+                      <tr className="bg-gray-50">
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">Доступность</td>
+                        <td className="px-6 py-4 text-center text-sm text-green-600">24/7/365</td>
+                        <td className="px-6 py-4 text-center text-sm text-red-600">8 часов в день</td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">Скорость ответа</td>
+                        <td className="px-6 py-4 text-center text-sm text-green-600">Мгновенно</td>
+                        <td className="px-6 py-4 text-center text-sm text-red-600">До нескольких минут</td>
+                      </tr>
+                      <tr className="bg-gray-50">
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">Надёжность</td>
+                        <td className="px-6 py-4 text-center text-sm text-green-600">100% стабильно</td>
+                        <td className="px-6 py-4 text-center text-sm text-red-600">Зависит от настроения</td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">Обучение</td>
+                        <td className="px-6 py-4 text-center text-sm text-green-600">Не требуется</td>
+                        <td className="px-6 py-4 text-center text-sm text-red-600">Месяцы обучения</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
-            <div className="animate-fade-in-right">
-              <h3 className="text-2xl font-bold mb-6 flex items-center">
-                <Smartphone className="w-8 h-8 mr-3 text-purple-600" />
-                Мобильная версия
-              </h3>
-              <div className="flex justify-center">
-                <div className="relative">
-                  <img
-                    src="/images/mobile-chat.png"
-                    alt="ИИ чат на мобильном"
-                    className="rounded-2xl shadow-2xl hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-4 right-4 bg-green-500 w-3 h-3 rounded-full animate-pulse"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Use Cases Section */}
-      <section className="py-16 px-4 bg-white">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Идеально для любого бизнеса</h2>
-            <p className="text-xl text-gray-600">Посмотри, как разные специалисты используют ИИ-консультантов</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                avatar: "/images/fitness-coach.png",
-                title: "Фитнес-тренер",
-                description: "Отвечает на вопросы о тренировках и записывает на консультации",
-                badge: "Здоровье и фитнес",
-              },
-              {
-                avatar: "/images/psychologist.png",
-                title: "Психолог",
-                description: "Предоставляет первичную поддержку и записывает на терапию",
-                badge: "Психическое здоровье",
-              },
-              {
-                avatar: "/images/stylist.png",
-                title: "Стилист",
-                description: "Помогает с вопросами стиля и записывает на встречи",
-                badge: "Мода и стиль",
-              },
-              {
-                avatar: "/images/business-consultant.png",
-                title: "Бизнес-консультант",
-                description: "Квалифицирует лиды и объясняет пакеты услуг",
-                badge: "Бизнес",
-              },
-            ].map((useCase, index) => (
-              <Card
-                key={index}
-                className="p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up border-0 bg-gradient-to-br from-white to-gray-50"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <CardContent className="p-0">
-                  <img
-                    src={useCase.avatar || "/placeholder.svg"}
-                    alt={useCase.title}
-                    className="w-20 h-20 rounded-full mx-auto mb-4 object-cover shadow-lg"
-                  />
-                  <Badge className="mb-3 bg-blue-100 text-blue-700">{useCase.badge}</Badge>
-                  <h3 className="font-bold text-lg mb-2 text-gray-900">{useCase.title}</h3>
-                  <p className="text-gray-600 text-sm">{useCase.description}</p>
+            <div className="mt-8 text-center">
+              <Card className="bg-green-50 border-green-200 inline-block">
+                <CardContent className="p-6">
+                  <h3 className="text-2xl font-bold text-green-800 mb-2">Экономия: 594,610₽ в год!</h3>
+                  <p className="text-green-700">ИИ-консультант окупается уже в первый месяц</p>
                 </CardContent>
               </Card>
-            ))}
+            </div>
           </div>
         </div>
       </section>
@@ -746,9 +761,6 @@ export default function AnimatedLandingPage() {
                 </p>
                 <p>
                   ❌ <strong>Нельзя изменять настройки</strong> — промпт, внешний вид остаются прежними
-                </p>
-                <p>
-                  💡 <strong>Один консультант на пользователя</strong> — фокус на качестве, а не количестве
                 </p>
               </div>
             </div>
