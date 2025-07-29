@@ -5,17 +5,22 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import DemoConsultant from "@/components/DemoConsultant"
 import { useCallback } from "react"
 import {
   Bot,
   Code,
+  FileText,
   Play,
+  Gift,
   Zap,
   Shield,
   CheckCircle,
   MessageCircle,
   Mail,
   ChevronDown,
+  Monitor,
+  Smartphone,
   CreditCard,
   ArrowRight,
   Menu,
