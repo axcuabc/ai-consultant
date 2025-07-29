@@ -5,22 +5,17 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import DemoConsultant from "@/components/DemoConsultant"
 import { useCallback } from "react"
 import {
   Bot,
   Code,
-  FileText,
   Play,
-  Gift,
   Zap,
   Shield,
   CheckCircle,
   MessageCircle,
   Mail,
   ChevronDown,
-  Monitor,
-  Smartphone,
   CreditCard,
   ArrowRight,
   Menu,
@@ -71,12 +66,12 @@ export default function AnimatedLandingPage() {
     }
     setMobileMenuOpen(false)
   }
-const scrollToDemo = useCallback(() => {
-  const section = document.getElementById("demo")
-  if (section) {
-    section.scrollIntoView({ behavior: "smooth" })
-  }
-}, [])
+  const scrollToDemo = useCallback(() => {
+    const section = document.getElementById("demo")
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" })
+    }
+  }, [])
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
@@ -192,16 +187,16 @@ const scrollToDemo = useCallback(() => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       {/* Floating Chat Button */}
-{!chatOpen && (
-  <div className="fixed bottom-6 right-6 z-50 animate-bounce">
-    <Button
-      onClick={() => setChatOpen(true)}
-      className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full w-16 h-16 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110"
-    >
-      <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
-    </Button>
-  </div>
-)}
+      {!chatOpen && (
+        <div className="fixed bottom-6 right-6 z-50 animate-bounce">
+          <Button
+            onClick={() => setChatOpen(true)}
+            className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full w-16 h-16 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110"
+          >
+            <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+          </Button>
+        </div>
+      )}
 
       {/* Chat Window */}
       {chatOpen && (
@@ -293,91 +288,90 @@ const scrollToDemo = useCallback(() => {
         </div>
       )}
 
-{/* Sticky Navigation */}
-<nav className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
-  <div className="container mx-auto px-4">
-    <div className="flex items-center justify-between h-16">
-      {/* Логотип */}
-      <div className="flex items-center">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-            <Bot className="w-5 h-5 text-white" />
+      {/* Sticky Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            {/* Логотип */}
+            <div className="flex items-center">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <Bot className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-bold text-xl text-gray-900">ИИ Консультант</span>
+              </div>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              {[
+                { id: "how-it-works", label: "Как это работает" },
+                { id: "benefits", label: "Преимущества" },
+                { id: "template", label: "Шаблоны" },
+                { id: "pricing", label: "Цены" },
+                { id: "contact", label: "Контакты" },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className={`text-sm font-medium transition-colors hover:text-blue-600 ${
+                    activeSection === item.id ? "text-blue-600" : "text-gray-600"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+
+              {/* Кнопка Войти */}
+              <Link href="/login">
+                <Button
+                  variant="outline"
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent ml-4"
+                >
+                  Войти
+                </Button>
+              </Link>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
-          <span className="font-bold text-xl text-gray-900">ИИ Консультант</span>
+
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden py-4 border-t border-gray-200/50">
+              {[
+                { id: "how-it-works", label: "Как это работает" },
+                { id: "whats-included", label: "Что входит" },
+                { id: "pricing", label: "Цены" },
+                { id: "contact", label: "Контакты" },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className="block w-full text-left px-4 py-2 text-gray-600 hover:text-blue-600 transition-colors"
+                >
+                  {item.label}
+                </button>
+              ))}
+
+              {/* Кнопка Войти в мобильном меню */}
+              <div className="mt-4 px-4">
+                <Link href="/login">
+                  <Button
+                    variant="outline"
+                    className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent"
+                  >
+                    Войти
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
-
-      {/* Desktop Navigation */}
-      <div className="hidden md:flex items-center space-x-8">
-        {[
-          { id: "how-it-works", label: "Как это работает" },
-          { id: "benefits", label: "Преимущества" },
-          { id: "template", label: "Шаблоны" },
-          { id: "pricing", label: "Цены" },
-          { id: "contact", label: "Контакты" },
-        ].map((item) => (
-          <button
-            key={item.id}
-            onClick={() => scrollToSection(item.id)}
-            className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-              activeSection === item.id ? "text-blue-600" : "text-gray-600"
-            }`}
-          >
-            {item.label}
-          </button>
-        ))}
-
-        {/* Кнопка Войти */}
-        <Link href="/login">
-          <Button
-            variant="outline"
-            className="border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent ml-4"
-          >
-            Войти
-          </Button>
-        </Link>
-      </div>
-
-      {/* Mobile Menu Button */}
-      <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-        {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-      </button>
-    </div>
-
-    {/* Mobile Menu */}
-    {mobileMenuOpen && (
-      <div className="md:hidden py-4 border-t border-gray-200/50">
-        {[
-          { id: "how-it-works", label: "Как это работает" },
-          { id: "whats-included", label: "Что входит" },
-          { id: "pricing", label: "Цены" },
-          { id: "contact", label: "Контакты" },
-        ].map((item) => (
-          <button
-            key={item.id}
-            onClick={() => scrollToSection(item.id)}
-            className="block w-full text-left px-4 py-2 text-gray-600 hover:text-blue-600 transition-colors"
-          >
-            {item.label}
-          </button>
-        ))}
-
-        {/* Кнопка Войти в мобильном меню */}
-        <div className="mt-4 px-4">
-          <Link href="/login">
-            <Button
-              variant="outline"
-              className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent"
-            >
-              Войти
-            </Button>
-          </Link>
-        </div>
-      </div>
-    )}
-  </div>
-</nav>
-
+      </nav>
 
       {/* Hero Section */}
       <section id="hero" className="pt-24 pb-16 px-4 overflow-hidden">
@@ -399,10 +393,10 @@ const scrollToDemo = useCallback(() => {
                 </Badge>
               </div>
 
-                <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                  ИИ-консультант, который <span className="text-blue-600">увеличивает продажи на 40%</span> за 10 минут
-                  установки
-                </h1>
+              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
+                ИИ-консультант, который <span className="text-blue-600">увеличивает продажи на 40%</span> за 10 минут
+                установки
+              </h1>
 
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                 Работает 24/7, заменяет живого сотрудника и экономит до 600,000₽ в год. Без программирования.
@@ -410,13 +404,13 @@ const scrollToDemo = useCallback(() => {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
-  onClick={scrollToDemo}
-  size="lg"
-  className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
->
-  <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-  Попробовать демо
-</Button>
+                  onClick={scrollToDemo}
+                  size="lg"
+                  className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                >
+                  <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                  Попробовать демо
+                </Button>
 
                 <Button
                   size="lg"
@@ -436,7 +430,7 @@ const scrollToDemo = useCallback(() => {
                 alt="Современный программист за работой"
                 className="relative z-10 w-full h-auto rounded-2xl shadow-2xl"
               />
-              <div className="absolute -bottom-13 -left-6 bg-white rounded-2xl p-4 shadow-xl animate-float">
+              <div className="absolute -bottom-1 -left-6 bg-white rounded-2xl p-4 shadow-xl">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                   <span className="text-sm font-medium text-gray-700">ИИ Ассистент активен</span>
@@ -447,7 +441,7 @@ const scrollToDemo = useCallback(() => {
         </div>
       </section>
 
-            {/* How It Works Section */}
+      {/* How It Works Section */}
       <section id="how-it-works" className="py-16 px-4 bg-white">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16 animate-fade-in-up">
@@ -508,7 +502,7 @@ const scrollToDemo = useCallback(() => {
         </div>
       </section>
 
-            {/* Benefits */}
+      {/* Benefits */}
       <section id="benefits" className="py-20 relative z-10">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
@@ -563,59 +557,106 @@ const scrollToDemo = useCallback(() => {
         </div>
       </section>
 
-{/* Demo Section */}
-<section id="demo" className="py-16 px-4 bg-white">
-  <div className="container mx-auto max-w-6xl">
-    <div className="text-center mb-16 animate-fade-in-up">
-      <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Попробуйте прямо сейчас</h2>
-      <p className="text-xl text-gray-600">3 готовых ИИ-консультанта для разных ниш</p>
-    </div>
+      {/* Demo Section */}
+      <section id="demo" className="py-16 px-4 bg-white">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16 animate-fade-in-up">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Попробуйте прямо сейчас</h2>
+            <p className="text-xl text-gray-600">3 готовых ИИ-консультанта для разных ниш</p>
+          </div>
 
-    <div className="grid md:grid-cols-3 gap-6">
-      {[
-  {
-    name: "Психолог Анна",
-    specialty: "Психологическая поддержка",
-    avatar: "👩‍⚕️",
-    color: "from-pink-500 to-rose-500",
-    prompt: "psychology",
-  },
-  {
-    name: "Диетолог Мария",
-    specialty: "Питание и здоровье",
-    avatar: "🥗",
-    color: "from-green-500 to-emerald-500",
-    prompt: "diet",
-  },
-  {
-    name: "Бизнес-коуч Игорь",
-    specialty: "Развитие бизнеса",
-    avatar: "💼",
-    color: "from-blue-500 to-indigo-500",
-    prompt: "business",
-  },
-]
-.map((consultant, index) => (
-        <DemoConsultant
-          key={index}
-          name={consultant.name}
-          specialty={consultant.specialty}
-          avatar={consultant.avatar}
-          color={consultant.color}
-          type={consultant.prompt}
-        />
-      ))}
-    </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                name: "Психолог Анна",
+                specialty: "Психологическая поддержка",
+                avatar: "👩‍⚕️",
+                color: "from-pink-500 to-rose-500",
+                messages: [
+                  "Привет! Я психолог Анна. Помогу разобраться с эмоциональными вопросами и подберу подходящую терапию.",
+                  "Расскажите, что вас беспокоит? Я выслушаю и дам профессиональные рекомендации.",
+                  "Могу записать вас на консультацию к специалисту или предложить техники самопомощи.",
+                ],
+              },
+              {
+                name: "Диетолог Мария",
+                specialty: "Питание и здоровье",
+                avatar: "🥗",
+                color: "from-green-500 to-emerald-500",
+                messages: [
+                  "Здравствуйте! Я диетолог Мария. Помогу составить план питания и достичь ваших целей.",
+                  "Какие у вас цели? Похудение, набор массы или просто здоровое питание?",
+                  "Могу рассчитать калории, составить меню и дать рекомендации по БЖУ.",
+                ],
+              },
+              {
+                name: "Бизнес-коуч Игорь",
+                specialty: "Развитие бизнеса",
+                avatar: "💼",
+                color: "from-blue-500 to-indigo-500",
+                messages: [
+                  "Приветствую! Я бизнес-коуч Игорь. Помогу развить ваш бизнес и увеличить прибыль.",
+                  "Расскажите о вашем бизнесе. Какие задачи нужно решить?",
+                  "Могу провести анализ, составить стратегию роста и дать практические советы.",
+                ],
+              },
+            ].map((consultant, index) => (
+              <Card
+                key={index}
+                className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="text-4xl">{consultant.avatar}</div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">{consultant.name}</h3>
+                      <p className="text-sm text-gray-600">{consultant.specialty}</p>
+                    </div>
+                    <div className="ml-auto">
+                      <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">Онлайн</Badge>
+                    </div>
+                  </div>
 
-    <div className="text-center mt-12">
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 inline-block">
-        <p className="text-amber-800">
-          <strong>💡 Это демо-версия.</strong> В полной версии вы сможете настроить собственного консультанта
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
+                  <div className="space-y-3 mb-4 h-32 overflow-y-auto">
+                    {consultant.messages.map((message, msgIndex) => (
+                      <div key={msgIndex} className="flex items-start gap-2">
+                        <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Bot className="w-3 h-3 text-blue-600" />
+                        </div>
+                        <div className="bg-gray-100 rounded-lg rounded-tl-sm px-3 py-2 text-xs text-gray-800 max-w-xs">
+                          {message}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Напишите сообщение..."
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      disabled
+                    />
+                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" disabled>
+                      <Send className="w-3 h-3" />
+                    </Button>
+                  </div>
+
+                  <div className="text-center text-xs text-gray-500 mt-2">Демо-версия • Осталось сообщений: 3</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 inline-block">
+              <p className="text-amber-800 text-sm">
+                <strong>💡 Это демо-версия.</strong> В полной версии вы сможете настроить собственного консультанта
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Templates Section */}
       <section id="template" className="py-16 px-4 bg-white">
@@ -652,7 +693,7 @@ const scrollToDemo = useCallback(() => {
         </div>
       </section>
 
-            {/* Comparison Table */}
+      {/* Comparison Table */}
       <section className="py-20 relative z-10">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
@@ -663,7 +704,8 @@ const scrollToDemo = useCallback(() => {
           <div className="max-w-4xl mx-auto">
             <Card className="bg-white shadow-xl border-0 overflow-hidden">
               <CardContent className="p-0">
-                <div className="overflow-x-auto">
+                {/* Desktop Table */}
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50">
                       <tr>
@@ -700,6 +742,63 @@ const scrollToDemo = useCallback(() => {
                       </tr>
                     </tbody>
                   </table>
+                </div>
+
+                {/* Mobile Cards */}
+                <div className="md:hidden space-y-4">
+                  {[
+                    {
+                      criterion: "Стоимость в год",
+                      ai: "5,390₽",
+                      human: "600,000₽+",
+                      aiColor: "text-green-600",
+                      humanColor: "text-red-600",
+                    },
+                    {
+                      criterion: "Доступность",
+                      ai: "24/7/365",
+                      human: "8 часов в день",
+                      aiColor: "text-green-600",
+                      humanColor: "text-red-600",
+                    },
+                    {
+                      criterion: "Скорость ответа",
+                      ai: "Мгновенно",
+                      human: "До нескольких минут",
+                      aiColor: "text-green-600",
+                      humanColor: "text-red-600",
+                    },
+                    {
+                      criterion: "Надёжность",
+                      ai: "100% стабильно",
+                      human: "Зависит от настроения",
+                      aiColor: "text-green-600",
+                      humanColor: "text-red-600",
+                    },
+                    {
+                      criterion: "Обучение",
+                      ai: "Не требуется",
+                      human: "Месяцы обучения",
+                      aiColor: "text-green-600",
+                      humanColor: "text-red-600",
+                    },
+                  ].map((item, index) => (
+                    <Card key={index} className="bg-white shadow-sm">
+                      <CardContent className="p-4">
+                        <h4 className="font-semibold text-gray-900 mb-3 text-center">{item.criterion}</h4>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="text-center">
+                            <div className="text-xs text-blue-600 font-medium mb-1">ИИ-консультант</div>
+                            <div className={`text-sm font-semibold ${item.aiColor}`}>{item.ai}</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-xs text-gray-600 font-medium mb-1">Живой сотрудник</div>
+                            <div className={`text-sm font-semibold ${item.humanColor}`}>{item.human}</div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </CardContent>
             </Card>
