@@ -369,9 +369,10 @@ export default function AnimatedLandingPage() {
                 </Badge>
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                ИИ-консультант, который увеличивает продажи на 40% за 10 минут установки
-              </h1>
+                <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+                  ИИ-консультант, который <span className="text-blue-600">увеличивает продажи на 40%</span> за 10 минут
+                  установки
+                </h1>
 
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                 Работает 24/7, заменяет живого сотрудника и экономит до 600,000₽ в год. Без программирования.
