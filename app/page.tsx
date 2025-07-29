@@ -1,205 +1,140 @@
 "use client"
 
-import type React from "react"
-
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import DemoConsultant from "@/components/DemoConsultant"
 import {
-  Bot,
+  Brain,
+  Zap,
+  Palette,
   MessageCircle,
-  Minimize2,
+  ArrowRight,
+  Play,
+  Check,
+  Users,
+  Shield,
+  Smartphone,
+  Monitor,
+  ChevronDown,
+  Mail,
   Send,
 } from "lucide-react"
-import { useState, useEffect, useRef } from "react"
+import Link from "next/link"
 
-interface Message {
-  id: string
-  text: string
-  isUser: boolean
-  timestamp: Date
-}
+export default function HomePage() {
+  const [activeDemo, setActiveDemo] = useState(0)
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
 
-export default function AnimatedLandingPage() {
-  const [chatOpen, setChatOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([{
-    id: "1",
-    text: "Привет! Я ваш ИИ-консультант по интеграции искусственного интеллекта на сайты. Помогу с любыми вопросами о настройке, стоимости и возможностях. О чем хотите узнать?",
-    isUser: false,
-    timestamp: new Date(),
-  }])
-  const [inputMessage, setInputMessage] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
-  const [isOnline] = useState(true)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const demoConsultants = [
+    {
+      name: "Психолог Анна",
+      specialty: "Психологическая поддержка",
+      icon: "👩‍⚕️",
+      messages: 3,
+    },
+    {
+      name: "Диетолог Мария",
+      specialty: "Питание и здоровье",
+      icon: "🥗",
+      messages: 3,
+    },
+    {
+      name: "Бизнес-коуч Игорь",
+      specialty: "Развитие бизнеса",
+      icon: "💼",
+      messages: 3,
+    },
+  ]
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+  const templates = [
+    { icon: "🧠", name: "Психолог", desc: "Первичная поддержка, запись на терапию" },
+    { icon: "🥗", name: "Диетолог", desc: "Советы по питанию, составление меню" },
+    { icon: "💼", name: "Бизнес-консультант", desc: "Анализ бизнеса, стратегии роста" },
+    { icon: "👥", name: "HR-консультант", desc: "Подбор персонала, развитие команды" },
+    { icon: "💰", name: "Финансовый помощник", desc: "Планирование бюджета, инвестиции" },
+    { icon: "🇬🇧", name: "Репетитор английского", desc: "Обучение языку, проверка знаний" },
+    { icon: "🎨", name: "UX-исследователь", desc: "Анализ интерфейса, пользовательский опыт" },
+    { icon: "💪", name: "Фитнес-тренер", desc: "Программы тренировок, мотивация" },
+    { icon: "➕", name: "Создать свой", desc: "Настройте под любую специальность" },
+  ]
 
-  const sendMessage = async () => {
-    if (!inputMessage.trim()) return
+  const useCases = [
+    {
+      title: "Фитнес-тренер",
+      category: "Здоровье и фитнес",
+      desc: "Отвечает на вопросы о тренировках и записывает на консультации",
+    },
+    {
+      title: "Психолог",
+      category: "Психическое здоровье",
+      desc: "Предоставляет первичную поддержку и записывает на терапию",
+    },
+    { title: "Стилист", category: "Мода и стиль", desc: "Помогает с вопросами стиля и записывает на встречи" },
+    { title: "Бизнес-консультант", category: "Бизнес", desc: "Квалифицирует лиды и объясняет пакеты услуг" },
+  ]
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: inputMessage,
-      isUser: true,
-      timestamp: new Date(),
-    }
-
-    const newMessages = [...messages, userMessage]
-    setMessages(newMessages)
-    setInputMessage("")
-    setIsTyping(true)
-
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: inputMessage,
-          chatHistory: messages.slice(-5),
-        }),
-      })
-      const data = await response.json()
-      const botResponse = data.response || "Извините, произошла ошибка. Попробуйте еще раз."
-
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: "",
-        isUser: false,
-        timestamp: new Date(),
-      }
-
-      setMessages((prev) => [...prev, botMessage])
-
-      const words = botResponse.split(" ")
-      for (let i = 0; i < words.length; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 100 + Math.random() * 100))
-        setMessages((prev) => {
-          const updated = [...prev]
-          const lastMessage = updated[updated.length - 1]
-          if (!lastMessage.isUser) {
-            lastMessage.text = words.slice(0, i + 1).join(" ")
-          }
-          return updated
-        })
-      }
-    } catch (error) {
-      console.error("Ошибка отправки сообщения:", error)
-      setMessages((prev) => [...prev, {
-        id: (Date.now() + 1).toString(),
-        text: "Извините, произошла ошибка. Проверьте подключение к интернету.",
-        isUser: false,
-        timestamp: new Date(),
-      }])
-    } finally {
-      setIsTyping(false)
-    }
-  }
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      sendMessage()
-    }
-  }
+  const faqs = [
+    {
+      q: "Нужны ли мне навыки программирования для настройки?",
+      a: "Нет, программирование не требуется. Мы предоставляем готовый код и подробные инструкции для интеграции.",
+    },
+    {
+      q: "Будет ли это работать на моем сайте Tilda/WordPress?",
+      a: "Да, наш ИИ-консультант совместим с любыми платформами через простую интеграцию HTML-кода.",
+    },
+    {
+      q: "Нужно ли платить ежемесячно?",
+      a: "Первый месяц стоит 990₽, далее продление по 400₽/месяц. Без продления консультант продолжает работать, но нельзя менять настройки.",
+    },
+    {
+      q: "Как быстро я получу материалы?",
+      a: "Материалы отправляются мгновенно на email после успешной оплаты.",
+    },
+    {
+      q: "Могу ли я настроить внешний вид?",
+      a: "Да, вы можете полностью настроить дизайн, цвета и стиль консультанта под ваш бренд.",
+    },
+  ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-      {!chatOpen && (
-        <div className="fixed bottom-6 right-6 z-50 animate-bounce">
-          <Button
-            onClick={() => setChatOpen(true)}
-            className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full w-16 h-16 shadow-2xl hover:scale-110"
-          >
-            <MessageCircle className="w-6 h-6" />
-          </Button>
-        </div>
-      )}
-
-      {chatOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-80 h-96 bg-white rounded-2xl shadow-2xl border animate-slide-up">
-          <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-2xl">
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                  <Bot className="w-5 h-5 text-blue-600" />
-                </div>
-                {isOnline && (
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
-                )}
-              </div>
-              <div>
-                <h3 className="font-semibold text-white">ИИ Консультант</h3>
-                <p className="text-xs text-blue-100">{isOnline ? "Онлайн" : "Оффлайн"}</p>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Header */}
+      <header className="border-b border-white/10 backdrop-blur-sm bg-black/20">
+        <div className="container mx-auto px-4 py-4">
+          <nav className="flex items-center justify-between">
+            <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              ИИ Консультант
             </div>
-            <Button onClick={() => setChatOpen(false)} variant="ghost" size="sm" className="text-white">
-              <Minimize2 className="w-4 h-4" />
-            </Button>
-          </div>
-
-          <div className="flex flex-col h-80">
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-xs px-4 py-2 rounded-2xl ${
-                      message.isUser
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    <p className="text-sm">{message.text}</p>
-                  </div>
-                </div>
-              ))}
-              {isTyping && (
-                <div className="flex justify-start">
-                  <div className="bg-gray-100 px-4 py-2 rounded-2xl">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-            <div className="p-4 border-t">
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Напишите сообщение..."
-                  className="flex-1 px-3 py-2 border rounded-full focus:outline-none focus:ring"
-                />
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#how-it-works" className="text-white/80 hover:text-white transition-colors">
+                Как это работает
+              </a>
+              <a href="#templates" className="text-white/80 hover:text-white transition-colors">
+                Что входит
+              </a>
+              <a href="#pricing" className="text-white/80 hover:text-white transition-colors">
+                Цены
+              </a>
+              <a href="#faq" className="text-white/80 hover:text-white transition-colors">
+                Вопросы
+              </a>
+              <a href="#contact" className="text-white/80 hover:text-white transition-colors">
+                Контакты
+              </a>
+              <Link href="/login">
                 <Button
-                  onClick={sendMessage}
-                  disabled={!inputMessage.trim() || isTyping}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full w-10 h-10"
+                  variant="outline"
+                  className="border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10 bg-transparent"
                 >
-                  <Send className="w-4 h-4" />
+                  Войти
                 </Button>
-              </div>
+              </Link>
             </div>
-          </div>
+          </nav>
         </div>
-      )}
-    </div>
-  )
-}
-
+      </header>
 
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden">
@@ -270,96 +205,60 @@ export default function AnimatedLandingPage() {
         </div>
       </section>
 
-{/* Demo Section */}
-<section className="py-20 bg-black/20">
-  <div className="container mx-auto px-4">
-    <div className="text-center mb-12">
-      <h2 className="text-4xl font-bold text-white mb-4">Попробуйте прямо сейчас</h2>
-      <p className="text-xl text-white/70">3 готовых ИИ-консультанта для разных ниш</p>
-    </div>
+      {/* Demo Section */}
+      <section className="py-20 bg-black/20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-white mb-4">Попробуйте прямо сейчас</h2>
+            <p className="text-xl text-white/70">3 готовых ИИ-консультанта для разных ниш</p>
+          </div>
 
-    <div className="grid md:grid-cols-3 gap-6 mb-8">
-      {[
-        {
-          name: "Психолог Анна",
-          specialty: "Психологическая поддержка",
-          avatar: "👩‍⚕️",
-          color: "from-pink-500 to-rose-500",
-          prompt: "psychology",
-          messages: 3,
-        },
-        {
-          name: "Диетолог Мария",
-          specialty: "Питание и здоровье",
-          avatar: "🥗",
-          color: "from-green-500 to-emerald-500",
-          prompt: "diet",
-          messages: 3,
-        },
-        {
-          name: "Бизнес-коуч Игорь",
-          specialty: "Развитие бизнеса",
-          avatar: "💼",
-          color: "from-blue-500 to-indigo-500",
-          prompt: "business",
-          messages: 3,
-        },
-      ].map((consultant, index) => (
-        <div
-          key={index}
-          className="bg-black/40 border border-white/10 rounded-xl backdrop-blur-sm hover:border-cyan-400/50 transition-all cursor-pointer"
-        >
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-2xl">{consultant.avatar}</span>
-              <div>
-                <h3 className="text-white font-semibold">{consultant.name}</h3>
-                <p className="text-white/60 text-sm">{consultant.specialty}</p>
-              </div>
-            </div>
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            {demoConsultants.map((consultant, index) => (
+              <Card
+                key={index}
+                className="bg-black/40 border-white/10 backdrop-blur-sm hover:border-cyan-400/50 transition-all cursor-pointer"
+                onClick={() => setActiveDemo(index)}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-2xl">{consultant.icon}</span>
+                    <div>
+                      <h3 className="text-white font-semibold">{consultant.name}</h3>
+                      <p className="text-white/60 text-sm">{consultant.specialty}</p>
+                    </div>
+                  </div>
 
-            <div className="bg-black/50 rounded-lg p-4 mb-4">
-              <p className="text-white/80 text-sm mb-3">
-                Привет! Я {consultant.name}. {consultant.specialty}. Чем могу помочь?
-              </p>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Напишите сообщение..."
-                  className="bg-white/10 border border-white/20 text-white placeholder:text-white/50 rounded-lg px-3 py-2 w-full text-sm"
-                />
-                <button
-                  className={`bg-gradient-to-r ${consultant.color} text-white rounded-lg px-3 py-2`}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 12h16m0 0l-6-6m6 6l-6 6" />
-                  </svg>
-                </button>
-              </div>
-            </div>
+                  <div className="bg-black/50 rounded-lg p-4 mb-4">
+                    <p className="text-white/80 text-sm mb-3">
+                      Привет! Я {consultant.name}. {consultant.specialty}. Чем могу помочь?
+                    </p>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Напишите сообщение..."
+                        className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                      />
+                      <Button size="icon" className="bg-gradient-to-r from-cyan-500 to-purple-500">
+                        <Send className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
 
-            <div className="text-center">
-              <span className="text-white/60 text-sm">Осталось сообщений: {consultant.messages}</span>
-            </div>
+                  <div className="text-center">
+                    <span className="text-white/60 text-sm">Осталось сообщений: {consultant.messages}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <p className="text-white/60">
+              💡 Это демо-версия. В полной версии вы сможете настроить собственного консультанта
+            </p>
           </div>
         </div>
-      ))}
-    </div>
-
-    <div className="text-center">
-      <p className="text-white/60">
-        💡 Это демо-версия. В полной версии вы сможете настроить собственного консультанта
-      </p>
-    </div>
-  </div>
-</section>
-
+      </section>
 
       {/* How It Works */}
       <section id="how-it-works" className="py-20">
