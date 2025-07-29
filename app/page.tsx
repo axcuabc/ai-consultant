@@ -557,107 +557,59 @@ export default function AnimatedLandingPage() {
         </div>
       </section>
 
-      {/* Demo Section */}
-      <section id="demo" className="py-16 px-4 bg-white">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Попробуйте прямо сейчас</h2>
-            <p className="text-xl text-gray-600">3 готовых ИИ-консультанта для разных ниш</p>
-          </div>
+{/* Demo Section */}
+<section id="demo" className="py-16 px-4 bg-white">
+  <div className="container mx-auto max-w-6xl">
+    <div className="text-center mb-16 animate-fade-in-up">
+      <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Попробуйте прямо сейчас</h2>
+      <p className="text-xl text-gray-600">3 готовых ИИ-консультанта для разных ниш</p>
+    </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                name: "Психолог Анна",
-                specialty: "Психологическая поддержка",
-                avatar: "👩‍⚕️",
-                color: "from-pink-500 to-rose-500",
-                messages: [
-                  "Привет! Я психолог Анна. Помогу разобраться с эмоциональными вопросами и подберу подходящую терапию.",
-                  "Расскажите, что вас беспокоит? Я выслушаю и дам профессиональные рекомендации.",
-                  "Могу записать вас на консультацию к специалисту или предложить техники самопомощи.",
-                ],
-              },
-              {
-                name: "Диетолог Мария",
-                specialty: "Питание и здоровье",
-                avatar: "🥗",
-                color: "from-green-500 to-emerald-500",
-                messages: [
-                  "Здравствуйте! Я диетолог Мария. Помогу составить план питания и достичь ваших целей.",
-                  "Какие у вас цели? Похудение, набор массы или просто здоровое питание?",
-                  "Могу рассчитать калории, составить меню и дать рекомендации по БЖУ.",
-                ],
-              },
-              {
-                name: "Бизнес-коуч Игорь",
-                specialty: "Развитие бизнеса",
-                avatar: "💼",
-                color: "from-blue-500 to-indigo-500",
-                messages: [
-                  "Приветствую! Я бизнес-коуч Игорь. Помогу развить ваш бизнес и увеличить прибыль.",
-                  "Расскажите о вашем бизнесе. Какие задачи нужно решить?",
-                  "Могу провести анализ, составить стратегию роста и дать практические советы.",
-                ],
-              },
-            ].map((consultant, index) => (
-              <Card
-                key={index}
-                className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="text-4xl">{consultant.avatar}</div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{consultant.name}</h3>
-                      <p className="text-sm text-gray-600">{consultant.specialty}</p>
-                    </div>
-                    <div className="ml-auto">
-                      <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">Онлайн</Badge>
-                    </div>
-                  </div>
+    <div className="grid md:grid-cols-3 gap-6">
+      {[
+  {
+    name: "Психолог Анна",
+    specialty: "Психологическая поддержка",
+    avatar: "👩‍⚕️",
+    color: "from-pink-500 to-rose-500",
+    prompt: "psychology",
+  },
+  {
+    name: "Диетолог Мария",
+    specialty: "Питание и здоровье",
+    avatar: "🥗",
+    color: "from-green-500 to-emerald-500",
+    prompt: "diet",
+  },
+  {
+    name: "Бизнес-коуч Игорь",
+    specialty: "Развитие бизнеса",
+    avatar: "💼",
+    color: "from-blue-500 to-indigo-500",
+    prompt: "business",
+  },
+]
+.map((consultant, index) => (
+        <DemoConsultant
+          key={index}
+          name={consultant.name}
+          specialty={consultant.specialty}
+          avatar={consultant.avatar}
+          color={consultant.color}
+          type={consultant.prompt}
+        />
+      ))}
+    </div>
 
-                  <div className="space-y-3 mb-4 h-32 overflow-y-auto">
-                    {consultant.messages.map((message, msgIndex) => (
-                      <div key={msgIndex} className="flex items-start gap-2">
-                        <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Bot className="w-3 h-3 text-blue-600" />
-                        </div>
-                        <div className="bg-gray-100 rounded-lg rounded-tl-sm px-3 py-2 text-xs text-gray-800 max-w-xs">
-                          {message}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Напишите сообщение..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                      disabled
-                    />
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" disabled>
-                      <Send className="w-3 h-3" />
-                    </Button>
-                  </div>
-
-                  <div className="text-center text-xs text-gray-500 mt-2">Демо-версия • Осталось сообщений: 3</div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 inline-block">
-              <p className="text-amber-800 text-sm">
-                <strong>💡 Это демо-версия.</strong> В полной версии вы сможете настроить собственного консультанта
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
+    <div className="text-center mt-12">
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 inline-block">
+        <p className="text-amber-800">
+          <strong>💡 Это демо-версия.</strong> В полной версии вы сможете настроить собственного консультанта
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
       {/* Templates Section */}
       <section id="template" className="py-16 px-4 bg-white">
         <div className="container mx-auto max-w-6xl">
