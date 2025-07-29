@@ -31,7 +31,6 @@ import {
   DollarSign,
   TrendingUp,
   Settings,
-  Link,
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 
@@ -42,13 +41,12 @@ interface Message {
   timestamp: Date
 }
 
-export default function Page() {
+export default function AnimatedLandingPage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("")
   const [chatOpen, setChatOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
-    
     {
       id: "1",
       text: "Привет! Я ваш ИИ-консультант по интеграции искусственного интеллекта на сайты. Помогу с любыми вопросами о настройке, стоимости и возможностях. О чем хотите узнать?",
@@ -116,7 +114,6 @@ export default function Page() {
     setMessages(newMessages)
     setInputMessage("")
     setIsTyping(true)
-    
 
     // Добавляем задержку для реалистичности
     setTimeout(
@@ -186,25 +183,19 @@ export default function Page() {
     }
   }
 
-return (
-  <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-    {/* Floating Chat Button */}
-    {!chatOpen && (
-      <div className="fixed bottom-6 right-6 z-50 animate-bounce">
-        <Button
-          onClick={() => setChatOpen(true)}
-          className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full w-16 h-16 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110"
-        >
-          <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
-        </Button>
-      </div>
-    )}
-
-    {/* Здесь можно добавить остальной интерфейс чата или страницу */}
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+      {/* Floating Chat Button */}
+{!chatOpen && (
+  <div className="fixed bottom-6 right-6 z-50 animate-bounce">
+    <Button
+      onClick={() => setChatOpen(true)}
+      className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full w-16 h-16 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110"
+    >
+      <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+    </Button>
   </div>
-)
-}
-
+)}
 
       {/* Chat Window */}
       {chatOpen && (
@@ -296,80 +287,90 @@ return (
         </div>
       )}
 
-      {/* Sticky Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Bot className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-bold text-xl text-gray-900">ИИ Консультант</span>
-              </div>
-            </div>
+{/* Sticky Navigation */}
+<nav className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
+  <div className="container mx-auto px-4">
+    <div className="flex items-center justify-between h-16">
+      {/* Логотип */}
+      <div className="flex items-center">
+        <div className="flex items-center space-x-2">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <Bot className="w-5 h-5 text-white" />
+          </div>
+          <span className="font-bold text-xl text-gray-900">ИИ Консультант</span>
+        </div>
+      </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              {[
-                { id: "how-it-works", label: "Как это работает" },
-                { id: "benefits", label: "Выгоды" },
-                { id: "templates", label: "Шаблоны" },
-                { id: "pricing", label: "Цены" },
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => scrollToSection(item.id)}
-                  className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-                    activeSection === item.id ? "text-blue-600" : "text-gray-600"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
+      {/* Desktop Navigation */}
+      <div className="hidden md:flex items-center space-x-8">
+        {[
+          { id: "how-it-works", label: "Как это работает" },
+          { id: "benefits", label: "Преимущества" },
+          { id: "templates", label: "Шаблоны" },
+          { id: "pricing", label: "Цены" },
+          { id: "contact", label: "Контакты" },
+        ].map((item) => (
+          <button
+            key={item.id}
+            onClick={() => scrollToSection(item.id)}
+            className={`text-sm font-medium transition-colors hover:text-blue-600 ${
+              activeSection === item.id ? "text-blue-600" : "text-gray-600"
+            }`}
+          >
+            {item.label}
+          </button>
+        ))}
 
-  {/* Кнопка Войти для десктопа */}
-  <Link href="/login">
-    <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent">
-      Войти
-    </Button>
-  </Link>
-</div>
+        {/* Кнопка Войти */}
+        <Link href="/login">
+          <Button
+            variant="outline"
+            className="border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent ml-4"
+          >
+            Войти
+          </Button>
+        </Link>
+      </div>
 
-{/* Mobile Menu Button */}
-<button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-  {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-</button>
-</div>
-
-{/* Mobile Menu */}
-{mobileMenuOpen && (
-  <div className="md:hidden py-4 border-t border-gray-200/50">
-    {[ 
-      { id: "how-it-works", label: "Как это работает" },
-      { id: "whats-included", label: "Что входит" },
-      { id: "pricing", label: "Цены" },
-      { id: "contact", label: "Контакты" },
-    ].map((item) => (
-      <button
-        key={item.id}
-        onClick={() => scrollToSection(item.id)}
-        className="block w-full text-left px-4 py-2 text-gray-600 hover:text-blue-600 transition-colors"
-      >
-        {item.label}
+      {/* Mobile Menu Button */}
+      <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+        {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </button>
-    ))}
-
-    {/* Кнопка Войти для мобильной версии */}
-    <div className="py-2">
-      <Link href="/login">
-        <Button variant="outline" className="w-full text-center border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent">
-          Войти
-        </Button>
-      </Link>
     </div>
+
+    {/* Mobile Menu */}
+    {mobileMenuOpen && (
+      <div className="md:hidden py-4 border-t border-gray-200/50">
+        {[
+          { id: "how-it-works", label: "Как это работает" },
+          { id: "whats-included", label: "Что входит" },
+          { id: "pricing", label: "Цены" },
+          { id: "contact", label: "Контакты" },
+        ].map((item) => (
+          <button
+            key={item.id}
+            onClick={() => scrollToSection(item.id)}
+            className="block w-full text-left px-4 py-2 text-gray-600 hover:text-blue-600 transition-colors"
+          >
+            {item.label}
+          </button>
+        ))}
+
+        {/* Кнопка Войти в мобильном меню */}
+        <div className="mt-4 px-4">
+          <Link href="/login">
+            <Button
+              variant="outline"
+              className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent"
+            >
+              Войти
+            </Button>
+          </Link>
+        </div>
+      </div>
+    )}
   </div>
-)}
+</nav>
 
 
       {/* Hero Section */}
@@ -397,11 +398,10 @@ return (
                   установки
                 </h1>
 
-                <p className="text-xl text-gray-600 leading-relaxed">
-                  Работает 24/7, заменяет живого сотрудника и экономит до 600,000₽ в год. Без программирования.
-                </p>
-              </div>
-              
+              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                Работает 24/7, заменяет живого сотрудника и экономит до 600,000₽ в год. Без программирования.
+              </p>
+
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   size="lg"
