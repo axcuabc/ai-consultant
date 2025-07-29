@@ -300,54 +300,68 @@ export default function AnimatedLandingPage() {
               </div>
             </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              {[
-                { id: "how-it-works", label: "Как это работает" },
-                { id: "whats-included", label: "Что входит" },
-                { id: "pricing", label: "Цены" },
-                { id: "faq", label: "Вопросы" },
-                { id: "contact", label: "Контакты" },
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => scrollToSection(item.id)}
-                  className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-                    activeSection === item.id ? "text-blue-600" : "text-gray-600"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
+{/* Desktop Navigation */}
+<div className="hidden md:flex items-center space-x-8">
+  {[ 
+    { id: "how-it-works", label: "Как это работает" },
+    { id: "benefits", label: "Выгоды" },
+    { id: "templates", label: "Шаблоны" },
+    { id: "pricing", label: "Цены" },
+  ].map((item) => (
+    <button
+      key={item.id}
+      onClick={() => scrollToSection(item.id)}
+      className={`text-sm font-medium transition-colors hover:text-blue-600 ${
+        activeSection === item.id ? "text-blue-600" : "text-gray-600"
+      }`}
+    >
+      {item.label}
+    </button>
+  ))}
 
-            {/* Mobile Menu Button */}
-            <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
+  {/* Кнопка Войти для десктопа */}
+  <Link href="/login">
+    <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent">
+      Войти
+    </Button>
+  </Link>
+</div>
 
-          {/* Mobile Menu */}
-          {mobileMenuOpen && (
-            <div className="md:hidden py-4 border-t border-gray-200/50">
-              {[
-                { id: "how-it-works", label: "Как это работает" },
-                { id: "whats-included", label: "Что входит" },
-                { id: "pricing", label: "Цены" },
-                { id: "contact", label: "Контакты" },
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => scrollToSection(item.id)}
-                  className="block w-full text-left px-4 py-2 text-gray-600 hover:text-blue-600 transition-colors"
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </nav>
+{/* Mobile Menu Button */}
+<button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+  {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+</button>
+</div>
+
+{/* Mobile Menu */}
+{mobileMenuOpen && (
+  <div className="md:hidden py-4 border-t border-gray-200/50">
+    {[ 
+    { id: "how-it-works", label: "Как это работает" },
+    { id: "benefits", label: "Выгоды" },
+    { id: "templates", label: "Шаблоны" },
+    { id: "pricing", label: "Цены" },
+    ].map((item) => (
+      <button
+        key={item.id}
+        onClick={() => scrollToSection(item.id)}
+        className="block w-full text-left px-4 py-2 text-gray-600 hover:text-blue-600 transition-colors"
+      >
+        {item.label}
+      </button>
+    ))}
+
+    {/* Кнопка Войти для мобильной версии */}
+    <div className="py-2">
+      <Link href="/login">
+        <Button variant="outline" className="w-full text-center border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent">
+          Войти
+        </Button>
+      </Link>
+    </div>
+  </div>
+)}
+
 
       {/* Hero Section */}
       <section id="hero" className="pt-24 pb-16 px-4 overflow-hidden">
@@ -374,9 +388,9 @@ export default function AnimatedLandingPage() {
                   установки
                 </h1>
 
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Работает 24/7, заменяет живого сотрудника и экономит до 600,000₽ в год. Без программирования.
-              </p>
+                <p className="text-xl text-gray-600 leading-relaxed">
+                  Работает 24/7, заменяет живого сотрудника и экономит до 600,000₽ в год. Без программирования.
+                </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
