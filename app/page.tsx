@@ -1,13 +1,7 @@
 "use client"
 
-<<<<<<< HEAD
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Bot, Play, Zap, Shield, CheckCircle, ChevronDown, CreditCard, ArrowRight, Menu, X } from "lucide-react"
-import { useState, useEffect } from "react"
-=======
 import type React from "react"
+import { supabase } from "@/lib/supabase"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -48,14 +42,11 @@ interface Message {
   isUser: boolean
   timestamp: Date
 }
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
 
 export default function AnimatedLandingPage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("")
-<<<<<<< HEAD
-=======
   const [chatOpen, setChatOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -69,7 +60,6 @@ export default function AnimatedLandingPage() {
   const [isTyping, setIsTyping] = useState(false)
   const [isOnline] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
 
   const toggleFAQ = (index: number) => {
     setOpenFAQ(openFAQ === index ? null : index)
@@ -82,12 +72,6 @@ export default function AnimatedLandingPage() {
     }
     setMobileMenuOpen(false)
   }
-<<<<<<< HEAD
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = ["hero", "demo", "how-it-works", "whats-included", "pricing", "faq", "contact"]
-=======
   const scrollToDemo = useCallback(() => {
     const section = document.getElementById("demo")
     if (section) {
@@ -105,7 +89,6 @@ export default function AnimatedLandingPage() {
   useEffect(() => {
     const handleScroll = () => {
       const sections = ["hero", "how-it-works", "whats-included", "pricing", "faq", "contact"]
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
       const scrollPosition = window.scrollY + 100
 
       for (const section of sections) {
@@ -124,10 +107,6 @@ export default function AnimatedLandingPage() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-<<<<<<< HEAD
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-=======
   const sendMessage = async () => {
     if (!inputMessage.trim()) return
 
@@ -315,15 +294,11 @@ export default function AnimatedLandingPage() {
         </div>
       )}
 
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
       {/* Sticky Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-<<<<<<< HEAD
-=======
             {/* Логотип */}
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
             <div className="flex items-center">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -336,18 +311,11 @@ export default function AnimatedLandingPage() {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               {[
-<<<<<<< HEAD
-                { id: "demo", label: "Демо" },
-                { id: "how-it-works", label: "Как работает" },
-                { id: "pricing", label: "Цены" },
-                { id: "faq", label: "Вопросы" },
-=======
                 { id: "how-it-works", label: "Как это работает" },
                 { id: "benefits", label: "Преимущества" },
                 { id: "template", label: "Шаблоны" },
                 { id: "pricing", label: "Цены" },
                 { id: "contact", label: "Контакты" },
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
               ].map((item) => (
                 <button
                   key={item.id}
@@ -359,8 +327,6 @@ export default function AnimatedLandingPage() {
                   {item.label}
                 </button>
               ))}
-<<<<<<< HEAD
-=======
 
               {/* Кнопка Войти */}
               <Link href="/login">
@@ -371,7 +337,6 @@ export default function AnimatedLandingPage() {
                   Войти
                 </Button>
               </Link>
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
             </div>
 
             {/* Mobile Menu Button */}
@@ -384,16 +349,10 @@ export default function AnimatedLandingPage() {
           {mobileMenuOpen && (
             <div className="md:hidden py-4 border-t border-gray-200/50">
               {[
-<<<<<<< HEAD
-                { id: "demo", label: "Демо" },
-                { id: "how-it-works", label: "Как работает" },
-                { id: "pricing", label: "Цены" },
-=======
                 { id: "how-it-works", label: "Как это работает" },
                 { id: "whats-included", label: "Что входит" },
                 { id: "pricing", label: "Цены" },
                 { id: "contact", label: "Контакты" },
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
               ].map((item) => (
                 <button
                   key={item.id}
@@ -403,8 +362,6 @@ export default function AnimatedLandingPage() {
                   {item.label}
                 </button>
               ))}
-<<<<<<< HEAD
-=======
 
               {/* Кнопка Войти в мобильном меню */}
               <div className="mt-4 px-4">
@@ -417,7 +374,6 @@ export default function AnimatedLandingPage() {
                   </Button>
                 </Link>
               </div>
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
             </div>
           )}
         </div>
@@ -431,31 +387,6 @@ export default function AnimatedLandingPage() {
               <div className="flex flex-wrap gap-3 mb-6">
                 <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
                   <Zap className="w-4 h-4 mr-1" />
-<<<<<<< HEAD
-                  Персональный ИИ
-                </Badge>
-                <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors">
-                  <Shield className="w-4 h-4 mr-1" />
-                  30 дней доступа
-                </Badge>
-                <Badge className="bg-green-100 text-green-700 hover:bg-green-200 transition-colors">
-                  <CheckCircle className="w-4 h-4 mr-1" />
-                  Готовые шаблоны
-                </Badge>
-              </div>
-
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                Персональный{" "}
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  ИИ-консультант
-                </span>{" "}
-                для вашей ниши
-              </h1>
-
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Готовые шаблоны для психологов, диетологов, бизнес-консультантов и других специалистов. Настройте один
-                раз — работает 24/7.
-=======
                   Без кода
                 </Badge>
                 <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors">
@@ -475,26 +406,10 @@ export default function AnimatedLandingPage() {
 
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                 Работает 24/7, заменяет живого сотрудника и экономит до 600,000₽ в год. Без программирования.
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
-<<<<<<< HEAD
-                  size="lg"
-                  className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                  onClick={() => (window.location.href = "/checkout")}
-                >
-                  <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                  Получить доступ — 990₽
-                </Button>
-                <Button
-                  size="lg"
-                  className="group bg-white text-gray-900 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                  onClick={() => scrollToSection("demo")}
-                >
-                  Попробовать демо
-=======
                   onClick={scrollToDemo}
                   size="lg"
                   className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
@@ -509,7 +424,6 @@ export default function AnimatedLandingPage() {
                   onClick={() => (window.location.href = "/payment")}
                 >
                   Купить сейчас
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
@@ -518,58 +432,6 @@ export default function AnimatedLandingPage() {
             <div className="relative animate-fade-in-right">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-3xl blur-3xl animate-pulse"></div>
               <img
-<<<<<<< HEAD
-                src="/placeholder.svg?height=500&width=600&text=AI+Consultant+Dashboard"
-                alt="Панель управления ИИ консультантом"
-                className="relative z-10 w-full h-auto rounded-2xl shadow-2xl"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Demo Section */}
-      <section id="demo" className="py-16 px-4 bg-white">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Попробуйте прямо сейчас</h2>
-            <p className="text-xl text-gray-600">3 готовых ИИ-консультанта для разных ниш</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                name: "Психолог Анна",
-                specialty: "Психологическая поддержка",
-                avatar: "👩‍⚕️",
-                color: "from-pink-500 to-rose-500",
-                prompt: "психолог",
-              },
-              {
-                name: "Диетолог Мария",
-                specialty: "Питание и здоровье",
-                avatar: "🥗",
-                color: "from-green-500 to-emerald-500",
-                prompt: "диетолог",
-              },
-              {
-                name: "Бизнес-коуч Игорь",
-                specialty: "Развитие бизнеса",
-                avatar: "💼",
-                color: "from-blue-500 to-indigo-500",
-                prompt: "бизнес-консультант",
-              },
-            ].map((consultant, index) => (
-              <DemoConsultant key={index} consultant={consultant} />
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 inline-block">
-              <p className="text-amber-800">
-                <strong>💡 Это демо-версия.</strong> В полной версии вы сможете настроить собственного консультанта
-              </p>
-=======
                 src="/images/hero-programmer.png"
                 alt="Современный программист за работой"
                 className="relative z-10 w-full h-auto rounded-2xl shadow-2xl"
@@ -580,66 +442,40 @@ export default function AnimatedLandingPage() {
                   <span className="text-sm font-medium text-gray-700">ИИ Ассистент активен</span>
                 </div>
               </div>
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
             </div>
           </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-<<<<<<< HEAD
-      <section id="how-it-works" className="py-16 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Как это работает</h2>
-            <p className="text-xl text-gray-600">Получите своего ИИ-консультанта в 3 простых шага</p>
-=======
       <section id="how-it-works" className="py-16 px-4 bg-white">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16 animate-fade-in-up">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Как это работает</h2>
             <p className="text-xl text-gray-600">Запусти своего ИИ-консультанта в 3 простых шага</p>
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 step: "01",
-<<<<<<< HEAD
-                title: "Оплачиваете доступ",
-                description: "После оплаты 990₽ получаете логин и пароль на email",
-=======
                 title: "Оплати - мгновенный доступ",
                 description: "Получите все материалы и инструкции сразу после оплаты",
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
                 icon: CreditCard,
                 color: "from-blue-500 to-blue-600",
               },
               {
                 step: "02",
-<<<<<<< HEAD
-                title: "Настраиваете консультанта",
-                description: "Выбираете шаблон, настраиваете под свою нишу и бренд",
-                icon: Bot,
-=======
                 title: "Вставь код на сайт",
                 description: "Скопируйте готовый код и вставьте на ваш сайт за 2 минуты",
                 icon: Code,
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
                 color: "from-purple-500 to-purple-600",
               },
               {
                 step: "03",
-<<<<<<< HEAD
-                title: "Получаете ссылку",
-                description: "Ваш ИИ-консультант готов работать 24/7 с клиентами",
-                icon: CheckCircle,
-=======
                 title: "ИИ-консультант помогает клиентам 24/7",
                 description: "Ваш ИИ начинает работать мгновенно и никогда не спит",
                 icon: Bot,
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
                 color: "from-green-500 to-green-600",
               },
             ].map((step, index) => (
@@ -672,10 +508,6 @@ export default function AnimatedLandingPage() {
         </div>
       </section>
 
-<<<<<<< HEAD
-      {/* Templates Section */}
-      <section className="py-16 px-4 bg-white">
-=======
       {/* Benefits */}
       <section id="benefits" className="py-20 relative z-10">
         <div className="container mx-auto px-4">
@@ -786,7 +618,6 @@ export default function AnimatedLandingPage() {
 </section>
       {/* Templates Section */}
       <section id="template" className="py-16 px-4 bg-white">
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Готовые шаблоны для любой ниши</h2>
@@ -820,8 +651,6 @@ export default function AnimatedLandingPage() {
         </div>
       </section>
 
-<<<<<<< HEAD
-=======
       {/* Comparison Table */}
       <section className="py-20 relative z-10">
         <div className="container mx-auto px-4">
@@ -944,7 +773,6 @@ export default function AnimatedLandingPage() {
         </div>
       </section>
 
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
       {/* Pricing Section */}
       <section id="pricing" className="py-16 px-4 bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="container mx-auto max-w-4xl text-center">
@@ -977,11 +805,7 @@ export default function AnimatedLandingPage() {
                   </ul>
                   <Button
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-<<<<<<< HEAD
-                    onClick={() => (window.location.href = "/checkout")}
-=======
                     onClick={() => (window.location.href = "/payment")}
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
                   >
                     Начать сейчас
                   </Button>
@@ -1030,12 +854,6 @@ export default function AnimatedLandingPage() {
                 <p>
                   ❌ <strong>Нельзя изменять настройки</strong> — промпт, внешний вид остаются прежними
                 </p>
-<<<<<<< HEAD
-                <p>
-                  💡 <strong>Один консультант на пользователя</strong> — фокус на качестве, а не количестве
-                </p>
-=======
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
               </div>
             </div>
           </div>
@@ -1047,41 +865,12 @@ export default function AnimatedLandingPage() {
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-16 animate-fade-in-up">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Часто задаваемые вопросы</h2>
-<<<<<<< HEAD
-            <p className="text-xl text-gray-600">Всё что нужно знать о подписке</p>
-=======
             <p className="text-xl text-gray-600">Всё что нужно знать</p>
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
           </div>
 
           <div className="space-y-4">
             {[
               {
-<<<<<<< HEAD
-                question: "Как создается мой персональный ИИ-консультант?",
-                answer:
-                  "После оплаты мы создаём для вас уникального ИИ-консультанта с собственным ID. Он привязан к нашему API и работает на модели DeepSeek. Вы получаете ссылку для размещения на сайте или в соцсетях.",
-              },
-              {
-                question: "Что происходит после истечения подписки?",
-                answer:
-                  "Ваш ИИ-консультант продолжает работать и отвечать клиентам, но вы не сможете изменять промпт, внешний вид или настройки. Для внесения изменений нужно продлить подписку за 400₽.",
-              },
-              {
-                question: "Можно ли создать несколько консультантов?",
-                answer:
-                  "Нет, на одного пользователя предоставляется один ИИ-консультант. Мы сосредоточены на качестве и персонализации одного помощника под вашу конкретную нишу.",
-              },
-              {
-                question: "Какие есть готовые шаблоны?",
-                answer:
-                  "У нас есть шаблоны для психологов, диетологов, бизнес-консультантов, HR-специалистов, финансовых консультантов, репетиторов английского, UX-исследователей и фитнес-тренеров. Также можно создать свой уникальный шаблон.",
-              },
-              {
-                question: "Как быстро я получу доступ к консультанту?",
-                answer:
-                  "Сразу после оплаты на ваш email придет письмо с логином, паролем и инструкциями. Настройка консультанта займет 5-10 минут, после чего он будет готов к работе.",
-=======
                 question: "Нужны ли мне навыки программирования для настройки?",
                 answer:
                   "Совсем нет! Наше пошаговое руководство показывает точно, куда вставить код. Если умеешь копировать и вставлять, то сможешь это настроить.",
@@ -1105,7 +894,6 @@ export default function AnimatedLandingPage() {
                 question: "Могу ли я настроить внешний вид?",
                 answer:
                   "Пакет включает несколько вариантов стилизации и инструкции о том, как подстроить под цвета и дизайн твоего бренда.",
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
               },
             ].map((faq, index) => (
               <Card
@@ -1133,8 +921,6 @@ export default function AnimatedLandingPage() {
         </div>
       </section>
 
-<<<<<<< HEAD
-=======
       {/* Support Section */}
       <section id="contact" className="py-16 px-4">
         <div className="container mx-auto max-w-4xl text-center">
@@ -1166,7 +952,6 @@ export default function AnimatedLandingPage() {
         </div>
       </section>
 
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
       {/* Footer */}
       <footer className="px-4 py-8 bg-gray-900 text-white">
         <div className="container mx-auto max-w-6xl">
@@ -1181,12 +966,6 @@ export default function AnimatedLandingPage() {
               <p className="text-gray-400">&copy; 2025 Все права защищены</p>
             </div>
             <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm">
-<<<<<<< HEAD
-              <a href="/login" className="text-gray-400 hover:text-white transition-colors">
-                Вход в кабинет
-              </a>
-              <span className="text-gray-400">Работает на DeepSeek API</span>
-=======
               <a href="/terms" className="text-gray-400 hover:text-white transition-colors">
                 Пользовательское соглашение
               </a>
@@ -1194,7 +973,6 @@ export default function AnimatedLandingPage() {
                 Контакты и реквизиты
               </a>
               <span className="text-gray-400">Работает на ChatGPT API</span>
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
             </div>
           </div>
         </div>
@@ -1243,8 +1021,6 @@ export default function AnimatedLandingPage() {
           }
         }
         
-<<<<<<< HEAD
-=======
         @keyframes slide-up {
           from {
             opacity: 0;
@@ -1265,7 +1041,6 @@ export default function AnimatedLandingPage() {
           }
         }
         
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
         .animate-fade-in-up {
           animation: fade-in-up 0.6s ease-out forwards;
         }
@@ -1281,8 +1056,6 @@ export default function AnimatedLandingPage() {
         .animate-fade-in {
           animation: fade-in 0.3s ease-out forwards;
         }
-<<<<<<< HEAD
-=======
         
         .animate-slide-up {
           animation: slide-up 0.3s ease-out forwards;
@@ -1291,135 +1064,7 @@ export default function AnimatedLandingPage() {
         .animate-float {
           animation: float 3s ease-in-out infinite;
         }
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
       `}</style>
     </div>
   )
 }
-<<<<<<< HEAD
-
-// Компонент демо-консультанта
-function DemoConsultant({ consultant }: { consultant: any }) {
-  const [messages, setMessages] = useState([
-    { text: `Привет! Я ${consultant.name}. ${consultant.specialty}. Чем могу помочь?`, isUser: false },
-  ])
-  const [input, setInput] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
-  const [messageCount, setMessageCount] = useState(0)
-
-  const sendMessage = async () => {
-    if (!input.trim() || messageCount >= 3) return
-
-    const newMessages = [...messages, { text: input, isUser: true }]
-    setMessages(newMessages)
-    setInput("")
-    setIsTyping(true)
-    setMessageCount((prev) => prev + 1)
-
-    // Имитируем ответ ИИ
-    setTimeout(
-      () => {
-        const responses = {
-          психолог: [
-            "Понимаю ваши переживания. Расскажите подробнее, что вас беспокоит?",
-            "Это действительно важный вопрос. Какие эмоции вы испытываете чаще всего?",
-            "Благодарю за доверие. Хотели бы записаться на личную консультацию для более глубокой работы?",
-          ],
-          диетолог: [
-            "Отличный вопрос о питании! Расскажите о ваших текущих пищевых привычках.",
-            "Для составления плана питания мне важно знать ваши цели и образ жизни.",
-            "Рекомендую записаться на персональную консультацию для составления индивидуального плана питания.",
-          ],
-          "бизнес-консультант": [
-            "Интересная бизнес-задача! Расскажите больше о вашей текущей ситуации.",
-            "Для анализа нужно понимать ваши ресурсы и цели. Какой у вас бюджет на развитие?",
-            "Предлагаю обсудить стратегию развития на индивидуальной консультации.",
-          ],
-        }
-
-        const responseIndex = Math.min(messageCount, 2)
-        const response = responses[consultant.prompt as keyof typeof responses][responseIndex]
-
-        setMessages((prev) => [...prev, { text: response, isUser: false }])
-        setIsTyping(false)
-      },
-      1000 + Math.random() * 1000,
-    )
-  }
-
-  return (
-    <Card className="h-96 flex flex-col">
-      <div className={`bg-gradient-to-r ${consultant.color} text-white p-4 rounded-t-lg`}>
-        <div className="flex items-center space-x-3">
-          <div className="text-2xl">{consultant.avatar}</div>
-          <div>
-            <h3 className="font-bold">{consultant.name}</h3>
-            <p className="text-sm opacity-90">{consultant.specialty}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-1 p-4 overflow-y-auto">
-        {messages.map((msg, idx) => (
-          <div key={idx} className={`mb-3 ${msg.isUser ? "text-right" : "text-left"}`}>
-            <div
-              className={`inline-block p-2 rounded-lg text-sm max-w-[80%] ${
-                msg.isUser ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-800"
-              }`}
-            >
-              {msg.text}
-            </div>
-          </div>
-        ))}
-        {isTyping && (
-          <div className="text-left mb-3">
-            <div className="inline-block p-2 rounded-lg bg-gray-100">
-              <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                <div
-                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.1s" }}
-                ></div>
-                <div
-                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.2s" }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {messageCount >= 3 ? (
-        <div className="p-4 bg-amber-50 border-t">
-          <p className="text-sm text-amber-800 text-center mb-2">Лимит сообщений достигнут</p>
-          <Button
-            size="sm"
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600"
-            onClick={() => (window.location.href = "/checkout")}
-          >
-            Получить полный доступ
-          </Button>
-        </div>
-      ) : (
-        <div className="p-4 border-t">
-          <div className="flex space-x-2">
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-              placeholder="Напишите сообщение..."
-              className="flex-1 px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <Button size="sm" onClick={sendMessage} disabled={!input.trim() || isTyping}>
-              →
-            </Button>
-          </div>
-          <p className="text-xs text-gray-500 mt-2 text-center">Осталось сообщений: {3 - messageCount}</p>
-        </div>
-      )}
-    </Card>
-  )
-}
-=======
->>>>>>> 6cf3ccb301f7828a509f07a213f938e79ebccbfd
