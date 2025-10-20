@@ -1,5 +1,8 @@
-export const dynamic = "force-dynamic";
+// 🚀 Эти две строки должны быть самыми первыми!
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const preferredRegion = "auto";
+
 
 import { NextResponse } from "next/server";
 import crypto from "crypto";
