@@ -32,12 +32,12 @@ export default function LoginPage() {
         return
       }
 
-      // ✅ Сохраняем сессию (если хочешь — email и т.д.)
+      // ✅ Сохраняем код в localStorage
       localStorage.setItem("access_code", code)
       localStorage.setItem("user_email", data.email)
 
-      // 🌍 Перенаправляем на отдельную платформу
-      window.location.href = "https://ai-consultant-platform.vercel.app"
+      // 🌍 Перенаправляем на платформу с кодом в URL
+      window.location.href = `https://ai-consultant-platform.vercel.app?code=${encodeURIComponent(code)}`
     } catch (err) {
       setError("Ошибка сервера. Попробуйте позже.")
     } finally {
