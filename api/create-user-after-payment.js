@@ -1,18 +1,9 @@
-// 🚀 Эти две строки должны быть самыми первыми!
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const preferredRegion = "auto";
-
-
-import { NextResponse } from "next/server";
+// ✅ Node.js API endpoint (работает без ошибок при билде)
 import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
 
-// 💾 Supabase admin client
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+// 🧠 Создаём Supabase client с правами администратора
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 // 🔐 Генерация безопасного пароля
 function generatePassword(length = 10) {
@@ -24,7 +15,7 @@ function generatePassword(length = 10) {
 async function sendPasswordEmail(email, password, amount) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.error("❌ RESEND_API_KEY is missing");
+    console.error("❌ RESEND_API_KEY отсутствует");
     return false;
   }
 
@@ -49,47 +40,60 @@ async function sendPasswordEmail(email, password, amount) {
              style="background:#3B82F6;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;display:inline-block;margin-top:10px;">
              Войти в личный кабинет
           </a>
+          <p style="color:#666;margin-top:20px;font-size:14px;">Пароль действителен 30 дней. После входа вы можете его изменить.</p>
         </div>`,
     }),
   });
 
   if (!res.ok) {
-    console.error("❌ Email send failed:", await res.text());
+    console.error("❌ Ошибка отправки письма:", await res.text());
     return false;
   }
 
-  console.log("✅ Email sent to", email);
+  console.log("✅ Письмо успешно отправлено:", email);
   return true;
 }
 
-// 🧠 Основной API endpoint
-export async function POST(req) {
+// ⚙️ Основной endpoint
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ success: false, error: "Метод не разрешён" });
+  }
+
   try {
-    const { email, amount, payment_id } = await req.json();
+    const { email, amount, payment_id } = req.body;
 
     if (!email || !amount) {
-      return NextResponse.json({ success: false, error: "Email и сумма обязательны" }, { status: 400 });
+      return res.status(400).json({ success: false, error: "Email и сумма обязательны" });
     }
 
     const password = generatePassword();
     let userId = null;
 
-    // Проверяем существующего пользователя
+    // Проверяем, существует ли пользователь
     const { data: userCheck } = await supabase.auth.admin.getUserByEmail(email);
+
     if (userCheck?.user) {
+      // уже есть
       userId = userCheck.user.id;
+      console.log("👤 Пользователь уже существует:", email);
     } else {
-      // Создаём нового
+      // создаём нового
       const { data: newUser, error: createErr } = await supabase.auth.admin.createUser({
         email,
         password,
         email_confirm: true,
       });
+
       if (createErr) {
-        console.error("❌ Create user error:", createErr);
-        return NextResponse.json({ success: false, error: "Ошибка создания пользователя" }, { status: 500 });
+        console.error("❌ Ошибка создания пользователя:", createErr);
+        return res.status(500).json({ success: false, error: "Ошибка создания пользователя" });
       }
+
       userId = newUser.user.id;
+      console.log("✅ Новый пользователь создан:", email);
+
+      // Отправляем письмо
       await sendPasswordEmail(email, password, amount);
     }
 
@@ -105,14 +109,15 @@ export async function POST(req) {
         created_at: new Date().toISOString(),
       },
     ]);
+
     if (purchaseErr) {
-      console.error("❌ Purchase save error:", purchaseErr);
-      return NextResponse.json({ success: false, error: "Ошибка сохранения покупки" }, { status: 500 });
+      console.error("❌ Ошибка сохранения покупки:", purchaseErr);
+      return res.status(500).json({ success: false, error: "Ошибка сохранения покупки" });
     }
 
-    return NextResponse.json({ success: true, user_id: userId });
+    return res.status(200).json({ success: true, user_id: userId });
   } catch (err) {
-    console.error("❌ Server error:", err);
-    return NextResponse.json({ success: false, error: "Внутренняя ошибка сервера" }, { status: 500 });
+    console.error("❌ Ошибка сервера:", err);
+    return res.status(500).json({ success: false, error: "Внутренняя ошибка сервера" });
   }
 }
