@@ -111,7 +111,7 @@ export default async function handler(req, res) {
     ]);
 
     if (purchaseErr) {
-      console.error("❌ Ошибка сохранения покупки:", purchaseErr);
+      console.error("❌ Ошибка сохранения поокупки:", purchaseErr);
       return res.status(500).json({ success: false, error: "Ошибка сохранения покупки" });
     }
 
