@@ -40,7 +40,7 @@ export default function LoginPage() {
       localStorage.setItem("userCode", password)
 
       // ✅ Перенаправление на защищённый сайт
-      window.location.href = "https://platform.aiconsultant.com"
+      window.location.href = "https://ai-consultant-platform.vercel.app"
     } catch (err) {
       console.error(err)
       setError("Ошибка соединения с сервером.")
