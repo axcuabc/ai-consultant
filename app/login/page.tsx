@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,13 +11,40 @@ import { ArrowLeft, Lock, Mail, Eye, EyeOff, Shield, Clock, CheckCircle } from "
 import Link from "next/link"
 
 export default function LoginPage() {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Login attempt:", { email, password })
+    setError("")
+
+    try {
+      const res = await fetch("/api/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: password }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok || !data.success) {
+        setError("Неверный или просроченный код.")
+        return
+      }
+
+      // Сохраняем токен и email локально
+      localStorage.setItem("userEmail", data.email)
+      localStorage.setItem("userCode", password)
+
+      // ✅ Перенаправление на защищённый сайт
+      window.location.href = "https://platform.aiconsultant.com"
+    } catch (err) {
+      console.error(err)
+      setError("Ошибка соединения с сервером.")
+    }
   }
 
   return (
@@ -33,14 +61,14 @@ export default function LoginPage() {
               <Lock className="w-8 h-8 text-white" />
             </div>
             <CardTitle className="text-2xl text-gray-900">Вход в систему</CardTitle>
-            <p className="text-gray-500">Введите данные для доступа к панели управления</p>
+            <p className="text-gray-500">Введите код, полученный после оплаты</p>
           </CardHeader>
 
           <CardContent className="space-y-6">
             <Alert className="bg-blue-50 border-blue-200">
               <Mail className="w-4 h-4 text-blue-600" />
               <AlertDescription className="text-sm text-blue-800 mt-2">
-                Пароль для входа придет на почту после оплаты
+                Код для входа отправляется на вашу почту после оплаты.
               </AlertDescription>
             </Alert>
 
@@ -62,13 +90,13 @@ export default function LoginPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm text-gray-700">
-                  Пароль
+                  Код доступа
                 </Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Введите пароль"
+                    placeholder="Введите код"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="bg-white border-gray-300 text-gray-900 pr-10"
@@ -83,6 +111,8 @@ export default function LoginPage() {
                   </button>
                 </div>
               </div>
+
+              {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
               <Button
                 type="submit"
@@ -103,9 +133,9 @@ export default function LoginPage() {
               <div className="text-gray-400 text-xs">
                 <p>После оплаты вы получите:</p>
                 <ul className="mt-2 space-y-1 text-left max-w-xs mx-auto">
-                  <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-green-500" /> Логин и пароль на email</li>
-                  <li className="flex items-center"><Clock className="w-4 h-4 mr-2 text-blue-500" /> Мгновенный доступ</li>
-                  <li className="flex items-center"><Shield className="w-4 h-4 mr-2 text-purple-500" /> Гарантии и поддержка</li>
+                  <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-green-500" /> Индивидуальный код на email</li>
+                  <li className="flex items-center"><Clock className="w-4 h-4 mr-2 text-blue-500" /> Доступ на 30 дней</li>
+                  <li className="flex items-center"><Shield className="w-4 h-4 mr-2 text-purple-500" /> Защищённая авторизация</li>
                 </ul>
               </div>
             </div>
