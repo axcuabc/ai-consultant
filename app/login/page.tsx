@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,7 +12,6 @@ export default function LoginPage() {
   const [code, setCode] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,12 +32,12 @@ export default function LoginPage() {
         return
       }
 
-      // ✅ Сохраняем сессию (можно хранить email, если нужно)
+      // ✅ Сохраняем сессию (если хочешь — email и т.д.)
       localStorage.setItem("access_code", code)
       localStorage.setItem("user_email", data.email)
 
-      // 🔁 Перенаправляем в личный кабинет
-      router.push("/dashboard")
+      // 🌍 Перенаправляем на отдельную платформу
+      window.location.href = "https://ai-consultant-platform.vercel.app"
     } catch (err) {
       setError("Ошибка сервера. Попробуйте позже.")
     } finally {
@@ -82,9 +80,7 @@ export default function LoginPage() {
               />
             </div>
 
-            {error && (
-              <p className="text-sm text-red-600 text-center">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-600 text-center">{error}</p>}
 
             <Button
               type="submit"
