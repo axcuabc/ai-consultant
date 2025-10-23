@@ -345,7 +345,7 @@ export default function PaymentPage() {
             {/* Правый столбец — превью (замени src на свой скрин) */}
             <div className="rounded-xl bg-white ring-1 ring-gray-200 overflow-hidden">
               <img
-                src="/images/platform-preview.png"
+                src="/images/2025-10-23_23-59-44.png"
                 alt="Интерфейс платформы ИИ-консультанта"
                 className="w-full h-auto"
                 loading="lazy"
