@@ -304,7 +304,7 @@ export default function AnimatedLandingPage() {
     <img
       src="/branding/icononmysitec.svg"
       alt="FORMAII — КОНСУЛЬТАНТЫ"
-      className="h-10 w-auto block"  // высота ≈ 40px; впишется в h-16 шапки
+      className="h-18 w-auto block"  // высота ≈ 40px; впишется в h-16 шапки
     />
   </Link>
 </div>
