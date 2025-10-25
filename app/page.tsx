@@ -298,15 +298,17 @@ export default function AnimatedLandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            {/* Логотип */}
-            <div className="flex items-center">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Bot className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-bold text-xl text-gray-900">ИИ Консультант</span>
-              </div>
-            </div>
+ {/* Логотип */}
+<div className="flex items-center">
+  <Link href="/" className="inline-flex items-center" aria-label="FORMAII — КОНСУЛЬТАНТЫ">
+    <img
+      src="/branding/icononmysitec.svg"
+      alt="FORMAII — КОНСУЛЬТАНТЫ"
+      className="h-10 w-auto block"  // высота ≈ 40px; впишется в h-16 шапки
+    />
+  </Link>
+</div>
+
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
