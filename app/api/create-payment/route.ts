@@ -1,74 +1,62 @@
-import { type NextRequest, NextResponse } from "next/server"
+import crypto from "crypto";
 
-const YOOMONEY_SHOP_ID = process.env.YOOMONEY_SHOP_ID
-const YOOMONEY_SECRET_KEY = process.env.YOOMONEY_SECRET_KEY
-const YOOMONEY_API_URL = "https://api.yookassa.ru/v3/payments"
-
-export async function POST(request: NextRequest) {
+export async function POST(req) {
   try {
-    const contentType = request.headers.get("content-type") || ""
+    const { amount, description, email } = await req.json();
 
-    if (!contentType.includes("application/json")) {
-      return NextResponse.json({ success: false, error: "Неверный формат запроса. Ожидается JSON." }, { status: 400 })
+    const shopId = process.env.YOOKASSA_SHOP_ID;
+    const secretKey = process.env.YOOKASSA_SECRET_KEY;
+
+    if (!shopId || !secretKey) {
+      return Response.json(
+        { success: false, error: "ЮKassa не настроена" },
+        { status: 500 }
+      );
     }
 
-    const { amount, description, email } = await request.json()
+    const idempotenceKey = crypto.randomUUID();
 
-    if (!amount || !description || !email) {
-      return NextResponse.json({ success: false, error: "Отсутствуют обязательные параметры" }, { status: 400 })
-    }
-
-    if (!YOOMONEY_SHOP_ID || !YOOMONEY_SECRET_KEY) {
-      return NextResponse.json({ success: false, error: "ЮKassa не настроена" }, { status: 500 })
-    }
-
-    const idempotenceKey = `payment_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
-
-    const paymentData = {
-      amount: {
-        value: amount.toString(),
-        currency: "RUB",
-      },
-      confirmation: {
-        type: "redirect",
-        return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success`,
-      },
-      capture: true,
-      description,
-      metadata: {
-        email,
-        product: "ai-consultant-package",
-      },
-    }
-
-    const response = await fetch(YOOMONEY_API_URL, {
+    const response = await fetch("https://api.yookassa.ru/v3/payments", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Basic ${Buffer.from(`${YOOMONEY_SHOP_ID}:${YOOMONEY_SECRET_KEY}`).toString("base64")}`,
         "Idempotence-Key": idempotenceKey,
+        Authorization:
+          "Basic " +
+          Buffer.from(`${shopId}:${secretKey}`).toString("base64"),
       },
-      body: JSON.stringify(paymentData),
-    })
+      body: JSON.stringify({
+        amount: { value: amount || 990, currency: "RUB" },
+        confirmation: {
+          type: "redirect",
+          return_url: "https://ai-consultant-platform.vercel.app/payment/success",
+        },
+        capture: true,
+        description:
+          description || "Оплата доступа к платформе AI Consultant",
+        metadata: { email },
+      }),
+    });
 
-    const paymentResult = await response.json()
+    const data = await response.json();
 
-    if (!response.ok) {
-      console.error("ЮKassa API Error:", paymentResult)
-      return NextResponse.json({ success: false, error: "Ошибка создания платежа в ЮKassa" }, { status: 500 })
+    if (response.ok && data?.confirmation?.confirmation_url) {
+      return Response.json({
+        success: true,
+        paymentUrl: data.confirmation.confirmation_url,
+      });
+    } else {
+      console.error("Ошибка ЮKassa:", data);
+      return Response.json(
+        { success: false, error: data.description || "Ошибка ЮKassa" },
+        { status: 500 }
+      );
     }
-
-    return NextResponse.json({
-      success: true,
-      paymentId: paymentResult.id,
-      paymentUrl: paymentResult.confirmation.confirmation_url,
-      status: paymentResult.status,
-    })
   } catch (error) {
-    console.error("Ошибка при создании платежа:", error)
-    return NextResponse.json({ success: false, error: "Внутренняя ошибка сервера" }, { status: 500 })
+    console.error("Ошибка при создании платежа:", error);
+    return Response.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
   }
 }
-
-export const runtime = "nodejs"
-export const dynamic = "force-dynamic"
