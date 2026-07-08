@@ -23,7 +23,7 @@ export default function CheckoutPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: 990,
+          amount: 4000,
           description: "ИИ-Консультант - Первый месяц доступа",
           email: email,
         }),
@@ -134,7 +134,7 @@ export default function CheckoutPage() {
               </div>
 
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-900 mb-2">990₽</div>
+                <div className="text-3xl font-bold text-gray-900 mb-2">4000₽</div>
                 <p className="text-gray-600">за первый месяц</p>
                 <p className="text-sm text-gray-500 mt-1">далее 400₽/месяц при желании продлить</p>
               </div>
@@ -186,7 +186,7 @@ export default function CheckoutPage() {
                   ) : (
                     <>
                       <CreditCard className="w-5 h-5 mr-2" />
-                      Оплатить 990₽ и получить доступ
+                      Оплатить 4000₽ и получить доступ
                     </>
                   )}
                 </Button>

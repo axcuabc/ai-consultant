@@ -533,7 +533,7 @@ export default function AnimatedLandingPage() {
               {
                 icon: <DollarSign className="w-8 h-8" />,
                 title: "Стоит в 10 раз дешевле",
-                desc: "990₽/месяц против 50,000₽+ зарплаты консультанта. Окупается с первого клиента.",
+                desc: "4000₽/месяц против 50,000₽+ зарплаты консультанта. Окупается с первого клиента.",
               },
               {
                 icon: <Shield className="w-8 h-8" />,
@@ -785,7 +785,7 @@ export default function AnimatedLandingPage() {
               <Card className="p-6 border-2 border-gray-200">
                 <CardContent className="p-0">
                   <h3 className="text-xl font-bold mb-4">Первый месяц</h3>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">990₽</div>
+                  <div className="text-4xl font-bold text-gray-900 mb-2">4000₽</div>
                   <p className="text-gray-600 mb-6">Полный доступ на 30 дней</p>
                   <ul className="text-left space-y-2 mb-6">
                     <li className="flex items-center">

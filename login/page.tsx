@@ -151,7 +151,7 @@ export default function LoginPage() {
                 onClick={() => router.push("/checkout")}
                 className="text-blue-600 border-blue-600 hover:bg-blue-50"
               >
-                Еще нет доступа? Получить за 990₽
+                Еще нет доступа? Получить за 4000₽
               </Button>
             </div>
           </CardContent>

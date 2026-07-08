@@ -26,7 +26,7 @@ export async function POST(req) {
           Buffer.from(`${shopId}:${secretKey}`).toString("base64"),
       },
       body: JSON.stringify({
-        amount: { value: amount || 990, currency: "RUB" },
+        amount: { value: amount || 4000, currency: "RUB" },
         confirmation: {
           type: "redirect",
           return_url: "https://ai-consultant-platform.vercel.app/payment/success",

@@ -23,7 +23,7 @@ export default function PaymentPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: 990,
+          amount: 4000,
           description: "ИИ-Консультант для сайта - Полный пакет материалов",
           email,
         }),
@@ -160,7 +160,7 @@ export default function PaymentPage() {
                     <h3 className="font-semibold break-words">ИИ-Консультант для сайта</h3>
                     <p className="text-sm text-gray-600 break-words">Полный пакет материалов</p>
                   </div>
-                  <span className="text-2xl font-bold shrink-0">990₽</span>
+                  <span className="text-2xl font-bold shrink-0">4000₽</span>
                 </div>
               </div>
 
@@ -249,7 +249,7 @@ export default function PaymentPage() {
                 ) : (
                   <>
                     <CreditCard className="w-5 h-5 mr-2" />
-                    Оплатить 990₽ через ЮMoney
+                    Оплатить 4000₽ через ЮMoney
                   </>
                 )}
               </Button>

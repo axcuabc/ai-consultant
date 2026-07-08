@@ -15,7 +15,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 
-const AMOUNT = 990;
+const AMOUNT = 4000;
 
 export default function PaymentPage() {
   const [isProcessing, setIsProcessing] = useState(false);

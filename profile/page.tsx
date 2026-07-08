@@ -208,7 +208,7 @@ export default function ProfilePage() {
                       value={newPurchase.amount}
                       onChange={(e) => setNewPurchase({ ...newPurchase, amount: e.target.value })}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="990"
+                      placeholder="4000"
                       min="0"
                       step="0.01"
                       required

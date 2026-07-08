@@ -15,7 +15,7 @@ export async function POST() {
       },
       body: JSON.stringify({
         amount: {
-          value: "990.00",
+          value: "4000.00",
           currency: "RUB",
         },
         confirmation: {
