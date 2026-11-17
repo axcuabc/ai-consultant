@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-// Твой API-ключ OpenRouter (хранить в .env.local)
-const OPENROUTER_API_KEY = "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"
+// Ключ OpenRouter берётся из переменных окружения (Vercel → Settings → Environment Variables)
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 // Запасные ответы
