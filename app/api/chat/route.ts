@@ -81,7 +81,7 @@ async function queryOpenRouter(prompt: string): Promise<string | null> {
       headers: {
         Authorization: `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://ai-consultant-six.vercel.app",
+        "HTTP-Referer": process.env.BASE_URL || "https://ai-consultant-omega.vercel.app",
         "X-Title": "AI-Consultant",
       },
       body: JSON.stringify({
