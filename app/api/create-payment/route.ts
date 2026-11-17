@@ -1,62 +1,42 @@
-import crypto from "crypto";
+import { NextResponse, type NextRequest } from "next/server"
+import { PLAN, priceFor, type PaymentKind } from "@/lib/plans"
+import { createPayment } from "@/lib/yookassa"
+import { siteUrl } from "@/lib/supabase-admin"
 
-export async function POST(req) {
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+export async function POST(request: NextRequest) {
   try {
-    const { amount, description, email } = await req.json();
+    const body = await request.json().catch(() => ({}))
+    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : ""
+    const kind: PaymentKind = body.kind === "renew" ? "renew" : "start"
 
-    const shopId = process.env.YOOKASSA_SHOP_ID;
-    const secretKey = process.env.YOOKASSA_SECRET_KEY;
-
-    if (!shopId || !secretKey) {
-      return Response.json(
-        { success: false, error: "ЮKassa не настроена" },
-        { status: 500 }
-      );
+    if (!EMAIL.test(email) || email.length > 200) {
+      return NextResponse.json({ success: false, error: "Проверьте email" }, { status: 400 })
     }
 
-    const idempotenceKey = crypto.randomUUID();
+    // Сумма считается только на сервере: клиент не может её подменить
+    const amount = priceFor(kind)
+    const base = siteUrl() || request.nextUrl.origin
+    const payment = await createPayment({
+      amount,
+      description:
+        kind === "renew"
+          ? `ИИ-Консультант: продление на ${PLAN.periodDays} дней`
+          : `ИИ-Консультант: подключение и ${PLAN.periodDays} дней доступа`,
+      returnUrl: `${base}/payment/success?email=${encodeURIComponent(email)}`,
+      metadata: { email, kind },
+    })
 
-    const response = await fetch("https://api.yookassa.ru/v3/payments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Idempotence-Key": idempotenceKey,
-        Authorization:
-          "Basic " +
-          Buffer.from(`${shopId}:${secretKey}`).toString("base64"),
-      },
-      body: JSON.stringify({
-        amount: { value: amount || 4000, currency: "RUB" },
-        confirmation: {
-          type: "redirect",
-          return_url: "https://ai-consultant-platform.vercel.app/payment/success",
-        },
-        capture: true,
-        description:
-          description || "Оплата доступа к платформе AI Consultant",
-        metadata: { email },
-      }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok && data?.confirmation?.confirmation_url) {
-      return Response.json({
-        success: true,
-        paymentUrl: data.confirmation.confirmation_url,
-      });
-    } else {
-      console.error("Ошибка ЮKassa:", data);
-      return Response.json(
-        { success: false, error: data.description || "Ошибка ЮKassa" },
-        { status: 500 }
-      );
-    }
+    return NextResponse.json({ success: true, paymentUrl: payment.confirmationUrl })
   } catch (error) {
-    console.error("Ошибка при создании платежа:", error);
-    return Response.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
+    console.error("create-payment:", error)
+    return NextResponse.json(
+      { success: false, error: error instanceof Error ? error.message : "Не удалось создать платёж" },
+      { status: 500 },
+    )
   }
 }

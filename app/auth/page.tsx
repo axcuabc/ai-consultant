@@ -26,11 +26,25 @@ export default function AuthPage() {
         data: { user },
       } = await supabase.auth.getUser()
       if (user) {
-        router.push("/profile")
+        router.push("/dashboard")
       }
     }
     checkUser()
   }, [router])
+
+  const handleReset = async () => {
+    setError("")
+    setMessage("")
+    if (!email) {
+      setError("Введите email, и мы пришлём ссылку для смены пароля")
+      return
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset`,
+    })
+    if (error) setError(error.message)
+    else setMessage("Если такой аккаунт есть, мы отправили ссылку для смены пароля. Проверьте почту.")
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,7 +63,7 @@ export default function AuthPage() {
         if (error) throw error
 
         if (data.user) {
-          router.push("/profile")
+          router.push("/dashboard")
         }
       } else {
         // Регистрация
@@ -111,7 +125,7 @@ export default function AuthPage() {
                 {isLogin ? "Вход в аккаунт" : "Создать аккаунт"}
               </h1>
               <p className="text-gray-600">
-                {isLogin ? "Войдите, чтобы управлять покупками" : "Зарегистрируйтесь для доступа к материалам"}
+                {isLogin ? "Войдите, чтобы настроить консультанта" : "Зарегистрируйтесь, а затем оплатите доступ в кабинете"}
               </p>
             </div>
 
@@ -219,6 +233,12 @@ export default function AuthPage() {
                 )}
               </Button>
             </form>
+
+            {isLogin && (
+              <button type="button" onClick={handleReset} className="mt-3 w-full text-center text-sm text-gray-500 hover:text-gray-700">
+                Забыли пароль?
+              </button>
+            )}
 
             <div className="text-center mt-6">
               <p className="text-sm text-gray-600">

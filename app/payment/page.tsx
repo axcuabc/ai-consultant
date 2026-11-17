@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { PLAN, formatRub, priceFor, type PaymentKind } from "@/lib/plans";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -15,15 +17,31 @@ import {
   MessageCircle,
 } from "lucide-react";
 
-const AMOUNT = 4000;
-
 export default function PaymentPage() {
+  return (
+    <Suspense>
+      <PaymentForm />
+    </Suspense>
+  );
+}
+
+function PaymentForm() {
+  const params = useSearchParams();
   const [isProcessing, setIsProcessing] = useState(false);
   const [email, setEmail] = useState("");
+  const [kind, setKind] = useState<PaymentKind>("start");
+
+  useEffect(() => {
+    const e = params.get("email");
+    if (e) setEmail(e);
+    if (params.get("kind") === "renew") setKind("renew");
+  }, [params]);
+
+  const AMOUNT = priceFor(kind);
 
   const handlePay = async () => {
     if (!email) {
-      alert("Пожалуйста, введите email для получения токена и инструкции");
+      alert("Пожалуйста, введите email: на него придут данные для входа");
       return;
     }
     setIsProcessing(true);
@@ -31,11 +49,7 @@ export default function PaymentPage() {
       const response = await fetch("/api/create-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: AMOUNT,
-          description: "ИИ-Консультант — доступ к платформе на 30 дней",
-          email,
-        }),
+        body: JSON.stringify({ email, kind }),
       });
 
       const data = await response.json();
@@ -98,9 +112,11 @@ export default function PaymentPage() {
               <div className="flex justify-between items-center pb-4 border-b mb-6">
                 <div>
                   <h3 className="font-semibold">ИИ-Консультант для сайта</h3>
-                  <p className="text-sm text-gray-600">Доступ на 30 дней</p>
+                  <p className="text-sm text-gray-600">
+                    {kind === "renew" ? `Продление на ${PLAN.periodDays} дней` : `Подключение и ${PLAN.periodDays} дней доступа`}
+                  </p>
                 </div>
-                <span className="text-2xl font-bold">{AMOUNT}₽</span>
+                <span className="text-2xl font-bold">{formatRub(AMOUNT)}</span>
               </div>
 
               <div className="rounded-lg p-4 mb-6 bg-gradient-to-br from-green-50 to-emerald-50 ring-1 ring-emerald-100">
@@ -110,13 +126,13 @@ export default function PaymentPage() {
                 </div>
                 <ul className="text-sm text-emerald-800 space-y-1">
                   <li>• Мгновенный доступ после оплаты</li>
-                  <li>• 30 дней поддержки включено</li>
+                  <li>• Дальше — {formatRub(PLAN.renewPrice)} за каждые {PLAN.periodDays} дней, продление вручную</li>
                 </ul>
               </div>
 
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Email для отправки токена и инструкции *
+                  Email для входа в кабинет *
                 </label>
                 <input
                   type="email"
@@ -129,7 +145,7 @@ export default function PaymentPage() {
                   required
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  На этот email придут инструкция и <b>токен доступа</b>
+                  На этот email придут <b>логин и пароль</b> от кабинета
                 </p>
               </div>
 
@@ -146,7 +162,7 @@ export default function PaymentPage() {
                 ) : (
                   <>
                     <CreditCard className="w-5 h-5 mr-2" />
-                    Оплатить {AMOUNT}₽ через ЮMoney
+                    Оплатить {formatRub(AMOUNT)}
                   </>
                 )}
               </Button>
@@ -158,9 +174,10 @@ export default function PaymentPage() {
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold mb-6">Как это работает</h2>
               <ol className="space-y-3 text-sm text-gray-700">
-                <li>1. Оплачиваете на защищённой странице ЮMoney</li>
-                <li>2. Получаете письмо с токеном и инструкцией</li>
-                <li>3. Вставляете код на свой сайт и запускаете консультанта</li>
+                <li>1. Оплачиваете на защищённой странице ЮKassa</li>
+                <li>2. Получаете письмо с логином и паролем</li>
+                <li>3. В кабинете выбираете нишу, заполняете данные о бизнесе и настраиваете вид</li>
+                <li>4. Копируете одну строку кода и вставляете на сайт (Tilda, свой сайт и другие)</li>
               </ol>
             </CardContent>
           </Card>
