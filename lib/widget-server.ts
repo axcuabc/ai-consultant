@@ -17,9 +17,15 @@ export function isUuid(value: unknown): value is string {
 /** Консультант + активна ли подписка его владельца. */
 export async function loadConsultant(id: string): Promise<{ consultant: Consultant; active: boolean } | null> {
   const db = getAdmin()
-  const { data: consultant } = await db.from("consultants").select("*").eq("id", id).maybeSingle()
+  const { data: consultant, error } = await db.from("consultants").select("*").eq("id", id).maybeSingle()
+  if (error) throw error
   if (!consultant) return null
-  const { data: owner } = await db.from("users").select("subscription_ends_at").eq("id", consultant.user_id).maybeSingle()
+  const { data: owner, error: ownerError } = await db
+    .from("users")
+    .select("subscription_ends_at")
+    .eq("id", consultant.user_id)
+    .maybeSingle()
+  if (ownerError) throw ownerError
   const active = Boolean(owner?.subscription_ends_at && new Date(owner.subscription_ends_at) > new Date())
   return { consultant: consultant as Consultant, active }
 }
