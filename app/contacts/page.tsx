@@ -99,8 +99,8 @@ export default function ContactsPage() {
                 <div className="flex items-start space-x-3">
                   <User className="w-5 h-5 text-purple-600 mt-1 flex-shrink-0" />
                   <div>
-                    <p className="font-medium text-gray-900">Индивидуальный предприниматель</p>
-                    <p className="text-gray-600">ТОКАРЕВА АНГЕЛИНА АЛЕКСЕЕВНА</p>
+                    <p className="font-medium text-gray-900">Самозанятая (плательщик налога на профессиональный доход)</p>
+                    <p className="text-gray-600">Токарева Ангелина Алексеевна</p>
                   </div>
                 </div>
 
