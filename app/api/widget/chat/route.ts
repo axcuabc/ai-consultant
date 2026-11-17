@@ -12,6 +12,7 @@ import {
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
+export const maxDuration = 30
 
 const MAX_MESSAGES = 12
 const MAX_MESSAGE_LENGTH = 1000

@@ -1,3 +1,4 @@
+import { modelFields } from "@/lib/models"
 import { type NextRequest, NextResponse } from "next/server"
 import { PLAN, formatRub } from "@/lib/plans"
 
@@ -73,7 +74,7 @@ async function queryOpenRouter(prompt: string): Promise<string | null> {
 
   try {
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 секунд таймаут
+    const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 секунд: бесплатные модели бывают медленнее
 
     const response = await fetch(OPENROUTER_URL, {
       method: "POST",
@@ -84,7 +85,7 @@ async function queryOpenRouter(prompt: string): Promise<string | null> {
         "X-Title": "AI-Consultant",
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-chat",
+        ...modelFields(),
         messages: [
           {
             role: "system",
@@ -101,7 +102,7 @@ async function queryOpenRouter(prompt: string): Promise<string | null> {
             content: prompt,
           },
         ],
-        max_tokens: 150,
+        max_tokens: 300,
         temperature: 0.7,
       }),
       signal: controller.signal,

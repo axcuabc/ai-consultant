@@ -1,0 +1,31 @@
+// Какие модели OpenRouter использовать для ответов.
+//
+// По умолчанию — бесплатные модели (с «:free» в конце). Если первая не ответила
+// (перегружена или убрана из каталога), OpenRouter сам пробует следующую.
+// Лимит бесплатных моделей: 50 запросов в день, а после разового пополнения
+// OpenRouter на $10 — 1000 в день.
+//
+// Чтобы сменить модели без правки кода, задайте в Vercel переменную OPENROUTER_MODEL:
+// одну модель или несколько через запятую, например
+//   OPENROUTER_MODEL=google/gemma-4-31b-it:free,nvidia/nemotron-3.5-lightning:free
+// Список бесплатных моделей меняется, актуальный: https://openrouter.ai/models?q=free
+
+const DEFAULT_MODELS = [
+  "google/gemma-4-31b-it:free",
+  "nvidia/nemotron-3.5-super-vl:free",
+  "nvidia/nemotron-3.5-lightning:free",
+]
+
+export function modelList(): string[] {
+  const fromEnv = (process.env.OPENROUTER_MODEL || "")
+    .split(",")
+    .map((m) => m.trim())
+    .filter(Boolean)
+  return fromEnv.length > 0 ? fromEnv : DEFAULT_MODELS
+}
+
+/** Поля запроса к OpenRouter: одна модель или список запасных. */
+export function modelFields(): { model: string } | { models: string[] } {
+  const list = modelList()
+  return list.length === 1 ? { model: list[0] } : { models: list.slice(0, 3) }
+}

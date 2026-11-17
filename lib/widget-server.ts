@@ -1,3 +1,4 @@
+import { modelFields } from "./models"
 import { getAdmin } from "./supabase-admin"
 import type { Consultant } from "./consultant"
 
@@ -79,10 +80,12 @@ export async function askModel(systemPrompt: string, messages: ChatMessage[]): P
         "X-Title": "AI-Consultant",
       },
       body: JSON.stringify({
-        model: process.env.OPENROUTER_MODEL || "deepseek/deepseek-chat",
+        ...modelFields(),
         messages: [{ role: "system", content: systemPrompt }, ...messages],
-        max_tokens: 400,
+        max_tokens: 800,
         temperature: 0.5,
+        // У «думающих» моделей рассуждения не показываем и делаем короткими
+        reasoning: { effort: "low", exclude: true },
       }),
     })
     if (!res.ok) {
