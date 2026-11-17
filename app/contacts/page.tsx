@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Bot, ArrowLeft, Phone, MapPin, Mail, User, FileText, MessageCircle } from "lucide-react"
+import { Bot, ArrowLeft, MapPin, Mail, User, FileText, MessageCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export default function ContactsPage() {
@@ -49,19 +49,6 @@ export default function ContactsPage() {
               <h2 className="text-xl font-bold text-gray-900 mb-6">Контактная информация</h2>
 
               <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <Phone className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-gray-900">Телефон</p>
-                    <button
-                      onClick={() => copyToClipboard("89162731769")}
-                      className="text-blue-600 hover:text-blue-700 transition-colors"
-                    >
-                      8 (916) 273-17-69
-                    </button>
-                  </div>
-                </div>
-
                 <div className="flex items-start space-x-3">
                   <Mail className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
                   <div>
@@ -158,15 +145,7 @@ export default function ContactsPage() {
         </Card>
 
         {/* Быстрые действия */}
-        <div className="grid md:grid-cols-3 gap-4">
-          <Button
-            onClick={() => window.open("tel:89162731769")}
-            className="bg-green-600 hover:bg-green-700 text-white p-4 h-auto flex flex-col items-center space-y-2"
-          >
-            <Phone className="w-6 h-6" />
-            <span>Позвонить</span>
-          </Button>
-
+        <div className="grid md:grid-cols-2 gap-4">
           <Button
             onClick={() => window.open("mailto:ai.consultant.site@gmail.com")}
             className="bg-blue-600 hover:bg-blue-700 text-white p-4 h-auto flex flex-col items-center space-y-2"

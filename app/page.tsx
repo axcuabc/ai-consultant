@@ -301,12 +301,11 @@ export default function AnimatedLandingPage() {
           <div className="flex items-center justify-between h-16">
  {/* Логотип */}
 <div className="flex items-center">
-  <Link href="/" className="inline-flex items-center" aria-label="FORMAII — КОНСУЛЬТАНТЫ">
-    <img
-      src="/branding/icononmysitec.svg"
-      alt="FORMAII — КОНСУЛЬТАНТЫ"
-      className="h-16 w-auto block"  // высота ≈ 40px; впишется в h-16 шапки
-    />
+  <Link href="/" className="inline-flex items-center space-x-2" aria-label="ИИ Консультант — на главную">
+    <span className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+      <Bot className="w-5 h-5 text-white" />
+    </span>
+    <span className="font-bold text-xl text-gray-900">ИИ Консультант</span>
   </Link>
 </div>
 
