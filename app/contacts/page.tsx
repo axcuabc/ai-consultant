@@ -120,7 +120,7 @@ export default function ContactsPage() {
 
               <div className="bg-purple-50 rounded-lg p-4 mt-6">
                 <p className="text-sm text-purple-800">
-                  <strong>Примечание:</strong> Все платежи обрабатываются через безопасную платежную систему ЮMoney.
+                  <strong>Примечание:</strong> Оплата проходит на защищённой странице платёжного сервиса, данные карты нам не передаются.
                   Чеки и документы об оплате отправляются автоматически на указанный email.
                 </p>
               </div>
@@ -139,7 +139,7 @@ export default function ContactsPage() {
                 <ul className="text-gray-600 space-y-2">
                   <li>• Email поддержка: круглосуточно</li>
                   <li>• Ответ в течение 24 часов</li>
-                  <li>• Поддержка включена на 30 дней</li>
+                  <li>• Поддержка на всё время подписки</li>
                   <li>• Помощь с настройкой и интеграцией</li>
                 </ul>
               </div>
