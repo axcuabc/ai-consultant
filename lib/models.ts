@@ -12,7 +12,7 @@
 
 const DEFAULT_MODELS = [
   "google/gemma-4-31b-it:free",
-  "nvidia/nemotron-3.5-super-vl:free",
+  "google/gemma-4-26b-a4b-it:free",
   "nvidia/nemotron-3.5-lightning:free",
 ]
 
