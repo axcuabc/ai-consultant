@@ -2,16 +2,19 @@
 -- Запуск: Supabase → SQL Editor → вставить весь файл → Run.
 -- Скрипт можно запускать повторно: он ничего не ломает в уже созданных таблицах.
 
-create extension if not exists pgcrypto;
+create extension if not exists pgcrypto with schema extensions;
 
 -- Автообновление updated_at
-create or replace function update_updated_at_column()
-returns trigger as $$
+create or replace function public.update_updated_at_column()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
 begin
   new.updated_at = now();
   return new;
 end;
-$$ language plpgsql;
+$$;
 
 -- ---------------------------------------------------------------------------
 -- Пользователи (профиль поверх auth.users)
@@ -41,7 +44,7 @@ create index if not exists users_email_idx on public.users(email);
 drop trigger if exists update_users_updated_at on public.users;
 create trigger update_users_updated_at
   before update on public.users
-  for each row execute function update_updated_at_column();
+  for each row execute function public.update_updated_at_column();
 
 -- ---------------------------------------------------------------------------
 -- Консультанты
@@ -104,7 +107,7 @@ create index if not exists consultants_user_id_idx on public.consultants(user_id
 drop trigger if exists update_consultants_updated_at on public.consultants;
 create trigger update_consultants_updated_at
   before update on public.consultants
-  for each row execute function update_updated_at_column();
+  for each row execute function public.update_updated_at_column();
 
 -- ---------------------------------------------------------------------------
 -- Платежи (каждый платёж ЮKassa обрабатывается ровно один раз)
@@ -124,3 +127,9 @@ alter table public.payments enable row level security;
 drop policy if exists "Users can view own payments" on public.payments;
 create policy "Users can view own payments" on public.payments
   for select using (auth.uid() = user_id);
+
+-- ---------------------------------------------------------------------------
+-- Права: без входа к таблицам доступа нет; пользователи и платежи пишет только сервер
+-- ---------------------------------------------------------------------------
+revoke all on public.users, public.consultants, public.payments from anon;
+revoke insert, update, delete on public.users, public.payments from authenticated;
