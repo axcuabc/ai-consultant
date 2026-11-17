@@ -7,10 +7,10 @@ import { Analytics } from "@vercel/analytics/react" // <= обязательно
 const inter = Inter({ subsets: ["latin", "cyrillic"] })
 
 export const metadata: Metadata = {
-  title: "ИИ Консультант для сайта | Добавь ChatGPT на свой сайт за 10 минут",
+  title: "ИИ-консультант для сайта на Tilda — отвечает клиентам 24/7",
   description:
-    "Готовый код для интеграции ИИ-консультанта на любой сайт. Без программирования. Работает на Tilda, WordPress и других платформах. Разовая оплата 4000₽.",
-  keywords: "ИИ консультант, ChatGPT для сайта, чатбот, автоматизация, Tilda, WordPress",
+    "ИИ-консультант для сайта: выберите нишу, заполните данные о бизнесе и вставьте одну строку кода. Работает на Tilda и любых сайтах. Без программирования.",
+  keywords: "ИИ консультант, чат-бот для сайта, ИИ для Tilda, онлайн-консультант, автоматизация заявок",
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://your-domain.vercel.app"),
   openGraph: {
     title: "ИИ Консультант для сайта",

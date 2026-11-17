@@ -1,7 +1,9 @@
+import { modelFields } from "@/lib/models"
 import { type NextRequest, NextResponse } from "next/server"
+import { PLAN, formatRub } from "@/lib/plans"
 
-// Твой API-ключ OpenRouter (лучше хранить в .env.local)
-const OPENROUTER_API_KEY = "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"
+// Ключ OpenRouter берётся из переменных окружения (Vercel → Settings → Environment Variables)
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY
 
 // URL OpenRouter
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -9,15 +11,15 @@ const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 // Запасные ответы
 const FALLBACK_RESPONSES = [
   "Отличный вопрос! Наш ИИ-консультант легко интегрируется на любой сайт. Просто скопируйте код и вставьте его перед закрывающим тегом </body>.",
-  "Да, это работает на всех популярных платформах: Tilda, WordPress, Wix, Squarespace. Настройка займет всего 5-10 минут!",
-  "Стоимость составляет 4000 рублей за полный пакет. Это разовая оплата, никаких ежемесячных платежей.",
-  "У нас есть подробная видео-инструкция и PDF-гайд с пошаговыми скриншотами. Даже без навыков программирования вы легко справитесь!",
+  "Да, это работает на Tilda (блок T123, нужен платный тариф Tilda), на своём сайте и в любом конструкторе, где можно вставить HTML-код. Настройка занимает 5–10 минут.",
+  `Это подписка: ${formatRub(PLAN.startPrice)} за подключение и первые ${PLAN.periodDays} дней, дальше ${formatRub(PLAN.renewPrice)} за каждые ${PLAN.periodDays} дней. Ответы ИИ уже включены в цену.`,
+  "Всё настраивается в кабинете: выбираете нишу, заполняете данные о бизнесе, настраиваете вид и копируете код. Программировать не нужно.",
   "ИИ-консультант работает 24/7, отвечает на вопросы клиентов, может записывать на консультации и рассказывать о ваших услугах.",
-  "Можно полностью настроить под ваш бренд - цвета, шрифты, стиль сообщений. Все инструкции включены в пакет.",
-  "Для работы вам понадобится только API-ключ OpenAI. Обычно это стоит 300-1500₽ в месяц в зависимости от количества сообщений.",
+  "Можно настроить под ваш бренд: цвет, иконку, шрифт и положение виджета.",
+  "Никаких своих ключей и сервисов не нужно: ответы ИИ включены в подписку.",
   "Консультант может работать на русском, английском и других языках. Настраивается через промпты.",
-  "Да, можно добавить на несколько сайтов. Код универсальный и работает везде.",
-  "Поддержка включена! Поможем с настройкой через Telegram или email в течение 30 дней после покупки.",
+  `На одном аккаунте можно создать до ${PLAN.maxConsultants} консультантов — например, для разных сайтов.`,
+  "Если что-то не получается, напишите на почту из раздела «Контакты».",
 ]
 
 // Функция для релевантных ответов по ключевым словам (оставь без изменений)
@@ -25,19 +27,19 @@ function getRelevantResponse(message: string): string {
   const lowerMessage = message.toLowerCase()
 
   if (lowerMessage.includes("цена") || lowerMessage.includes("стоимость") || lowerMessage.includes("сколько")) {
-    return "Стоимость составляет 4000 рублей за полный пакет. Это разовая оплата, никаких ежемесячных платежей. Вы получаете код, инструкции, видео и поддержку."
+    return `Это подписка: ${formatRub(PLAN.startPrice)} за подключение и первые ${PLAN.periodDays} дней, дальше ${formatRub(PLAN.renewPrice)} за каждые ${PLAN.periodDays} дней. Ответы ИИ уже включены в цену.`
   }
 
   if (lowerMessage.includes("tilda") || lowerMessage.includes("wordpress") || lowerMessage.includes("сайт")) {
-    return "Да, наш код работает на всех популярных платформах: Tilda, WordPress, Wix, Squarespace и обычных HTML сайтах. Просто вставьте код - и всё готово!"
+    return "Да, код работает на Tilda (блок T123), на своём сайте и в любом конструкторе, где можно вставить HTML-код. Это одна строка, которую нужно скопировать и вставить."
   }
 
   if (lowerMessage.includes("настрой") || lowerMessage.includes("установ") || lowerMessage.includes("как")) {
-    return "Настройка очень простая! Скопируйте наш HTML-код и вставьте его на сайт перед закрывающим тегом </body>. У нас есть подробная видео-инструкция и PDF-гайд."
+    return "Настройка простая: скопируйте одну строку кода из кабинета и вставьте на сайт. На Tilda — в блок T123, на своём сайте — перед </body>."
   }
 
   if (lowerMessage.includes("программирован") || lowerMessage.includes("код") || lowerMessage.includes("сложно")) {
-    return "Никаких навыков программирования не нужно! Если умеете копировать и вставлять текст - справитесь легко. Всё объяснено пошагово с картинками."
+    return "Навыки программирования не нужны: в кабинете всё настраивается формой, а код для сайта — одна строка, которую нужно скопировать."
   }
 
   if (lowerMessage.includes("работа") || lowerMessage.includes("функци") || lowerMessage.includes("возможност")) {
@@ -45,11 +47,11 @@ function getRelevantResponse(message: string): string {
   }
 
   if (lowerMessage.includes("дизайн") || lowerMessage.includes("внешний вид") || lowerMessage.includes("цвет")) {
-    return "Да, можно полностью кастомизировать! Меняйте цвета, шрифты, расположение под ваш бренд. В пакете есть готовые стили и инструкции по настройке."
+    return "Да: в конструкторе выбираются цвет, иконка, шрифт и положение, а предпросмотр сразу показывает результат."
   }
 
   if (lowerMessage.includes("поддержка") || lowerMessage.includes("помощь") || lowerMessage.includes("вопрос")) {
-    return "Конечно поможем! Поддержка включена в стоимость. Обращайтесь в Telegram или на email - ответим быстро и поможем с любыми вопросами."
+    return "Если что-то не получается, напишите на почту из раздела «Контакты»."
   }
 
   if (lowerMessage.includes("привет") || lowerMessage.includes("здравствуй") || lowerMessage.includes("добро")) {
@@ -72,27 +74,27 @@ async function queryOpenRouter(prompt: string): Promise<string | null> {
 
   try {
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 секунд таймаут
+    const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 секунд: бесплатные модели бывают медленнее
 
     const response = await fetch(OPENROUTER_URL, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://ai-consultant-six.vercel.app",
+        "HTTP-Referer": process.env.BASE_URL || "https://ai-consultant-omega.vercel.app",
         "X-Title": "AI-Consultant",
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-chat",
+        ...modelFields(),
         messages: [
           {
             role: "system",
             content: `Ты профессиональный консультант по ИИ-решениям для сайтов. 
             Отвечай кратко, дружелюбно и по существу на русском языке.
             Помогаешь с вопросами о настройке ИИ-консультантов на сайты.
-            Стоимость продукта: 4000 рублей за полный пакет.
-            Включает: HTML код, PDF инструкции, видео-гайд, библиотеку промптов, поддержку.
-            Работает на всех платформах: Tilda, WordPress, Wix и других.
+            Цена: ${formatRub(PLAN.startPrice)} за подключение и первые ${PLAN.periodDays} дней, дальше ${formatRub(PLAN.renewPrice)} за каждые ${PLAN.periodDays} дней. Ответы ИИ включены в цену, свои ключи не нужны.
+            Как работает: оплата → письмо с паролем → в кабинете выбор ниши, данные о бизнесе, цвет/иконка/шрифт → одна строка кода на сайт.
+            Работает на Tilda (блок T123, платный тариф Tilda), на своём сайте и в конструкторах со вставкой HTML-кода.
             Отвечай максимум в 2-3 предложения.`,
           },
           {
@@ -100,7 +102,7 @@ async function queryOpenRouter(prompt: string): Promise<string | null> {
             content: prompt,
           },
         ],
-        max_tokens: 150,
+        max_tokens: 300,
         temperature: 0.7,
       }),
       signal: controller.signal,

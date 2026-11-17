@@ -1,70 +1,33 @@
-import { type NextRequest, NextResponse } from "next/server"
-
-const YOOMONEY_SECRET_KEY = process.env.YOOMONEY_SECRET_KEY
-const BASE_URL = process.env.BASE_URL || process.env.NEXT_PUBLIC_BASE_URL
-
-export async function POST(request: NextRequest) {
-  try {
-    const rawBody = await request.text()
-    const webhookData = JSON.parse(rawBody)
-    const { event, object: payment } = webhookData
-
-    console.log("Webhook received:", {
-      event,
-      paymentId: payment.id,
-      status: payment.status,
-      amount: payment.amount?.value,
-      email: payment.metadata?.email,
-    })
-
-    if (event === "payment.succeeded" && payment.status === "succeeded") {
-      const email = payment.metadata?.email
-      const amount = Number(payment.amount?.value)
-      const paymentId = payment.id
-
-      if (email && amount) {
-        try {
-          const response = await fetch(`${BASE_URL}/api/create-user-after-payment`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email,
-              amount,
-              payment_id: paymentId,
-            }),
-          })
-
-          const result = await response.json()
-
-          if (result.success) {
-            console.log(`✅ Пользователь обработан: ${email}`)
-          } else {
-            console.error(`❌ Ошибка обработки пользователя: ${result.error}`)
-          }
-        } catch (err) {
-          console.error("Ошибка вызова create-user-after-payment:", err)
-        }
-      } else {
-        console.error("Отсутствует email или сумма в metadata")
-      }
-    }
-
-    if (event === "payment.canceled") {
-      console.log(`Платёж отменён: ${payment.id}`)
-    }
-
-    if (event === "payment.waiting_for_capture") {
-      console.log(`Ожидается подтверждение платёжа: ${payment.id}`)
-    }
-
-    return NextResponse.json({ received: true })
-  } catch (error) {
-    console.error("Ошибка обработки webhook:", error)
-    return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 })
-  }
-}
+import { NextResponse, type NextRequest } from "next/server"
+import { fetchPayment } from "@/lib/yookassa"
+import { fulfillPayment } from "@/lib/fulfill"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
+
+// Уведомления ЮKassa. Адрес для настройки в кабинете ЮKassa:
+//   https://ВАШ-ДОМЕН/api/webhook/yoomoney  (событие payment.succeeded)
+// Содержимому уведомления мы не доверяем: по id заново запрашиваем платёж у ЮKassa
+// и выдаём доступ, только если сама ЮKassa подтверждает оплату.
+export async function POST(request: NextRequest) {
+  let paymentId: unknown
+  try {
+    const body = await request.json()
+    paymentId = body?.object?.id
+  } catch {
+    return NextResponse.json({ error: "bad_json" }, { status: 400 })
+  }
+  if (typeof paymentId !== "string") return NextResponse.json({ ok: true })
+
+  try {
+    const payment = await fetchPayment(paymentId)
+    if (!payment) return NextResponse.json({ ok: true })
+    const result = await fulfillPayment(payment)
+    console.log(`Webhook ${paymentId}: ${payment.status} → ${result}`)
+    return NextResponse.json({ ok: true })
+  } catch (error) {
+    console.error("Webhook error:", error)
+    // 500 → ЮKassa повторит уведомление позже
+    return NextResponse.json({ error: "processing_failed" }, { status: 500 })
+  }
+}

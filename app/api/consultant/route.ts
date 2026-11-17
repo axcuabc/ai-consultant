@@ -1,21 +1,23 @@
+import { modelFields } from "@/lib/models"
 import { type NextRequest, NextResponse } from "next/server"
+import { PLAN, formatRub } from "@/lib/plans"
 
-// Твой API-ключ OpenRouter (хранить в .env.local)
-const OPENROUTER_API_KEY = "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"
+// Ключ OpenRouter берётся из переменных окружения (Vercel → Settings → Environment Variables)
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 // Запасные ответы
 const FALLBACK_RESPONSES = [
   "Отличный вопрос! Наш ИИ-консультант легко интегрируется на любой сайт. Просто скопируйте код и вставьте его перед закрывающим тегом </body>.",
-  "Да, это работает на всех популярных платформах: Tilda, WordPress, Wix, Squarespace. Настройка займет всего 5-10 минут!",
-  "Стоимость составляет 4000 рублей за полный пакет. Это разовая оплата, никаких ежемесячных платежей.",
-  "У нас есть подробная видео-инструкция и PDF-гайд с пошаговыми скриншотами. Даже без навыков программирования вы легко справитесь!",
+  "Да, это работает на Tilda (блок T123, нужен платный тариф Tilda), на своём сайте и в любом конструкторе, где можно вставить HTML-код. Настройка занимает 5–10 минут.",
+  `Это подписка: ${formatRub(PLAN.startPrice)} за подключение и первые ${PLAN.periodDays} дней, дальше ${formatRub(PLAN.renewPrice)} за каждые ${PLAN.periodDays} дней. Ответы ИИ уже включены в цену.`,
+  "Всё настраивается в кабинете: выбираете нишу, заполняете данные о бизнесе, настраиваете вид и копируете код. Программировать не нужно.",
   "ИИ-консультант работает 24/7, отвечает на вопросы клиентов, может записывать на консультации и рассказывать о ваших услугах.",
-  "Можно полностью настроить под ваш бренд - цвета, шрифты, стиль сообщений. Все инструкции включены в пакет.",
-  "Для работы вам понадобится только API-ключ OpenAI. Обычно это стоит 300-1500₽ в месяц в зависимости от количества сообщений.",
+  "Можно настроить под ваш бренд: цвет, иконку, шрифт и положение виджета.",
+  "Никаких своих ключей и сервисов не нужно: ответы ИИ включены в подписку.",
   "Консультант может работать на русском, английском и других языках. Настраивается через промпты.",
-  "Да, можно добавить на несколько сайтов. Код универсальный и работает везде.",
-  "Поддержка включена! Поможем с настройкой через Telegram или email в течение 30 дней после покупки.",
+  `На одном аккаунте можно создать до ${PLAN.maxConsultants} консультантов — например, для разных сайтов.`,
+  "Если что-то не получается, напишите на почту из раздела «Контакты».",
 ]
 
 // Системные промпты для демо-консультантов
@@ -38,7 +40,7 @@ function getRelevantResponse(message: string): string {
   const lowerMessage = message.toLowerCase()
 
   if (lowerMessage.includes("цена") || lowerMessage.includes("стоимость")) {
-    return "Стоимость составляет 4000 рублей за полный пакет. Это разовая оплата, никаких ежемесячных платежей."
+    return `Это подписка: ${formatRub(PLAN.startPrice)} за подключение и первые ${PLAN.periodDays} дней, дальше ${formatRub(PLAN.renewPrice)} за каждые ${PLAN.periodDays} дней. Ответы ИИ уже включены в цену.`
   }
 
   if (lowerMessage.includes("настрой") || lowerMessage.includes("установ") || lowerMessage.includes("как")) {
@@ -63,7 +65,7 @@ async function queryOpenRouter(systemPrompt: string, userPrompt: string): Promis
 
   try {
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000)
+    const timeoutId = setTimeout(() => controller.abort(), 20000)
 
     const response = await fetch(OPENROUTER_URL, {
       method: "POST",
@@ -72,12 +74,12 @@ async function queryOpenRouter(systemPrompt: string, userPrompt: string): Promis
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-chat",
+        ...modelFields(),
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        max_tokens: 150,
+        max_tokens: 300,
         temperature: 0.7,
       }),
       signal: controller.signal,

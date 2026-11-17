@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import DemoConsultant from "@/components/DemoConsultant"
+import { PLAN, formatRub } from "@/lib/plans"
 import { useCallback } from "react"
 import {
   Bot,
@@ -331,7 +332,7 @@ export default function AnimatedLandingPage() {
               ))}
 
               {/* Кнопка Войти */}
-              <Link href="/login">
+              <Link href="/auth">
                 <Button
                   variant="outline"
                   className="border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent ml-4"
@@ -367,7 +368,7 @@ export default function AnimatedLandingPage() {
 
               {/* Кнопка Войти в мобильном меню */}
               <div className="mt-4 px-4">
-                <Link href="/login">
+                <Link href="/auth">
                   <Button
                     variant="outline"
                     className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent"
@@ -533,7 +534,7 @@ export default function AnimatedLandingPage() {
               {
                 icon: <DollarSign className="w-8 h-8" />,
                 title: "Стоит в 10 раз дешевле",
-                desc: "4000₽/месяц против 50,000₽+ зарплаты консультанта. Окупается с первого клиента.",
+                desc: `${formatRub(PLAN.renewPrice)}/месяц против 50 000₽+ зарплаты консультанта. Окупается с первого клиента.`,
               },
               {
                 icon: <Shield className="w-8 h-8" />,
@@ -785,8 +786,8 @@ export default function AnimatedLandingPage() {
               <Card className="p-6 border-2 border-gray-200">
                 <CardContent className="p-0">
                   <h3 className="text-xl font-bold mb-4">Первый месяц</h3>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">4000₽</div>
-                  <p className="text-gray-600 mb-6">Полный доступ на 30 дней</p>
+                  <div className="text-4xl font-bold text-gray-900 mb-2">{formatRub(PLAN.startPrice)}</div>
+                  <p className="text-gray-600 mb-6">Подключение и {PLAN.periodDays} дней доступа</p>
                   <ul className="text-left space-y-2 mb-6">
                     <li className="flex items-center">
                       <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
@@ -820,8 +821,8 @@ export default function AnimatedLandingPage() {
                 </div>
                 <CardContent className="p-0">
                   <h3 className="text-xl font-bold mb-4">Следующие месяцы</h3>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">400₽</div>
-                  <p className="text-gray-600 mb-6">Продление на 30 дней</p>
+                  <div className="text-4xl font-bold text-gray-900 mb-2">{formatRub(PLAN.renewPrice)}</div>
+                  <p className="text-gray-600 mb-6">Продление на {PLAN.periodDays} дней</p>
                   <ul className="text-left space-y-2 mb-6">
                     <li className="flex items-center">
                       <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
@@ -833,11 +834,11 @@ export default function AnimatedLandingPage() {
                     </li>
                     <li className="flex items-center">
                       <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      Новые шаблоны каждый месяц
+                      Ответы ИИ включены в цену
                     </li>
                     <li className="flex items-center">
                       <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      Приоритетная поддержка
+                      До {PLAN.maxConsultants} консультантов на аккаунт
                     </li>
                   </ul>
                   <div className="text-center">
@@ -851,10 +852,10 @@ export default function AnimatedLandingPage() {
               <h4 className="font-bold mb-2">❗ Важно: что происходит, если не продлить подписку</h4>
               <div className="text-left text-sm text-amber-800">
                 <p>
-                  ✅ <strong>ИИ продолжает работать</strong> — ваши клиенты могут общаться с консультантом
+                  ⏸ <strong>Виджет на сайте скрывается</strong>, пока подписка не продлена
                 </p>
                 <p>
-                  ❌ <strong>Нельзя изменять настройки</strong> — промпт, внешний вид остаются прежними
+                  ✅ <strong>Все настройки сохраняются</strong>: после продления консультант сразу снова работает
                 </p>
               </div>
             </div>
@@ -878,24 +879,23 @@ export default function AnimatedLandingPage() {
                   "Совсем нет! Наше пошаговое руководство показывает точно, куда вставить код. Если умеешь копировать и вставлять, то сможешь это настроить.",
               },
               {
-                question: "Будет ли это работать на моем сайте Tilda/WordPress?",
+                question: "Будет ли это работать на моем сайте Tilda?",
                 answer:
-                  "Да! Наш код работает на всех основных платформах, включая Tilda, WordPress, Wix, Squarespace и пользовательские HTML сайты.",
+                  "Да. Код — одна строка: на Tilda её вставляют в блок T123 (нужен платный тариф Tilda), на своём сайте — перед </body>. Подойдёт любой конструктор, где можно вставить свой HTML-код.",
               },
               {
                 question: "Нужно ли платить ежемесячно?",
-                answer:
-                  "Никаких ежемесячных платежей от нас! Ты платишь только один раз за код. Тебе понадобится собственный API ключ OpenAI, который стоит в зависимости от использования (обычно 300-1500₽/месяц).",
+                answer: `Да, это подписка: ${formatRub(PLAN.startPrice)} за подключение и первые ${PLAN.periodDays} дней, дальше ${formatRub(PLAN.renewPrice)} за каждые ${PLAN.periodDays} дней. Ответы ИИ уже включены в цену — свои ключи и отдельные сервисы не нужны.`,
               },
               {
                 question: "Как быстро я получу материалы?",
                 answer:
-                  "Мгновенно! После оплаты ты сразу получишь доступ для скачивания всех материалов и сможешь начать настройку своего ИИ-консультанта.",
+                  "Сразу после оплаты на почту придут логин и пароль от кабинета. Там выбираешь нишу, заполняешь данные о бизнесе и копируешь код для сайта.",
               },
               {
                 question: "Могу ли я настроить внешний вид?",
                 answer:
-                  "Пакет включает несколько вариантов стилизации и инструкции о том, как подстроить под цвета и дизайн твоего бренда.",
+                  "Да, в конструкторе выбираются цвет, иконка, шрифт и положение виджета, а предпросмотр сразу показывает результат.",
               },
             ].map((faq, index) => (
               <Card
