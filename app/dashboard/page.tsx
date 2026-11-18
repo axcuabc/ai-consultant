@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { CalendarClock, Pencil, Plus, Trash2 } from "lucide-react"
+import { CalendarClock, Check, Pencil, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { AppShell, Spinner, subscriptionStatus, useAccount } from "@/components/account"
@@ -50,47 +50,85 @@ export default function DashboardPage() {
   }
 
   const status = subscriptionStatus(profile)
-  const payHref = `/payment?email=${encodeURIComponent(user?.email ?? "")}&kind=${status === "never" ? "start" : "renew"}`
-  const canCreate = profile && consultants.length < PLAN.maxConsultants
+  const canCreate = consultants.length < PLAN.maxConsultants
+  const hasConsultant = consultants.length > 0
+  const steps = [
+    { title: "Создайте консультанта", text: "Выберите нишу и расскажите о своих услугах", done: hasConsultant },
+    { title: "Проверьте, как он отвечает", text: "Задайте ему вопросы прямо в конструкторе — это бесплатно", done: hasConsultant },
+    {
+      title: "Включите на сайте",
+      text: `${formatRub(PLAN.startPrice)} за подключение и ${PLAN.periodDays} дней, дальше ${formatRub(PLAN.renewPrice)}`,
+      done: status === "active",
+    },
+    { title: "Вставьте код на сайт", text: "Одна строка — в Tilda или любой конструктор", done: false },
+  ]
 
   return (
     <AppShell>
       <h1 className="mb-6 text-3xl font-bold text-gray-900">Личный кабинет</h1>
 
-      <Card className="mb-8">
-        <CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-3">
-            <CalendarClock className="mt-1 h-6 w-6 text-blue-600" />
-            <div>
-              {status === "active" && (
-                <>
-                  <p className="font-semibold text-green-700">Подписка активна</p>
-                  <p className="text-sm text-gray-600">До {formatDate(profile!.subscription_ends_at)}</p>
-                </>
-              )}
-              {status === "expired" && (
-                <>
-                  <p className="font-semibold text-red-700">Подписка закончилась</p>
-                  <p className="text-sm text-gray-600">
-                    {formatDate(profile!.subscription_ends_at)}. Виджеты на сайтах сейчас скрыты, настройки сохранены.
-                  </p>
-                </>
-              )}
-              {status === "never" && (
-                <>
-                  <p className="font-semibold text-gray-900">Подписки пока нет</p>
-                  <p className="text-sm text-gray-600">Оплатите доступ, чтобы создать консультанта и поставить его на сайт.</p>
-                </>
-              )}
+      {status === "never" && (
+        <Card className="mb-8">
+          <CardContent className="p-6">
+            <p className="mb-4 font-semibold text-gray-900">Четыре шага до работающего консультанта</p>
+            <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {steps.map((step, i) => (
+                <li key={step.title} className="flex gap-3">
+                  <span
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
+                      step.done ? "bg-green-500 text-white" : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    {step.done ? <Check className="h-4 w-4" /> : i + 1}
+                  </span>
+                  <div>
+                    <p className="font-medium text-gray-900">{step.title}</p>
+                    <p className="text-sm text-gray-600">{step.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            {hasConsultant ? (
+              <Button onClick={() => router.push("/payment")} className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600">
+                Включить на сайте — {formatRub(PLAN.startPrice)}
+              </Button>
+            ) : (
+              <Button onClick={() => router.push("/template/create")} className="mt-6 gap-2 bg-gradient-to-r from-blue-600 to-purple-600">
+                <Plus className="h-4 w-4" />
+                Создать консультанта
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {status !== "never" && (
+        <Card className="mb-8">
+          <CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <CalendarClock className="mt-1 h-6 w-6 text-blue-600" />
+              <div>
+                {status === "active" ? (
+                  <>
+                    <p className="font-semibold text-green-700">Консультант работает на сайте</p>
+                    <p className="text-sm text-gray-600">Подписка до {formatDate(profile!.subscription_ends_at)}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-semibold text-red-700">Подписка закончилась</p>
+                    <p className="text-sm text-gray-600">
+                      {formatDate(profile!.subscription_ends_at)}. Виджет на сайте сейчас скрыт, все настройки сохранены.
+                    </p>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-          <Button onClick={() => router.push(payHref)} className="bg-gradient-to-r from-blue-600 to-purple-600">
-            {status === "never"
-              ? `Оплатить ${formatRub(PLAN.startPrice)}`
-              : `Продлить на ${PLAN.periodDays} дней — ${formatRub(PLAN.renewPrice)}`}
-          </Button>
-        </CardContent>
-      </Card>
+            <Button onClick={() => router.push("/payment")} className="bg-gradient-to-r from-blue-600 to-purple-600">
+              Продлить на {PLAN.periodDays} дней — {formatRub(PLAN.renewPrice)}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-900">Мои консультанты</h2>
@@ -107,9 +145,7 @@ export default function DashboardPage() {
       ) : consultants.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center text-gray-600">
-            {profile
-              ? "Пока нет ни одного консультанта. Нажмите «Создать», выберите нишу и оформление."
-              : "После оплаты здесь появится конструктор консультанта."}
+            Пока нет ни одного консультанта. Нажмите «Создать», выберите нишу и оформление.
           </CardContent>
         </Card>
       ) : (
@@ -138,7 +174,14 @@ export default function DashboardPage() {
                     </Button>
                   </div>
                 </div>
-                <EmbedCode id={c.id} />
+                {status === "active" ? (
+                  <EmbedCode id={c.id} />
+                ) : (
+                  <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+                    Сейчас консультант отвечает только здесь, в кабинете: откройте «Изменить» и задайте ему вопросы. Код
+                    для сайта появится после оплаты.
+                  </p>
+                )}
               </CardContent>
             </Card>
           ))}

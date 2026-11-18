@@ -8,10 +8,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { AppShell, Spinner, useAccount } from "@/components/account"
+import { AppShell, Spinner, subscriptionStatus, useAccount } from "@/components/account"
 import EmbedCode from "@/components/EmbedCode"
 import WidgetPreview from "@/components/WidgetPreview"
 import { supabase } from "@/lib/supabase"
+import { PLAN, formatRub } from "@/lib/plans"
 import { HEX_COLOR, emptyDraft, type ConsultantDraft } from "@/lib/consultant"
 import { FONTS, ICONS, TEMPLATES, getTemplate, type WidgetFont, type WidgetIcon } from "@/lib/templates"
 
@@ -121,19 +122,6 @@ export default function ConsultantEditor({ id }: { id?: string }) {
     return (
       <AppShell>
         <Spinner />
-      </AppShell>
-    )
-  }
-
-  if (!profile) {
-    return (
-      <AppShell>
-        <Card>
-          <CardContent className="space-y-4 p-8 text-center">
-            <p className="text-gray-700">Конструктор доступен после оплаты.</p>
-            <Button onClick={() => router.push("/dashboard")}>В кабинет</Button>
-          </CardContent>
-        </Card>
       </AppShell>
     )
   }
@@ -287,7 +275,19 @@ export default function ConsultantEditor({ id }: { id?: string }) {
             <Card>
               <CardContent className="space-y-3 p-6">
                 <h2 className="text-lg font-semibold">Код для сайта</h2>
-                <EmbedCode id={id} />
+                {subscriptionStatus(profile) === "active" ? (
+                  <EmbedCode id={id} />
+                ) : (
+                  <div className="space-y-3 text-sm text-gray-700">
+                    <p>
+                      Сейчас консультант отвечает только здесь, в предпросмотре справа. Задайте ему несколько вопросов, как
+                      ваш клиент. Если ответы нравятся, включите его на сайте.
+                    </p>
+                    <Button onClick={() => router.push("/payment")} className="w-full bg-gradient-to-r from-blue-600 to-purple-600">
+                      Включить на сайте — {formatRub(PLAN.startPrice)}
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
@@ -295,7 +295,7 @@ export default function ConsultantEditor({ id }: { id?: string }) {
 
         <div className="lg:sticky lg:top-24 lg:self-start">
           <WidgetPreview config={preview} />
-          {!id && <p className="mt-2 text-xs text-gray-500">Настоящие ответы ИИ появятся в предпросмотре после сохранения.</p>}
+          {!id && <p className="mt-2 text-xs text-gray-500">Сохраните консультанта, и в предпросмотре можно будет задать ему вопросы.</p>}
         </div>
       </div>
     </AppShell>

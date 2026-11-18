@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { buildSystemPrompt } from "@/lib/consultant"
+import { siteUrl } from "@/lib/supabase-admin"
 import {
   CORS_HEADERS,
   askModel,
@@ -16,6 +17,29 @@ export const maxDuration = 30
 
 const MAX_MESSAGES = 12
 const MAX_MESSAGE_LENGTH = 1000
+const PREVIEW_PER_DAY = 30
+
+/** Запрос пришёл со страниц самого сервиса (кабинет), а не с сайта клиента. */
+function fromOwnSite(request: NextRequest): boolean {
+  const origin = request.headers.get("origin")
+  if (!origin) return false
+  let host: string
+  try {
+    host = new URL(origin).host
+  } catch {
+    return false
+  }
+  const own = new Set([request.nextUrl.host])
+  const base = siteUrl()
+  if (base) {
+    try {
+      own.add(new URL(base).host)
+    } catch {
+      /* не URL — пропускаем */
+    }
+  }
+  return own.has(host)
+}
 
 function reply(body: object, status = 200) {
   return NextResponse.json(body, { status, headers: CORS_HEADERS })
@@ -54,8 +78,16 @@ export async function POST(request: NextRequest) {
   try {
     const found = await loadConsultant(id)
     if (!found) return reply({ error: "not_found" }, 404)
-    if (!found.active) return reply({ error: "inactive", reply: "Консультант сейчас недоступен." }, 403)
-    if (!originAllowed(found.consultant.allowed_domain, request.headers.get("origin"))) {
+    if (!found.active) {
+      // Без подписки консультант отвечает только в кабинете (проверка перед оплатой),
+      // и не больше PREVIEW_PER_DAY сообщений в сутки.
+      if (!fromOwnSite(request)) return reply({ error: "inactive", reply: "Консультант сейчас недоступен." }, 403)
+      if (rateLimited(`preview:${id}`, PREVIEW_PER_DAY, 24 * 60 * 60_000)) {
+        return reply({
+          reply: "На сегодня лимит пробных сообщений исчерпан. Включите подписку, и консультант будет отвечать без ограничений.",
+        })
+      }
+    } else if (!originAllowed(found.consultant.allowed_domain, request.headers.get("origin"))) {
       return reply({ error: "forbidden_origin" }, 403)
     }
 

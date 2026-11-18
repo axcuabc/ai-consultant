@@ -1,41 +1,46 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { PLAN, priceFor, type PaymentKind } from "@/lib/plans"
 import { createPayment } from "@/lib/yookassa"
-import { siteUrl } from "@/lib/supabase-admin"
+import { getAdmin, siteUrl } from "@/lib/supabase-admin"
+import { userFromRequest } from "@/lib/auth-server"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
+// Оплата только из кабинета: пользователь уже вошёл, почта берётся из аккаунта,
+// а тип платежа (первый или продление) и сумма считаются на сервере.
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json().catch(() => ({}))
-    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : ""
-    const kind: PaymentKind = body.kind === "renew" ? "renew" : "start"
-
-    if (!EMAIL.test(email) || email.length > 200) {
-      return NextResponse.json({ success: false, error: "Проверьте email" }, { status: 400 })
+    const user = await userFromRequest(request)
+    if (!user?.email) {
+      return NextResponse.json({ success: false, error: "Войдите в кабинет, чтобы оплатить" }, { status: 401 })
     }
+    const email = user.email.toLowerCase()
 
-    // Сумма считается только на сервере: клиент не может её подменить
+    const { data: profile } = await getAdmin()
+      .from("users")
+      .select("subscription_ends_at")
+      .eq("id", user.id)
+      .maybeSingle()
+    const kind: PaymentKind = profile?.subscription_ends_at ? "renew" : "start"
     const amount = priceFor(kind)
     const base = siteUrl() || request.nextUrl.origin
+
     const payment = await createPayment({
       amount,
       description:
         kind === "renew"
-          ? `ИИ-Консультант: продление на ${PLAN.periodDays} дней`
-          : `ИИ-Консультант: подключение и ${PLAN.periodDays} дней доступа`,
-      returnUrl: `${base}/payment/success?email=${encodeURIComponent(email)}`,
-      metadata: { email, kind },
+          ? `ИИ Консультант: продление на ${PLAN.periodDays} дней`
+          : `ИИ Консультант: подключение и ${PLAN.periodDays} дней`,
+      returnUrl: `${base}/payment/success`,
+      metadata: { user_id: user.id, email, kind },
     })
 
     return NextResponse.json({ success: true, paymentUrl: payment.confirmationUrl })
   } catch (error) {
     console.error("create-payment:", error)
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : "Не удалось создать платёж" },
+      { success: false, error: "Не удалось создать платёж. Попробуйте ещё раз через минуту." },
       { status: 500 },
     )
   }

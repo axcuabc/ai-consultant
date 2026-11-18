@@ -155,11 +155,11 @@ export default function ContactsPage() {
           </Button>
 
           <Button
-            onClick={() => router.push("/payment")}
+            onClick={() => router.push("/auth?mode=signup")}
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white p-4 h-auto flex flex-col items-center space-y-2"
           >
             <Bot className="w-6 h-6" />
-            <span>Купить сейчас</span>
+            <span>Создать консультанта</span>
           </Button>
         </div>
       </div>
