@@ -1,1046 +1,526 @@
 "use client"
 
-import type React from "react"
-import { supabase } from "@/lib/supabase"
+import { useState } from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import DemoConsultant from "@/components/DemoConsultant"
-import { DEMOS } from "@/lib/demo"
-import { PLAN, formatRub } from "@/lib/plans"
-import { useCallback } from "react"
 import {
-  Bot,
-  Code,
-  FileText,
-  Play,
-  Gift,
-  Zap,
-  Shield,
-  CheckCircle,
-  MessageCircle,
-  Mail,
-  ChevronDown,
-  Monitor,
-  Smartphone,
-  CreditCard,
   ArrowRight,
-  Menu,
-  X,
-  Send,
-  Minimize2,
+  Bot,
+  Check,
+  ChevronDown,
   Clock,
-  Target,
-  DollarSign,
-  TrendingUp,
-  Settings,
+  Code,
+  Lock,
+  Mail,
+  Menu,
+  MessageCircle,
+  MessagesSquare,
+  MoonStar,
+  Palette,
+  RotateCcw,
+  ShieldCheck,
+  Sparkles,
+  UserX,
+  X,
 } from "lucide-react"
-import { useState, useEffect, useRef } from "react"
+import { Button } from "@/components/ui/button"
+import DemoConsultant from "@/components/DemoConsultant"
+import SiteAssistant from "@/components/SiteAssistant"
+import { DEMOS } from "@/lib/demo"
+import { TEMPLATES } from "@/lib/templates"
+import { PLAN, formatRub } from "@/lib/plans"
 
-interface Message {
-  id: string
-  text: string
-  isUser: boolean
-  timestamp: Date
+const SIGNUP = "/auth?mode=signup"
+const SUPPORT = "ai.consultant.site@gmail.com"
+
+const NAV = [
+  { id: "how", label: "Как это работает" },
+  { id: "demo", label: "Демо" },
+  { id: "pricing", label: "Цены" },
+  { id: "faq", label: "Вопросы" },
+]
+
+const NICHE_ICONS: Record<string, string> = {
+  psychologist: "🧠",
+  finance: "💰",
+  nutrition: "🥗",
+  designer: "🎨",
+  beauty: "💅",
+  school: "🎓",
+  travel: "🌴",
+  other: "✨",
 }
 
-export default function AnimatedLandingPage() {
-  const [openFAQ, setOpenFAQ] = useState<number | null>(null)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState("")
-  const [chatOpen, setChatOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      text: "Привет! Я ваш ИИ-консультант по интеграции искусственного интеллекта на сайты. Помогу с любыми вопросами о настройке, стоимости и возможностях. О чем хотите узнать?",
-      isUser: false,
-      timestamp: new Date(),
-    },
-  ])
-  const [inputMessage, setInputMessage] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
-  const [isOnline] = useState(true)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+const DEMO_TABS: Record<string, string> = { psychology: "Психолог", diet: "Нутрициолог", design: "Дизайнер" }
 
-  const toggleFAQ = (index: number) => {
-    setOpenFAQ(openFAQ === index ? null : index)
-  }
+const PAINS = [
+  {
+    icon: MoonStar,
+    title: "Пишут ночью и в выходные",
+    text: "Вы отвечаете утром — а человек уже записался к тому, кто ответил сразу.",
+  },
+  {
+    icon: MessagesSquare,
+    title: "Одни и те же вопросы",
+    text: "«Сколько стоит?», «Как проходит?», «Есть ли время?» — по десять раз в неделю.",
+  },
+  {
+    icon: UserX,
+    title: "Уходят молча",
+    text: "Зашли на сайт, не нашли ответ за минуту и закрыли вкладку. Вы даже не узнаете о них.",
+  },
+]
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId)
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" })
-    }
-    setMobileMenuOpen(false)
-  }
-  const scrollToDemo = useCallback(() => {
-    const section = document.getElementById("demo")
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" })
-    }
-  }, [])
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
+const STEPS = [
+  {
+    icon: Sparkles,
+    title: "Расскажите о своих услугах",
+    text: "Выберите нишу и вставьте описание: услуги, цены, формат. Есть готовый пример — замените в нём данные на свои.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Проверьте ответы бесплатно",
+    text: "Задайте помощнику вопросы так, как спросил бы клиент. Поправьте описание, если что-то не нравится.",
+  },
+  {
+    icon: Code,
+    title: "Поставьте на сайт",
+    text: "Оплатите подписку и вставьте одну строку кода в Tilda или любой конструктор. Это 2 минуты.",
+  },
+]
 
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+const CAN = [
+  "Отвечает на вопросы об услугах, ценах, формате и сроках",
+  "Приглашает записаться и даёт вашу ссылку или контакт",
+  "Работает круглосуточно, в том числе ночью и в выходные",
+  "Отвечает на языке посетителя",
+  "Выглядит в цветах вашего сайта",
+]
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = ["hero", "how-it-works", "whats-included", "pricing", "faq", "contact"]
-      const scrollPosition = window.scrollY + 100
+const CANNOT = [
+  "Не придумывает цены и услуги — говорит только то, что вы написали",
+  "Не ставит диагнозы и не составляет планы лечения или питания",
+  "Не обещает свободное время для записи — отправляет к вам",
+  "Не выдаёт себя за вас: представляется вашим помощником",
+]
 
-      for (const section of sections) {
-        const element = document.getElementById(section)
-        if (element) {
-          const { offsetTop, offsetHeight } = element
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveSection(section)
-            break
-          }
-        }
-      }
-    }
+const FAQ = [
+  {
+    q: "Нужна ли карта, чтобы попробовать?",
+    a: "Нет. Регистрация — только почта и пароль. Создать помощника и проверить его ответы в кабинете можно бесплатно. Платить нужно, только когда решите поставить его на сайт.",
+  },
+  {
+    q: "Будет ли это работать на моём сайте Tilda?",
+    a: "Да. Код — одна строка: на Tilda её вставляют в блок «Другое → T123 (HTML-код)» — для этого нужен платный тариф Tilda. На своём сайте — перед </body>. Подойдёт любой конструктор, где можно вставить HTML-код.",
+  },
+  {
+    q: "А если помощник ответит неправильно?",
+    a: "Он отвечает только по вашему описанию и не придумывает цены. Если ответа в описании нет, честно скажет об этом и предложит связаться с вами. Перед оплатой вы сами проверяете ответы и можете дополнить описание. Но ИИ — не человек: иногда он может сформулировать неточно, поэтому важные условия лучше описать прямо.",
+  },
+  {
+    q: "Где хранятся переписки с моими клиентами?",
+    a: "Мы не храним диалоги посетителей на своём сервере: история остаётся в браузере посетителя. Чтобы ответить, сообщение передаётся модели ИИ.",
+  },
+  {
+    q: "Как платить и можно ли вернуть деньги?",
+    a: `Оплата через ЮKassa: ${formatRub(PLAN.startPrice)} за подключение и первые ${PLAN.periodDays} дней, дальше ${formatRub(PLAN.renewPrice)} за каждые ${PLAN.periodDays} дней. Автосписаний нет — продлеваете сами. Стоимость неиспользованных дней можно вернуть по заявлению на почту.`,
+  },
+  {
+    q: "Нужно ли разбираться в программировании?",
+    a: "Нет. Всё настраивается формой в кабинете, а код для сайта — одна строка, которую нужно скопировать и вставить. Если не получится — напишите на почту, поможем по переписке.",
+  },
+]
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+function scrollTo(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })
+}
 
-  const sendMessage = async () => {
-    if (!inputMessage.trim()) return
+function SectionTitle({ title, subtitle }: { title: string; subtitle?: string }) {
+  return (
+    <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-12">
+      <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">{title}</h2>
+      {subtitle && <p className="mt-3 text-lg text-gray-600">{subtitle}</p>}
+    </div>
+  )
+}
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: inputMessage,
-      isUser: true,
-      timestamp: new Date(),
-    }
+/** Макет сайта специалиста с открытым чатом помощника. */
+function HeroMockup() {
+  return (
+    <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+      <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-r from-blue-400/20 to-purple-400/20 blur-2xl" aria-hidden />
+      <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl">
+        <div className="flex items-center gap-2 border-b bg-gray-50 px-4 py-3">
+          <span className="h-3 w-3 rounded-full bg-red-300" />
+          <span className="h-3 w-3 rounded-full bg-amber-300" />
+          <span className="h-3 w-3 rounded-full bg-green-300" />
+          <span className="ml-3 flex-1 truncate rounded-md bg-white px-3 py-1 text-xs text-gray-400">anna-psychologist.ru</span>
+        </div>
+        <div className="relative h-[29rem] bg-gradient-to-br from-rose-50 to-white p-6 sm:h-[27rem]">
+          <p className="text-xs font-semibold uppercase tracking-wide text-rose-500">Психолог</p>
+          <p className="mt-1 text-2xl font-bold text-gray-900">Анна Смирнова</p>
+          <div className="mt-3 space-y-2" aria-hidden>
+            <div className="h-2.5 w-3/4 rounded bg-gray-200" />
+            <div className="h-2.5 w-2/3 rounded bg-gray-200" />
+            <div className="h-2.5 w-1/2 rounded bg-gray-200" />
+          </div>
+          <div className="absolute bottom-4 right-4 w-[85%] max-w-xs overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-gray-200">
+            <div className="flex items-center gap-2 bg-rose-500 px-4 py-3 text-sm font-semibold text-white">
+              <span className="h-2 w-2 rounded-full bg-green-300" />
+              Помощник Анны
+            </div>
+            <div className="space-y-2 p-3 text-[13px] leading-snug">
+              <p className="ml-auto w-fit max-w-[85%] rounded-xl bg-rose-500 px-3 py-2 text-white">Сколько стоит первая консультация?</p>
+              <p className="w-fit max-w-[90%] rounded-xl bg-gray-100 px-3 py-2 text-gray-800">
+                Первая встреча — 3 000 ₽, 50 минут онлайн. Можно просто прийти и рассказать, что беспокоит. Подсказать, как записаться?
+              </p>
+              <p className="ml-auto w-fit max-w-[85%] rounded-xl bg-rose-500 px-3 py-2 text-white">Да, давайте</p>
+              <p className="w-fit max-w-[90%] rounded-xl bg-gray-100 px-3 py-2 text-gray-800">
+                Напишите Анне в Telegram @anna_psy — она подберёт удобное время.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="absolute -left-2 top-1/2 hidden rounded-xl bg-white px-4 py-3 text-sm shadow-xl ring-1 ring-gray-100 sm:block">
+        <p className="flex items-center gap-2 font-medium text-gray-900">
+          <Clock className="h-4 w-4 text-blue-600" />
+          02:14 ночи
+        </p>
+        <p className="text-xs text-gray-500">ответ за 3 секунды</p>
+      </div>
+    </div>
+  )
+}
 
-    const newMessages = [...messages, userMessage]
-    setMessages(newMessages)
-    setInputMessage("")
-    setIsTyping(true)
+export default function LandingPage() {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [demoId, setDemoId] = useState(DEMOS[0].id)
+  const [openFaq, setOpenFaq] = useState<number | null>(0)
+  const demo = DEMOS.find((d) => d.id === demoId) ?? DEMOS[0]
 
-    // Добавляем задержку для реалистичности
-    setTimeout(
-      async () => {
-        try {
-          const response = await fetch("/api/chat", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              message: inputMessage,
-              chatHistory: messages.slice(-5), // Отправляем последние 5 сообщений для контекста
-            }),
-          })
-
-          const data = await response.json()
-
-          // Имитируем постепенное появление текста
-          const botResponse = data.response || "Извините, произошла ошибка. Попробуйте еще раз."
-
-          // Создаем сообщение бота
-          const botMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            text: "",
-            isUser: false,
-            timestamp: new Date(),
-          }
-
-          setMessages((prev) => [...prev, botMessage])
-
-          // Анимация печатания
-          const words = botResponse.split(" ")
-          for (let i = 0; i < words.length; i++) {
-            await new Promise((resolve) => setTimeout(resolve, 100 + Math.random() * 100))
-
-            setMessages((prev) => {
-              const updated = [...prev]
-              const lastMessage = updated[updated.length - 1]
-              if (!lastMessage.isUser) {
-                lastMessage.text = words.slice(0, i + 1).join(" ")
-              }
-              return updated
-            })
-          }
-        } catch (error) {
-          console.error("Ошибка отправки сообщения:", error)
-          const errorMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            text: "Извините, произошла ошибка. Проверьте подключение к интернету.",
-            isUser: false,
-            timestamp: new Date(),
-          }
-          setMessages((prev) => [...prev, errorMessage])
-        } finally {
-          setIsTyping(false)
-        }
-      },
-      800 + Math.random() * 1200,
-    ) // Случайная задержка 0.8-2 секунды
-  }
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      sendMessage()
-    }
+  const go = (id: string) => {
+    scrollTo(id)
+    setMenuOpen(false)
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-      {/* Floating Chat Button */}
-      {!chatOpen && (
-        <div className="fixed bottom-6 right-6 z-50 animate-bounce">
-          <Button
-            onClick={() => setChatOpen(true)}
-            className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full w-16 h-16 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110"
-          >
-            <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
-          </Button>
-        </div>
-      )}
-
-      {/* Chat Window */}
-      {chatOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-80 h-96 bg-white rounded-2xl shadow-2xl border border-gray-200 animate-slide-up">
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-2xl">
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                  <Bot className="w-5 h-5 text-blue-600" />
-                </div>
-                {isOnline && (
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
-                )}
-              </div>
-              <div>
-                <h3 className="font-semibold text-white">ИИ Консультант</h3>
-                <p className="text-xs text-blue-100">{isOnline ? "Онлайн" : "Оффлайн"}</p>
-              </div>
-            </div>
-            <Button
-              onClick={() => setChatOpen(false)}
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20"
-            >
-              <Minimize2 className="w-4 h-4" />
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* Шапка */}
+      <nav className="fixed inset-x-0 top-0 z-40 border-b border-gray-200/60 bg-white/85 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
+              <Bot className="h-5 w-5 text-white" />
+            </span>
+            <span className="text-lg font-bold">ИИ Консультант</span>
+          </Link>
+          <div className="hidden items-center gap-6 md:flex">
+            {NAV.map((item) => (
+              <button key={item.id} onClick={() => go(item.id)} className="text-sm text-gray-600 hover:text-blue-600">
+                {item.label}
+              </button>
+            ))}
+            <Link href="/auth" className="text-sm font-medium text-gray-700 hover:text-blue-600">
+              Войти
+            </Link>
+            <Button asChild size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600">
+              <Link href={SIGNUP}>Создать бесплатно</Link>
             </Button>
           </div>
-
-          <div className="flex flex-col h-80">
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.isUser ? "justify-end" : "justify-start"} animate-fade-in`}
-                >
-                  <div
-                    className={`max-w-xs px-4 py-2 rounded-2xl ${
-                      message.isUser
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    <p className="text-sm">{message.text}</p>
-                  </div>
-                </div>
-              ))}
-
-              {isTyping && (
-                <div className="flex justify-start animate-fade-in">
-                  <div className="bg-gray-100 px-4 py-2 rounded-2xl">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div
-                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.1s" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.2s" }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-
-            <div className="p-4 border-t border-gray-200">
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Напишите сообщение..."
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <Button
-                  onClick={sendMessage}
-                  disabled={!inputMessage.trim() || isTyping}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full w-10 h-10 p-0"
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
-              </div>
+          <button className="p-2 md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label="Меню">
+            {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
+        {menuOpen && (
+          <div className="space-y-1 border-t bg-white px-4 py-4 md:hidden">
+            {NAV.map((item) => (
+              <button key={item.id} onClick={() => go(item.id)} className="block w-full py-2 text-left text-gray-700">
+                {item.label}
+              </button>
+            ))}
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              <Button asChild variant="outline">
+                <Link href="/auth">Войти</Link>
+              </Button>
+              <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600">
+                <Link href={SIGNUP}>Создать</Link>
+              </Button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Sticky Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
- {/* Логотип */}
-<div className="flex items-center">
-  <Link href="/" className="inline-flex items-center space-x-2" aria-label="ИИ Консультант — на главную">
-    <span className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-      <Bot className="w-5 h-5 text-white" />
-    </span>
-    <span className="font-bold text-xl text-gray-900">ИИ Консультант</span>
-  </Link>
-</div>
-
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              {[
-                { id: "how-it-works", label: "Как это работает" },
-                { id: "benefits", label: "Преимущества" },
-                { id: "template", label: "Шаблоны" },
-                { id: "pricing", label: "Цены" },
-                { id: "contact", label: "Контакты" },
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => scrollToSection(item.id)}
-                  className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-                    activeSection === item.id ? "text-blue-600" : "text-gray-600"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-
-              {/* Кнопка Войти */}
-              <Link href="/auth">
-                <Button
-                  variant="outline"
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent ml-4"
-                >
-                  Войти
-                </Button>
-              </Link>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
-
-          {/* Mobile Menu */}
-          {mobileMenuOpen && (
-            <div className="md:hidden py-4 border-t border-gray-200/50">
-              {[
-                { id: "how-it-works", label: "Как это работает" },
-                { id: "whats-included", label: "Что входит" },
-                { id: "pricing", label: "Цены" },
-                { id: "contact", label: "Контакты" },
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => scrollToSection(item.id)}
-                  className="block w-full text-left px-4 py-2 text-gray-600 hover:text-blue-600 transition-colors"
-                >
-                  {item.label}
-                </button>
-              ))}
-
-              {/* Кнопка Войти в мобильном меню */}
-              <div className="mt-4 px-4">
-                <Link href="/auth">
-                  <Button
-                    variant="outline"
-                    className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent"
-                  >
-                    Войти
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
+        )}
       </nav>
 
-      {/* Hero Section */}
-      <section id="hero" className="pt-24 pb-16 px-4 overflow-hidden">
-        <div className="container mx-auto max-w-7xl">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-fade-in-up">
-              <div className="flex flex-wrap gap-3 mb-6">
-                <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
-                  <Zap className="w-4 h-4 mr-1" />
-                  Без кода
-                </Badge>
-                <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors">
-                  <Shield className="w-4 h-4 mr-1" />
-                  API готов
-                </Badge>
-                <Badge className="bg-green-100 text-green-700 hover:bg-green-200 transition-colors">
-                  <CheckCircle className="w-4 h-4 mr-1" />
-                  Визуальная настройка
-                </Badge>
-              </div>
-
-              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                ИИ-консультант, который <span className="text-blue-600">отвечает вашим клиентам 24/7</span> и приводит их к записи
-              </h1>
-
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Выберите нишу, расскажите о своём бизнесе и вставьте одну строку кода на сайт. Работает на Tilda и любых сайтах, без программирования.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  onClick={scrollToDemo}
-                  size="lg"
-                  className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                >
-                  <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                  Попробовать демо
-                </Button>
-
-                <Button
-                  size="lg"
-                  className="group bg-white text-gray-900 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                  onClick={() => (window.location.href = "/auth?mode=signup")}
-                >
+      {/* Первый экран */}
+      <section className="bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
+          <div>
+            <p className="mb-4 inline-flex rounded-full bg-white px-3 py-1 text-sm text-gray-600 shadow-sm ring-1 ring-gray-200">
+              Для психологов, нутрициологов, дизайнеров и других специалистов
+            </p>
+            <h1 className="text-4xl font-bold leading-tight sm:text-5xl">
+              Помощник в чате сайта, который{" "}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                отвечает клиентам 24/7
+              </span>{" "}
+              и приводит их к записи
+            </h1>
+            <p className="mt-5 text-lg leading-relaxed text-gray-600">
+              Расскажите о своих услугах — помощник ответит посетителям о ценах и формате работы и пригласит записаться. Работает на
+              Tilda и любом сайте, без программирования.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg" className="h-12 bg-gradient-to-r from-blue-600 to-purple-600 px-7 text-base shadow-lg">
+                <Link href={SIGNUP}>
                   Создать бесплатно
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="relative animate-fade-in-right">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-3xl blur-3xl animate-pulse"></div>
-              <img
-                src="/images/hero-programmer.png"
-                alt="ИИ-консультант для сайта"
-                className="relative z-10 w-full h-auto rounded-2xl shadow-2xl"
-              />
-              <div className="absolute -bottom-4 left-4 sm:-left-4 z-20 bg-white rounded-2xl p-4 shadow-xl">
-                <div className="flex items-center space-x-3">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium text-gray-700">ИИ Ассистент активен</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section id="how-it-works" className="py-16 px-4 bg-white">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Как это работает</h2>
-            <p className="text-xl text-gray-600">Запустите своего ИИ-консультанта в 3 простых шага</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                step: "01",
-                title: "Создайте и проверьте бесплатно",
-                description: "Зарегистрируйтесь, выберите нишу и задайте консультанту вопросы. Платите, только если понравится",
-                icon: CreditCard,
-                color: "from-blue-500 to-blue-600",
-              },
-              {
-                step: "02",
-                title: "Включите и вставьте код",
-                description: "Оплатите подписку и вставьте одну строку кода на сайт — это 2 минуты",
-                icon: Code,
-                color: "from-purple-500 to-purple-600",
-              },
-              {
-                step: "03",
-                title: "ИИ-консультант помогает клиентам 24/7",
-                description: "Ваш ИИ начинает работать мгновенно и никогда не спит",
-                icon: Bot,
-                color: "from-green-500 to-green-600",
-              },
-            ].map((step, index) => (
-              <div
-                key={index}
-                className="relative group animate-fade-in-up"
-                style={{ animationDelay: `${index * 0.2}s` }}
-              >
-                <Card className="p-8 text-center hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-2 border-0 bg-gradient-to-br from-gray-50 to-white">
-                  <CardContent className="p-0">
-                    <div
-                      className={`w-16 h-16 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}
-                    >
-                      <step.icon className="w-8 h-8 text-white" />
-                    </div>
-                    <div className="text-sm font-bold text-gray-400 mb-2">{step.step}</div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">{step.title}</h3>
-                    <p className="text-gray-600">{step.description}</p>
-                  </CardContent>
-                </Card>
-
-                {index < 2 && (
-                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
-                    <ArrowRight className="w-8 h-8 text-gray-300" />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits */}
-      <section id="benefits" className="py-20 relative z-10">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Преимущества ИИ-консультанта</h2>
-            <p className="text-xl text-gray-600">Почему ИИ лучше живого сотрудника</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <Clock className="w-8 h-8" />,
-                title: "Работает 24/7",
-                desc: "Никаких выходных, отпусков или больничных. Ваши клиенты получают помощь в любое время.",
-              },
-              {
-                icon: <Target className="w-8 h-8" />,
-                title: "Отвечает по вашим данным",
-                desc: "Говорит только то, что вы написали о своих услугах. Если ответа нет — честно предлагает связаться с вами.",
-              },
-              {
-                icon: <DollarSign className="w-8 h-8" />,
-                title: "Стоит в 10 раз дешевле",
-                desc: `${formatRub(PLAN.renewPrice)}/месяц против 50 000₽+ зарплаты консультанта. Окупается с первого клиента.`,
-              },
-              {
-                icon: <Shield className="w-8 h-8" />,
-                title: "Повышает доверие",
-                desc: "Посетитель получает ответ сразу, а не уходит к конкуренту, пока ждёт менеджера.",
-              },
-              {
-                icon: <TrendingUp className="w-8 h-8" />,
-                title: "Ведёт к записи",
-                desc: "Отвечает на вопросы о ваших услугах и ценах и предлагает записаться или оставить заявку.",
-              },
-              {
-                icon: <Settings className="w-8 h-8" />,
-                title: "Легко настраивается",
-                desc: "Настройка за 10 минут без программирования. Готовые шаблоны для любой ниши.",
-              },
-            ].map((benefit, index) => (
-              <Card key={index} className="bg-white border-0 shadow-lg hover:shadow-xl transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <div className="text-blue-600">{benefit.icon}</div>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{benefit.title}</h3>
-                  <p className="text-gray-600 text-sm">{benefit.desc}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-{/* Demo Section */}
-<section id="demo" className="py-16 px-4 bg-white">
-  <div className="container mx-auto max-w-6xl">
-    <div className="text-center mb-16 animate-fade-in-up">
-      <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Попробуйте прямо сейчас</h2>
-      <p className="text-xl text-gray-600">Задайте вопрос так, как его задал бы ваш клиент</p>
-    </div>
-
-    <div className="grid md:grid-cols-3 gap-6">
-      {DEMOS.map((demo) => (
-        <DemoConsultant key={demo.id} demo={demo} />
-      ))}
-    </div>
-
-    <div className="text-center mt-12">
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 inline-block">
-        <p className="text-amber-800">
-          Специалисты в демо вымышленные. Ваш консультант будет так же отвечать по вашим услугам и ценам.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-      {/* Templates Section */}
-      <section id="template" className="py-16 px-4 bg-white">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Готовые шаблоны для любой ниши</h2>
-            <p className="text-xl text-gray-600">Выберите подходящий или создайте свой</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { name: "Психолог", icon: "🧠", desc: "Рассказывает о консультациях и ведёт к записи" },
-              { name: "Финансовый консультант", icon: "💰", desc: "Объясняет услуги, без конкретных инвестсоветов" },
-              { name: "Нутрициолог", icon: "🥗", desc: "Рассказывает о программах, без планов питания" },
-              { name: "Дизайнер", icon: "🎨", desc: "Услуги, сроки, цены, приём заявок" },
-              { name: "Салон красоты", icon: "💅", desc: "Услуги и цены, направляет на запись" },
-              { name: "Онлайн-школа", icon: "🎓", desc: "Программа курса, формат и стоимость" },
-              { name: "Туры и экскурсии", icon: "🌴", desc: "Подбор тура и бронирование через вас" },
-              { name: "Создать свой", icon: "➕", desc: "Настройте под любую специальность" },
-            ].map((template, index) => (
-              <Card
-                key={index}
-                className="p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-              >
-                <CardContent className="p-0 text-center">
-                  <div className="text-4xl mb-4">{template.icon}</div>
-                  <h3 className="font-bold text-lg mb-2">{template.name}</h3>
-                  <p className="text-gray-600 text-sm">{template.desc}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Comparison Table */}
-      <section className="py-20 relative z-10">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">ИИ vs Живой сотрудник</h2>
-            <p className="text-xl text-gray-600">Сравните и убедитесь в выгоде</p>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-            <Card className="bg-white shadow-xl border-0 overflow-hidden">
-              <CardContent className="p-0">
-                {/* Desktop Table */}
-                <div className="hidden md:block overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Критерий</th>
-                        <th className="px-6 py-4 text-center text-sm font-semibold text-blue-600">ИИ-консультант</th>
-                        <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600">Живой сотрудник</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      <tr>
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">Стоимость в год</td>
-                        <td className="px-6 py-4 text-center text-sm text-green-600 font-semibold">{formatRub(PLAN.startPrice + 11 * PLAN.renewPrice)}</td>
-                        <td className="px-6 py-4 text-center text-sm text-red-600 font-semibold">600,000₽+</td>
-                      </tr>
-                      <tr className="bg-gray-50">
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">Доступность</td>
-                        <td className="px-6 py-4 text-center text-sm text-green-600">24/7/365</td>
-                        <td className="px-6 py-4 text-center text-sm text-red-600">8 часов в день</td>
-                      </tr>
-                      <tr>
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">Скорость ответа</td>
-                        <td className="px-6 py-4 text-center text-sm text-green-600">Мгновенно</td>
-                        <td className="px-6 py-4 text-center text-sm text-red-600">До нескольких минут</td>
-                      </tr>
-                      <tr className="bg-gray-50">
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">Надёжность</td>
-                        <td className="px-6 py-4 text-center text-sm text-green-600">Одинаково вежлив всегда</td>
-                        <td className="px-6 py-4 text-center text-sm text-red-600">Устаёт, болеет, уходит в отпуск</td>
-                      </tr>
-                      <tr>
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">Обучение</td>
-                        <td className="px-6 py-4 text-center text-sm text-green-600">Заполнить форму за 10 минут</td>
-                        <td className="px-6 py-4 text-center text-sm text-red-600">Недели на обучение</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Mobile Cards */}
-                <div className="md:hidden space-y-4">
-                  {[
-                    {
-                      criterion: "Стоимость в год",
-                      ai: formatRub(PLAN.startPrice + 11 * PLAN.renewPrice),
-                      human: "600,000₽+",
-                      aiColor: "text-green-600",
-                      humanColor: "text-red-600",
-                    },
-                    {
-                      criterion: "Доступность",
-                      ai: "24/7/365",
-                      human: "8 часов в день",
-                      aiColor: "text-green-600",
-                      humanColor: "text-red-600",
-                    },
-                    {
-                      criterion: "Скорость ответа",
-                      ai: "Мгновенно",
-                      human: "До нескольких минут",
-                      aiColor: "text-green-600",
-                      humanColor: "text-red-600",
-                    },
-                    {
-                      criterion: "Надёжность",
-                      ai: "Одинаково вежлив всегда",
-                      human: "Устаёт, болеет, уходит в отпуск",
-                      aiColor: "text-green-600",
-                      humanColor: "text-red-600",
-                    },
-                    {
-                      criterion: "Обучение",
-                      ai: "Заполнить форму за 10 минут",
-                      human: "Недели на обучение",
-                      aiColor: "text-green-600",
-                      humanColor: "text-red-600",
-                    },
-                  ].map((item, index) => (
-                    <Card key={index} className="bg-white shadow-sm">
-                      <CardContent className="p-4">
-                        <h4 className="font-semibold text-gray-900 mb-3 text-center">{item.criterion}</h4>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="text-center">
-                            <div className="text-xs text-blue-600 font-medium mb-1">ИИ-консультант</div>
-                            <div className={`text-sm font-semibold ${item.aiColor}`}>{item.ai}</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-xs text-gray-600 font-medium mb-1">Живой сотрудник</div>
-                            <div className={`text-sm font-semibold ${item.humanColor}`}>{item.human}</div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="mt-8 text-center">
-              <Card className="bg-green-50 border-green-200 inline-block">
-                <CardContent className="p-6">
-                  <h3 className="text-2xl font-bold text-green-800 mb-2">Дешевле одной зарплаты в месяц — за целый год</h3>
-                  <p className="text-green-700">ИИ-консультант окупается уже в первый месяц</p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="py-16 px-4 bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="container mx-auto max-w-4xl text-center">
-          <div className="animate-fade-in-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">Простые и честные цены</h2>
-
-            <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-              <Card className="p-6 border-2 border-gray-200">
-                <CardContent className="p-0">
-                  <h3 className="text-xl font-bold mb-4">Первый месяц</h3>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">{formatRub(PLAN.startPrice)}</div>
-                  <p className="text-gray-600 mb-6">Подключение и {PLAN.periodDays} дней доступа</p>
-                  <ul className="text-left space-y-2 mb-6">
-                    <li className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      Личный ИИ-консультант
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      Все шаблоны включены
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      Настройка внешнего вида
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      Техническая поддержка
-                    </li>
-                  </ul>
-                  <Button
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                    onClick={() => (window.location.href = "/auth?mode=signup")}
-                  >
-                    Создать и проверить бесплатно
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="p-6 border-2 border-blue-500 relative">
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-blue-500 text-white px-4">Продление</Badge>
-                </div>
-                <CardContent className="p-0">
-                  <h3 className="text-xl font-bold mb-4">Следующие месяцы</h3>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">{formatRub(PLAN.renewPrice)}</div>
-                  <p className="text-gray-600 mb-6">Продление на {PLAN.periodDays} дней</p>
-                  <ul className="text-left space-y-2 mb-6">
-                    <li className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      Консультант продолжает работать
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      Можно изменять настройки
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      Ответы ИИ включены в цену
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      До {PLAN.maxConsultants} консультантов на аккаунт
-                    </li>
-                  </ul>
-                  <div className="text-center">
-                    <p className="text-sm text-gray-500">Доступно после первой оплаты</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mt-8 max-w-2xl mx-auto">
-              <h4 className="font-bold mb-2">❗ Важно: что происходит, если не продлить подписку</h4>
-              <div className="text-left text-sm text-amber-800">
-                <p>
-                  ⚠️ <strong>Виджет на сайте скрывается</strong>, пока подписка не продлена
-                </p>
-                <p>
-                  ✅ <strong>Все настройки сохраняются</strong>: после продления консультант сразу снова работает
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section id="faq" className="py-16 px-4 bg-white">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Часто задаваемые вопросы</h2>
-            <p className="text-xl text-gray-600">Всё что нужно знать</p>
-          </div>
-
-          <div className="space-y-4">
-            {[
-              {
-                question: "Нужны ли мне навыки программирования для настройки?",
-                answer:
-                  "Нет. Всё настраивается формой в кабинете, а для сайта нужно лишь скопировать одну строку кода и вставить её — на Tilda это блок T123.",
-              },
-              {
-                question: "Будет ли это работать на моем сайте Tilda?",
-                answer:
-                  "Да. Код — одна строка: на Tilda её вставляют в блок T123 (нужен платный тариф Tilda), на своём сайте — перед </body>. Подойдёт любой конструктор, где можно вставить свой HTML-код.",
-              },
-              {
-                question: "Нужно ли платить ежемесячно?",
-                answer: `Да, это подписка: ${formatRub(PLAN.startPrice)} за подключение и первые ${PLAN.periodDays} дней, дальше ${formatRub(PLAN.renewPrice)} за каждые ${PLAN.periodDays} дней. Ответы ИИ уже включены в цену — свои ключи и отдельные сервисы не нужны.`,
-              },
-              {
-                question: "Как быстро я смогу начать?",
-                answer:
-                  "Сразу. Зарегистрируйтесь — карта не нужна, — выберите нишу, расскажите о своих услугах и проверьте ответы консультанта в кабинете. Понравится — оплатите и вставьте код на сайт.",
-              },
-              {
-                question: "Могу ли я настроить внешний вид?",
-                answer:
-                  "Да, в конструкторе выбираются цвет, иконка, шрифт и положение виджета, а предпросмотр сразу показывает результат.",
-              },
-            ].map((faq, index) => (
-              <Card
-                key={index}
-                className="overflow-hidden animate-fade-in-up border-0 bg-gray-50"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <CardContent className="p-0">
-                  <button
-                    onClick={() => toggleFAQ(index)}
-                    className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-100 transition-colors"
-                  >
-                    <span className="font-semibold text-gray-900">{faq.question}</span>
-                    <ChevronDown className={`w-5 h-5 transition-transform ${openFAQ === index ? "rotate-180" : ""}`} />
-                  </button>
-                  {openFAQ === index && (
-                    <div className="px-6 pb-4 animate-fade-in">
-                      <p className="text-gray-600">{faq.answer}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Support Section */}
-      <section id="contact" className="py-16 px-4">
-        <div className="container mx-auto max-w-4xl text-center">
-          <div className="animate-fade-in-up">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <MessageCircle className="w-10 h-10 text-white" />
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Нужна помощь?</h2>
-            <p className="text-xl text-gray-600 mb-8">Напишите на почту — ответим в течение 24 часов</p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                asChild
-                size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-              >
-                <a href="mailto:ai.consultant.site@gmail.com">
-                  <Mail className="w-5 h-5 mr-2" />
-                  Написать на почту
-                </a>
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
               </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-              >
-                <a href="/contacts">
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  Все контакты
-                </a>
+              <Button size="lg" variant="outline" onClick={() => scrollTo("demo")} className="h-12 bg-white px-7 text-base">
+                Посмотреть, как отвечает
               </Button>
             </div>
+            <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
+              <span className="flex items-center gap-1">
+                <Check className="h-4 w-4 text-green-600" />
+                Карта не нужна
+              </span>
+              <span className="flex items-center gap-1">
+                <Check className="h-4 w-4 text-green-600" />
+                Проверка бесплатно
+              </span>
+              <span className="flex items-center gap-1">
+                <Check className="h-4 w-4 text-green-600" />
+                Без автосписаний
+              </span>
+            </p>
+          </div>
+          <HeroMockup />
+        </div>
+      </section>
+
+      {/* Боль */}
+      <section className="px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-6xl">
+          <SectionTitle title="Знакомо?" subtitle="Клиенты не ждут ответа — они идут туда, где ответили быстрее" />
+          <div className="grid gap-4 md:grid-cols-3">
+            {PAINS.map(({ icon: Icon, title, text }) => (
+              <div key={title} className="rounded-2xl bg-gray-50 p-6">
+                <Icon className="h-8 w-8 text-purple-600" />
+                <h3 className="mt-4 text-lg font-semibold">{title}</h3>
+                <p className="mt-2 text-gray-600">{text}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mx-auto mt-8 max-w-2xl text-center text-lg text-gray-700">
+            Помощник отвечает сразу — днём и ночью — и передаёт вам уже тёплого клиента, который знает цены и готов записаться.
+          </p>
+        </div>
+      </section>
+
+      {/* Как это работает */}
+      <section id="how" className="scroll-mt-16 bg-gradient-to-br from-blue-50 to-purple-50 px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-6xl">
+          <SectionTitle title="Как это работает" subtitle="Три шага, около 10 минут" />
+          <div className="grid gap-4 md:grid-cols-3">
+            {STEPS.map(({ icon: Icon, title, text }, i) => (
+              <div key={title} className="rounded-2xl bg-white p-6 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <span className="text-sm font-semibold text-gray-400">Шаг {i + 1}</span>
+                </div>
+                <h3 className="mt-4 text-lg font-semibold">{title}</h3>
+                <p className="mt-2 text-gray-600">{text}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="px-4 py-8 bg-gray-900 text-white">
-        <div className="container mx-auto max-w-6xl">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <div className="flex items-center space-x-2 mb-2">
-                <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Bot className="w-4 h-4 text-white" />
+      {/* Демо */}
+      <section id="demo" className="scroll-mt-16 px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-3xl">
+          <SectionTitle title="Задайте вопрос как клиент" subtitle="Так помощник ответит вашим посетителям. Специалисты в примерах вымышленные." />
+          <div className="mb-4 grid grid-cols-3 gap-1 rounded-xl bg-gray-100 p-1">
+            {DEMOS.map((d) => (
+              <button
+                key={d.id}
+                onClick={() => setDemoId(d.id)}
+                className={`rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
+                  d.id === demo.id ? "bg-white text-gray-900 shadow-sm" : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                <span aria-hidden>{d.avatar}</span>
+                {DEMO_TABS[d.id] ?? d.title}
+              </button>
+            ))}
+          </div>
+          <DemoConsultant key={demo.id} demo={demo} />
+          <div className="mt-6 text-center">
+            <Button asChild size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600">
+              <Link href={SIGNUP}>Создать такого для себя — бесплатно</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Что умеет и чего не делает */}
+      <section className="bg-gray-50 px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-5xl">
+          <SectionTitle title="Честно о том, что умеет помощник" />
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-2xl bg-white p-6 shadow-sm">
+              <h3 className="mb-4 text-lg font-semibold text-green-700">Умеет</h3>
+              <ul className="space-y-3">
+                {CAN.map((t) => (
+                  <li key={t} className="flex gap-3 text-gray-700">
+                    <Check className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-2xl bg-white p-6 shadow-sm">
+              <h3 className="mb-4 text-lg font-semibold text-gray-900">Не делает</h3>
+              <ul className="space-y-3">
+                {CANNOT.map((t) => (
+                  <li key={t} className="flex gap-3 text-gray-700">
+                    <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Ниши */}
+      <section className="px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-5xl">
+          <SectionTitle title="Готовые настройки для вашей ниши" subtitle="Правила ответов и пример описания услуг уже подготовлены" />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {TEMPLATES.map((t) => (
+              <div key={t.id} className="rounded-xl border border-gray-200 p-4 text-center">
+                <div className="text-3xl" aria-hidden>
+                  {NICHE_ICONS[t.id] ?? "✨"}
                 </div>
-                <span className="font-bold">ИИ Консультант</span>
+                <p className="mt-2 text-sm font-medium text-gray-900">{t.id === "other" ? "Любая другая" : t.title}</p>
               </div>
-              <p className="text-gray-400">&copy; {new Date().getFullYear()} Все права защищены</p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Цены */}
+      <section id="pricing" className="scroll-mt-16 bg-gradient-to-br from-blue-50 to-purple-50 px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-4xl">
+          <SectionTitle title="Простая цена" subtitle="Меньше, чем стоит одна консультация в месяц" />
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl bg-white p-6 shadow-sm">
+              <p className="text-sm font-medium text-gray-500">Создание и проверка</p>
+              <p className="mt-2 text-3xl font-bold">0 ₽</p>
+              <p className="mt-2 text-sm text-gray-600">Настройте помощника и проверьте его ответы в кабинете. Карта не нужна.</p>
             </div>
-            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm">
-              <a href="/terms" className="text-gray-400 hover:text-white transition-colors">
-                Публичная оферта
-              </a>
-              <a href="/contacts" className="text-gray-400 hover:text-white transition-colors">
-                Контакты и реквизиты
-              </a>
-              <span className="text-gray-400">Работает на современных ИИ-моделях</span>
+            <div className="rounded-2xl bg-white p-6 shadow-lg ring-2 ring-blue-500">
+              <p className="text-sm font-medium text-blue-600">Первый месяц на сайте</p>
+              <p className="mt-2 text-3xl font-bold">{formatRub(PLAN.startPrice)}</p>
+              <p className="mt-2 text-sm text-gray-600">Подключение и {PLAN.periodDays} дней работы на вашем сайте.</p>
             </div>
+            <div className="rounded-2xl bg-white p-6 shadow-sm">
+              <p className="text-sm font-medium text-gray-500">Дальше</p>
+              <p className="mt-2 text-3xl font-bold">
+                {formatRub(PLAN.renewPrice)}
+                <span className="text-base font-normal text-gray-500"> / {PLAN.periodDays} дней</span>
+              </p>
+              <p className="mt-2 text-sm text-gray-600">Продлеваете сами, когда удобно.</p>
+            </div>
+          </div>
+          <div className="mt-6 grid gap-3 rounded-2xl bg-white p-6 text-sm text-gray-700 shadow-sm sm:grid-cols-2">
+            {[
+              [Sparkles, "Ответы ИИ включены в цену — свои ключи не нужны"],
+              [Palette, `До ${PLAN.maxConsultants} помощников на аккаунт, свои цвета и шрифт`],
+              [RotateCcw, "Без автосписаний и привязки карты"],
+              [Lock, "Оплата через ЮKassa, возврат за неиспользованные дни"],
+            ].map(([Icon, text]) => {
+              const I = Icon as typeof Sparkles
+              return (
+                <p key={text as string} className="flex gap-3">
+                  <I className="h-5 w-5 shrink-0 text-blue-600" />
+                  {text as string}
+                </p>
+              )
+            })}
+          </div>
+          <div className="mt-8 text-center">
+            <Button asChild size="lg" className="h-12 bg-gradient-to-r from-blue-600 to-purple-600 px-8 text-base shadow-lg">
+              <Link href={SIGNUP}>
+                Создать бесплатно
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+            <p className="mt-3 text-sm text-gray-500">Если подписка закончится, чат на сайте скроется, а все настройки сохранятся.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="scroll-mt-16 px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-3xl">
+          <SectionTitle title="Частые вопросы" />
+          <div className="space-y-3">
+            {FAQ.map((item, i) => (
+              <div key={item.q} className="overflow-hidden rounded-xl bg-gray-50">
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="flex w-full items-center justify-between gap-4 p-5 text-left font-semibold"
+                  aria-expanded={openFaq === i}
+                >
+                  {item.q}
+                  <ChevronDown className={`h-5 w-5 shrink-0 transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
+                </button>
+                {openFaq === i && <p className="px-5 pb-5 text-gray-600">{item.a}</p>}
+              </div>
+            ))}
+          </div>
+          <p className="mt-8 text-center text-gray-600">
+            Остались вопросы? Спросите помощника в правом нижнем углу или напишите на{" "}
+            <a href={`mailto:${SUPPORT}`} className="text-blue-600 underline">
+              {SUPPORT}
+            </a>
+            .
+          </p>
+        </div>
+      </section>
+
+      {/* Подвал */}
+      <footer className="bg-gray-900 px-4 py-10 text-gray-300 sm:px-6">
+        <div className="mx-auto flex max-w-6xl flex-col gap-6 text-sm sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="flex items-center gap-2 text-base font-semibold text-white">
+              <Bot className="h-5 w-5" />
+              ИИ Консультант
+            </p>
+            <p className="mt-2">Самозанятая Токарева Ангелина Алексеевна, ИНН 753613922473</p>
+            <p className="mt-1">© {new Date().getFullYear()}</p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Link href="/terms" className="hover:text-white">
+              Публичная оферта
+            </Link>
+            <Link href="/contacts" className="hover:text-white">
+              Контакты и реквизиты
+            </Link>
+            <a href={`mailto:${SUPPORT}`} className="flex items-center gap-2 hover:text-white">
+              <Mail className="h-4 w-4" />
+              {SUPPORT}
+            </a>
           </div>
         </div>
       </footer>
 
-      <style jsx>{`
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes fade-in-left {
-          from {
-            opacity: 0;
-            transform: translateX(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        
-        @keyframes fade-in-right {
-          from {
-            opacity: 0;
-            transform: translateX(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        
-        @keyframes slide-up {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-        }
-        
-        .animate-fade-in-up {
-          animation: fade-in-up 0.6s ease-out forwards;
-        }
-        
-        .animate-fade-in-left {
-          animation: fade-in-left 0.6s ease-out forwards;
-        }
-        
-        .animate-fade-in-right {
-          animation: fade-in-right 0.6s ease-out forwards;
-        }
-        
-        .animate-fade-in {
-          animation: fade-in 0.3s ease-out forwards;
-        }
-        
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out forwards;
-        }
-        
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-      `}</style>
+      <SiteAssistant />
     </div>
   )
 }
