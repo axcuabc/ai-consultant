@@ -422,9 +422,9 @@ export default function AnimatedLandingPage() {
                 <Button
                   size="lg"
                   className="group bg-white text-gray-900 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                  onClick={() => (window.location.href = "/payment")}
+                  onClick={() => (window.location.href = "/auth?mode=signup")}
                 >
-                  Купить сейчас
+                  Создать бесплатно
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
@@ -460,15 +460,15 @@ export default function AnimatedLandingPage() {
             {[
               {
                 step: "01",
-                title: "Оплатите — доступ сразу",
-                description: "Сразу после оплаты на почту придут логин и пароль от личного кабинета",
+                title: "Создайте и проверьте бесплатно",
+                description: "Зарегистрируйтесь, выберите нишу и задайте консультанту вопросы. Платите, только если понравится",
                 icon: CreditCard,
                 color: "from-blue-500 to-blue-600",
               },
               {
                 step: "02",
-                title: "Вставьте код на сайт",
-                description: "Скопируйте готовый код и вставьте на ваш сайт за 2 минуты",
+                title: "Включите и вставьте код",
+                description: "Оплатите подписку и вставьте одну строку кода на сайт — это 2 минуты",
                 icon: Code,
                 color: "from-purple-500 to-purple-600",
               },
@@ -805,9 +805,9 @@ export default function AnimatedLandingPage() {
                   </ul>
                   <Button
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                    onClick={() => (window.location.href = "/payment")}
+                    onClick={() => (window.location.href = "/auth?mode=signup")}
                   >
-                    Начать сейчас
+                    Создать и проверить бесплатно
                   </Button>
                 </CardContent>
               </Card>
@@ -887,7 +887,7 @@ export default function AnimatedLandingPage() {
               {
                 question: "Как быстро я смогу начать?",
                 answer:
-                  "Сразу после оплаты на почту придут логин и пароль от кабинета. Там вы выбираете нишу, заполняете данные о бизнесе и копируете код для сайта.",
+                  "Сразу. Зарегистрируйтесь — карта не нужна, — выберите нишу, расскажите о своих услугах и проверьте ответы консультанта в кабинете. Понравится — оплатите и вставьте код на сайт.",
               },
               {
                 question: "Могу ли я настроить внешний вид?",

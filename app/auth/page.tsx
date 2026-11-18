@@ -4,7 +4,7 @@ import type React from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Bot, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react"
+import { Bot, Mail, Lock, Eye, EyeOff, ArrowLeft, ShieldCheck } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 
@@ -18,6 +18,10 @@ export default function AuthPage() {
   const [error, setError] = useState("")
   const [message, setMessage] = useState("")
   const router = useRouter()
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("mode") === "signup") setIsLogin(false)
+  }, [])
 
   useEffect(() => {
     // Проверяем, авторизован ли пользователь
@@ -66,25 +70,23 @@ export default function AuthPage() {
           router.push("/dashboard")
         }
       } else {
-        // Регистрация
+        // Регистрация: аккаунт создаётся сразу, без письма-подтверждения
         if (password !== confirmPassword) {
           throw new Error("Пароли не совпадают")
         }
-
-        if (password.length < 6) {
-          throw new Error("Пароль должен содержать минимум 6 символов")
+        if (password.length < 8) {
+          throw new Error("Пароль должен быть не короче 8 символов")
         }
-
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
+        const res = await fetch("/api/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
         })
-
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(data?.error || "Не удалось создать аккаунт")
+        const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
-
-        if (data.user) {
-          setMessage("Проверьте вашу почту для подтверждения регистрации")
-        }
+        router.push("/dashboard?welcome=1")
       }
     } catch (error: any) {
       setError(error.message)
@@ -122,10 +124,12 @@ export default function AuthPage() {
                 <Bot className="w-8 h-8 text-white" />
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                {isLogin ? "Вход в аккаунт" : "Создать аккаунт"}
+                {isLogin ? "Вход в кабинет" : "Создайте консультанта бесплатно"}
               </h1>
               <p className="text-gray-600">
-                {isLogin ? "Войдите, чтобы настроить консультанта" : "Зарегистрируйтесь, а затем оплатите доступ в кабинете"}
+                {isLogin
+                  ? "Войдите, чтобы настроить консультанта"
+                  : "Настройте и проверьте его в кабинете. Платить нужно, только когда решите поставить его на сайт."}
               </p>
             </div>
 
@@ -172,6 +176,7 @@ export default function AuthPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="your@email.com"
+                    autoComplete="email"
                     required
                   />
                 </div>
@@ -186,9 +191,10 @@ export default function AuthPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="••••••••"
+                    placeholder={isLogin ? "••••••••" : "Не короче 8 символов"}
+                    autoComplete={isLogin ? "current-password" : "new-password"}
                     required
-                    minLength={6}
+                    minLength={isLogin ? 6 : 8}
                   />
                   <button
                     type="button"
@@ -210,9 +216,10 @@ export default function AuthPage() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="••••••••"
+                      placeholder="Повторите пароль"
+                      autoComplete="new-password"
                       required
-                      minLength={6}
+                      minLength={8}
                     />
                   </div>
                 </div>
@@ -226,13 +233,22 @@ export default function AuthPage() {
                 {isLoading ? (
                   <div className="flex items-center">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    {isLogin ? "Вход..." : "Регистрация..."}
+                    {isLogin ? "Вход..." : "Создаём аккаунт..."}
                   </div>
                 ) : (
-                  <>{isLogin ? "Войти" : "Зарегистрироваться"}</>
+                  <>{isLogin ? "Войти" : "Создать аккаунт"}</>
                 )}
               </Button>
             </form>
+
+            {!isLogin && (
+              <div className="mt-5 flex gap-3 rounded-lg bg-gray-50 p-4 text-sm text-gray-600">
+                <ShieldCheck className="h-5 w-5 shrink-0 text-emerald-600" />
+                <span>
+                  Карта не нужна. Пароль знаете только вы: мы храним его в зашифрованном виде и никогда не присылаем по почте.
+                </span>
+              </div>
+            )}
 
             {isLogin && (
               <button type="button" onClick={handleReset} className="mt-3 w-full text-center text-sm text-gray-500 hover:text-gray-700">

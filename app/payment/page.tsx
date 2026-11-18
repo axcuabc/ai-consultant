@@ -1,169 +1,158 @@
-"use client";
+"use client"
 
-import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { PLAN, formatRub, priceFor, type PaymentKind } from "@/lib/plans";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Bot,
-  CheckCircle,
-  CreditCard,
-  ArrowLeft,
-  Shield,
-  Clock,
-  Download,
-  Mail,
-  MessageCircle,
-} from "lucide-react";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { ArrowLeft, CalendarCheck, CreditCard, Lock, Mail, RotateCcw, ShieldCheck } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { AppShell, Spinner, subscriptionStatus, useAccount } from "@/components/account"
+import { supabase } from "@/lib/supabase"
+import { PLAN, formatRub } from "@/lib/plans"
 
-export default function PaymentPage() {
-  return (
-    <Suspense>
-      <PaymentForm />
-    </Suspense>
-  );
+function formatDate(d: Date) {
+  return d.toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })
 }
 
-function PaymentForm() {
-  const params = useSearchParams();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [email, setEmail] = useState("");
-  const [kind, setKind] = useState<PaymentKind>("start");
+export default function PaymentPage() {
+  const router = useRouter()
+  const { user, profile, loading } = useAccount()
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [error, setError] = useState("")
 
-  useEffect(() => {
-    const e = params.get("email");
-    if (e) setEmail(e);
-    if (params.get("kind") === "renew") setKind("renew");
-  }, [params]);
+  if (loading) {
+    return (
+      <AppShell>
+        <Spinner />
+      </AppShell>
+    )
+  }
 
-  const AMOUNT = priceFor(kind);
+  const status = subscriptionStatus(profile)
+  const isRenew = Boolean(profile?.subscription_ends_at)
+  const amount = isRenew ? PLAN.renewPrice : PLAN.startPrice
+  const from =
+    status === "active" && profile?.subscription_ends_at ? new Date(profile.subscription_ends_at) : new Date()
+  const until = new Date(from.getTime() + PLAN.periodDays * 24 * 60 * 60 * 1000)
 
   const handlePay = async () => {
-    if (!email) {
-      alert("Пожалуйста, введите email: на него придут данные для входа");
-      return;
-    }
-    setIsProcessing(true);
+    setError("")
+    setIsProcessing(true)
     try {
+      const { data } = await supabase.auth.getSession()
+      const token = data.session?.access_token
+      if (!token) {
+        router.replace("/auth")
+        return
+      }
       const response = await fetch("/api/create-payment", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, kind }),
-      });
-
-      const data = await response.json();
-
-      if (data?.success && data?.paymentUrl) {
-        window.location.href = data.paymentUrl;
-      } else {
-        console.error("Ошибка ЮKassa:", data);
-        alert("Ошибка при создании платежа: " + (data?.error || "Неизвестно"));
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      })
+      const result = await response.json().catch(() => ({}))
+      if (result?.success && result?.paymentUrl) {
+        try {
+          // Страница «Спасибо» сравнит дату окончания до и после оплаты
+          sessionStorage.setItem("aic:prevEnds", profile?.subscription_ends_at ?? "")
+        } catch {
+          /* хранилище недоступно — не страшно */
+        }
+        window.location.href = result.paymentUrl
+        return
       }
-    } catch (err) {
-      console.error("Ошибка при создании платежа:", err);
-      alert("Не удалось создать платёж, попробуйте снова.");
-    } finally {
-      setIsProcessing(false);
+      setError(result?.error || "Не удалось создать платёж. Попробуйте ещё раз.")
+    } catch {
+      setError("Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.")
     }
-  };
+    setIsProcessing(false)
+  }
+
+  const trust = [
+    {
+      icon: Lock,
+      title: "Оплата на защищённой странице ЮKassa",
+      text: "Данные карты вводятся у ЮKassa и к нам не попадают.",
+    },
+    {
+      icon: RotateCcw,
+      title: "Без автосписаний",
+      text: "Продлеваете сами, когда удобно. Карта не привязывается.",
+    },
+    {
+      icon: Mail,
+      title: "Подтверждение на почту",
+      text: `Пришлём письмо на ${user?.email ?? "вашу почту"} сразу после оплаты.`,
+    },
+    {
+      icon: ShieldCheck,
+      title: "Можно вернуть деньги",
+      text: "Вернём стоимость неиспользованных дней — по заявлению на почту.",
+    },
+  ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40">
-        <div className="mx-auto w-full max-w-screen-lg px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16">
-            <Button
-              variant="ghost"
-              onClick={() => (window.location.href = "/")}
-              className="flex items-center space-x-2"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Назад</span>
-            </Button>
+    <AppShell>
+      <Button variant="ghost" onClick={() => router.push("/dashboard")} className="mb-4 gap-2 px-0">
+        <ArrowLeft className="h-4 w-4" />
+        В кабинет
+      </Button>
 
-            <div className="flex items-center space-x-2 min-w-0">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shrink-0">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-bold text-lg sm:text-xl text-gray-900 truncate">
-                ИИ Консультант
-              </span>
+      <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
+        <Card>
+          <CardContent className="space-y-6 p-6 sm:p-8">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+                {isRenew ? "Продление подписки" : "Включить консультанта на сайте"}
+              </h1>
+              <p className="mt-2 text-gray-600">
+                {isRenew
+                  ? "Консультант продолжит отвечать посетителям вашего сайта."
+                  : "После оплаты консультант начнёт отвечать посетителям вашего сайта, а не только в кабинете."}
+              </p>
             </div>
-          </div>
-        </div>
-      </nav>
 
-      <main className="mx-auto w-full max-w-screen-lg px-4 sm:px-6 py-10">
-        <header className="text-center mb-10">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 leading-tight">
-            Завершение покупки
-          </h1>
-          <p className="text-base sm:text-xl text-gray-600">
-            Получите мгновенный доступ к платформе и начните за 5–10 минут
-          </p>
-        </header>
-
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="w-full overflow-hidden">
-            <CardContent className="p-6">
-              <h2 className="text-2xl font-bold mb-6">Ваш заказ</h2>
-
-              <div className="flex justify-between items-center pb-4 border-b mb-6">
+            <div className="rounded-xl border border-gray-200 p-5">
+              <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="font-semibold">ИИ-Консультант для сайта</h3>
-                  <p className="text-sm text-gray-600">
-                    {kind === "renew" ? `Продление на ${PLAN.periodDays} дней` : `Подключение и ${PLAN.periodDays} дней доступа`}
+                  <p className="font-semibold text-gray-900">
+                    {isRenew ? `Продление на ${PLAN.periodDays} дней` : `Подключение и ${PLAN.periodDays} дней работы`}
+                  </p>
+                  <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-600">
+                    <CalendarCheck className="h-4 w-4" />
+                    Будет работать до {formatDate(until)}
                   </p>
                 </div>
-                <span className="text-2xl font-bold">{formatRub(AMOUNT)}</span>
+                <span className="text-2xl font-bold text-gray-900">{formatRub(amount)}</span>
               </div>
-
-              <div className="rounded-lg p-4 mb-6 bg-gradient-to-br from-green-50 to-emerald-50 ring-1 ring-emerald-100">
-                <div className="flex items-center mb-2">
-                  <Shield className="w-5 h-5 text-emerald-700 mr-2" />
-                  <span className="font-semibold text-emerald-900">Гарантии</span>
-                </div>
-                <ul className="text-sm text-emerald-800 space-y-1">
-                  <li>• Мгновенный доступ после оплаты</li>
-                  <li>• Дальше — {formatRub(PLAN.renewPrice)} за каждые {PLAN.periodDays} дней, продление вручную</li>
-                </ul>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Email для входа в кабинет *
-                </label>
-                <input
-                  type="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  На этот email придут <b>логин и пароль</b> от кабинета
+              {!isRenew && (
+                <p className="mt-4 border-t pt-4 text-sm text-gray-600">
+                  Дальше — {formatRub(PLAN.renewPrice)} за каждые {PLAN.periodDays} дней. Продлеваете сами, только если
+                  захотите.
                 </p>
-              </div>
+              )}
+            </div>
 
+            <div className="text-sm text-gray-600">
+              Аккаунт: <b className="text-gray-900">{user?.email}</b>
+            </div>
+
+            {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+
+            <div>
               <Button
                 onClick={handlePay}
-                disabled={isProcessing || !email}
-                className="mt-6 w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                disabled={isProcessing}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 py-6 text-lg hover:from-blue-700 hover:to-purple-700"
               >
                 {isProcessing ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Создание платежа...
-                  </div>
+                  <span className="flex items-center gap-2">
+                    <span className="h-5 w-5 animate-spin rounded-full border-b-2 border-white" />
+                    Переходим к оплате...
+                  </span>
                 ) : (
-                  <>
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    Оплатить {formatRub(AMOUNT)}
-                  </>
+                  <span className="flex items-center gap-2">
+                    <CreditCard className="h-5 w-5" />
+                    Оплатить {formatRub(amount)}
+                  </span>
                 )}
               </Button>
               <p className="mt-3 text-center text-xs text-gray-500">
@@ -171,25 +160,33 @@ function PaymentForm() {
                 <a href="/terms" target="_blank" className="underline hover:text-gray-700">
                   публичной оферты
                 </a>
+                . Продавец — самозанятая Токарева А. А.,{" "}
+                <a href="/contacts" target="_blank" className="underline hover:text-gray-700">
+                  контакты
+                </a>
                 .
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Блок с преимуществами */}
-          <Card className="w-full overflow-hidden">
-            <CardContent className="p-6">
-              <h2 className="text-2xl font-bold mb-6">Как это работает</h2>
-              <ol className="space-y-3 text-sm text-gray-700">
-                <li>1. Оплачиваете на защищённой странице ЮKassa</li>
-                <li>2. Получаете письмо с логином и паролем</li>
-                <li>3. В кабинете выбираете нишу, заполняете данные о бизнесе и настраиваете вид</li>
-                <li>4. Копируете одну строку кода и вставляете на сайт (Tilda, свой сайт и другие)</li>
-              </ol>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    </div>
-  );
+        <Card>
+          <CardContent className="space-y-5 p-6 sm:p-8">
+            <h2 className="text-lg font-bold text-gray-900">Безопасно и без сюрпризов</h2>
+            {trust.map(({ icon: Icon, title, text }) => (
+              <div key={title} className="flex gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50">
+                  <Icon className="h-5 w-5 text-emerald-600" />
+                </span>
+                <div>
+                  <p className="font-medium text-gray-900">{title}</p>
+                  <p className="text-sm text-gray-600">{text}</p>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    </AppShell>
+  )
 }
