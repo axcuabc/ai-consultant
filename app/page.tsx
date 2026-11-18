@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import DemoConsultant from "@/components/DemoConsultant"
+import { DEMOS } from "@/lib/demo"
 import { PLAN, formatRub } from "@/lib/plans"
 import { useCallback } from "react"
 import {
@@ -526,8 +527,8 @@ export default function AnimatedLandingPage() {
               },
               {
                 icon: <Target className="w-8 h-8" />,
-                title: "Не ошибается",
-                desc: "Всегда отвечает согласно настройкам. Никакого человеческого фактора или плохого настроения.",
+                title: "Отвечает по вашим данным",
+                desc: "Говорит только то, что вы написали о своих услугах. Если ответа нет — честно предлагает связаться с вами.",
               },
               {
                 icon: <DollarSign className="w-8 h-8" />,
@@ -569,49 +570,19 @@ export default function AnimatedLandingPage() {
   <div className="container mx-auto max-w-6xl">
     <div className="text-center mb-16 animate-fade-in-up">
       <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Попробуйте прямо сейчас</h2>
-      <p className="text-xl text-gray-600">3 готовых ИИ-консультанта для разных ниш</p>
+      <p className="text-xl text-gray-600">Задайте вопрос так, как его задал бы ваш клиент</p>
     </div>
 
     <div className="grid md:grid-cols-3 gap-6">
-      {[
-  {
-    name: "Психолог Анна",
-    specialty: "Психологическая поддержка",
-    avatar: "👩‍⚕️",
-    color: "from-pink-500 to-rose-500",
-    prompt: "psychology",
-  },
-  {
-    name: "Диетолог Мария",
-    specialty: "Питание и здоровье",
-    avatar: "🥗",
-    color: "from-green-500 to-emerald-500",
-    prompt: "diet",
-  },
-  {
-    name: "Бизнес-коуч Игорь",
-    specialty: "Развитие бизнеса",
-    avatar: "💼",
-    color: "from-blue-500 to-indigo-500",
-    prompt: "business",
-  },
-]
-.map((consultant, index) => (
-        <DemoConsultant
-          key={index}
-          name={consultant.name}
-          specialty={consultant.specialty}
-          avatar={consultant.avatar}
-          color={consultant.color}
-          type={consultant.prompt}
-        />
+      {DEMOS.map((demo) => (
+        <DemoConsultant key={demo.id} demo={demo} />
       ))}
     </div>
 
     <div className="text-center mt-12">
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 inline-block">
         <p className="text-amber-800">
-          <strong>💡 Это демо-версия.</strong> В полной версии вы сможете настроить собственного консультанта
+          Специалисты в демо вымышленные. Ваш консультант будет так же отвечать по вашим услугам и ценам.
         </p>
       </div>
     </div>

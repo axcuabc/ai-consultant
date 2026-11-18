@@ -136,12 +136,12 @@ export default function ConsultantEditor({ id }: { id?: string }) {
       </Button>
       <h1 className="mb-6 text-3xl font-bold text-gray-900">{id ? "Настройка консультанта" : "Новый консультант"}</h1>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
-        <div className="space-y-6">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
+        <div className="min-w-0 space-y-6">
           <Card>
             <CardContent className="space-y-5 p-6">
               <h2 className="text-lg font-semibold">1. Содержание</h2>
-              <Field label="Ниша" htmlFor="category" hint={template.limits ? `Ограничение шаблона: ${template.limits}` : undefined}>
+              <Field label="Ниша" htmlFor="category" hint={template.note || undefined}>
                 <select
                   id="category"
                   value={draft.category}

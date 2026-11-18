@@ -29,9 +29,9 @@ export default function EmbedCode({ id }: { id: string }) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="min-w-0 space-y-3">
       <div className="relative">
-        <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 pr-14 text-sm text-gray-100">
+        <pre className="whitespace-pre-wrap break-all rounded-lg bg-gray-900 p-4 pr-14 text-sm text-gray-100">
           <code>{code}</code>
         </pre>
         <Button size="sm" variant="secondary" onClick={copy} className="absolute right-2 top-2" aria-label="Скопировать код">
