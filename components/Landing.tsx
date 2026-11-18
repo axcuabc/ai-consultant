@@ -227,35 +227,50 @@ export default function Landing() {
       </nav>
 
       {/* Первый экран */}
-      <section className="bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
+      <section className="bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 px-4 pb-12 pt-20 sm:px-6 sm:pb-16 sm:pt-28">
         <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
           <div>
             <p className="mb-4 inline-flex rounded-full bg-white px-3 py-1 text-sm text-gray-600 shadow-sm ring-1 ring-gray-200">
-              Для психологов, нутрициологов, дизайнеров и других специалистов
+              Для психологов, нутрициологов<span className="hidden sm:inline">, дизайнеров</span> и других специалистов
             </p>
-            <h1 className="text-4xl font-bold leading-tight sm:text-5xl">
+            <h1 className="text-[2rem] font-bold leading-tight sm:text-5xl">
               Помощник в чате сайта, который{" "}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 отвечает клиентам 24/7
               </span>{" "}
               и приводит их к записи
             </h1>
-            <p className="mt-5 text-lg leading-relaxed text-gray-600">
-              Расскажите о своих услугах — помощник ответит посетителям о ценах и формате работы и пригласит записаться. Работает на
-              Tilda и любом сайте, без программирования.
+            <p className="mt-4 text-base leading-relaxed text-gray-600 sm:mt-5 sm:text-lg">
+              Расскажите о своих услугах — помощник ответит посетителям о ценах и пригласит записаться.
+              <span className="hidden sm:inline"> Работает на Tilda и любом сайте, без программирования.</span>
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+
+            {/* На телефоне — короткий пример диалога прямо на первом экране */}
+            <div className="mt-5 overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-gray-200 lg:hidden" aria-label="Пример диалога">
+              <div className="flex items-center gap-2 bg-rose-500 px-3 py-2 text-xs font-semibold text-white">
+                <span className="h-2 w-2 rounded-full bg-green-300" />
+                Помощник психолога Анны · 02:14 ночи
+              </div>
+              <div className="space-y-2 p-3 text-[13px] leading-snug">
+                <p className="ml-auto w-fit max-w-[85%] rounded-xl bg-rose-500 px-3 py-1.5 text-white">Сколько стоит первая консультация?</p>
+                <p className="w-fit max-w-[92%] rounded-xl bg-gray-100 px-3 py-1.5 text-gray-800">
+                  3 000 ₽, 50 минут онлайн. Записаться можно в Telegram @anna_psy — Анна подберёт время.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-col gap-2 sm:mt-8 sm:flex-row sm:gap-3">
               <Button asChild size="lg" className="h-12 bg-gradient-to-r from-blue-600 to-purple-600 px-7 text-base shadow-lg">
                 <Link href={SIGNUP}>
                   Создать бесплатно
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" onClick={() => scrollTo("demo")} className="h-12 bg-white px-7 text-base">
+              <Button size="lg" variant="outline" onClick={() => scrollTo("demo")} className="h-11 bg-white px-7 text-base sm:h-12">
                 Посмотреть, как отвечает
               </Button>
             </div>
-            <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
+            <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
               <span className="flex items-center gap-1">
                 <Check className="h-4 w-4 text-green-600" />
                 Карта не нужна
@@ -270,7 +285,9 @@ export default function Landing() {
               </span>
             </p>
           </div>
-          <HeroMockup />
+          <div className="hidden lg:block">
+            <HeroMockup />
+          </div>
         </div>
       </section>
 
