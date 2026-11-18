@@ -43,7 +43,10 @@ export default function EmbedCode({ id }: { id: string }) {
         <ul className="mt-2 list-disc space-y-1 pl-5">
           <li>
             <b>Tilda:</b> добавьте на страницу блок «Другое → T123 (HTML-код)» и вставьте код. Или: Настройки сайта → Ещё →
-            HTML-код для вставки внутрь HEAD. Нужен платный тариф Tilda. Виджет появится после публикации.
+            HTML-код для вставки внутрь HEAD. Нужен платный тариф Tilda. Виджет появится после публикации.{" "}
+            <a href="/tilda" target="_blank" className="text-blue-600 underline">
+              Подробная инструкция
+            </a>
           </li>
           <li>
             <b>Свой сайт:</b> вставьте код перед закрывающим тегом <code>&lt;/body&gt;</code>.
