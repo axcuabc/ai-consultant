@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Bot, ArrowLeft, MapPin, Mail, User, FileText, MessageCircle } from "lucide-react"
+import { Bot, ArrowLeft, Mail, User, FileText, MessageCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export default function ContactsPage() {
@@ -62,17 +62,6 @@ export default function ContactsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-3">
-                  <MapPin className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-gray-900">Адрес</p>
-                    <p className="text-gray-600">
-                      Московская область, г. Химки
-                      <br />
-                      ул. Московская, дом 21
-                    </p>
-                  </div>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -108,7 +97,7 @@ export default function ContactsPage() {
               <div className="bg-purple-50 rounded-lg p-4 mt-6">
                 <p className="text-sm text-purple-800">
                   <strong>Примечание:</strong> Оплата проходит на защищённой странице платёжного сервиса, данные карты нам не передаются.
-                  Чеки и документы об оплате отправляются автоматически на указанный email.
+                  Подтверждение оплаты приходит на почту, с которой вы зарегистрировались.
                 </p>
               </div>
             </CardContent>
@@ -118,29 +107,13 @@ export default function ContactsPage() {
         {/* Время работы и поддержка */}
         <Card className="p-6 mb-8">
           <CardContent className="p-0">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Поддержка и время работы</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Поддержка</h2>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-3">Техническая поддержка</h3>
-                <ul className="text-gray-600 space-y-2">
-                  <li>• Email поддержка: круглосуточно</li>
-                  <li>• Ответ в течение 24 часов</li>
-                  <li>• Поддержка на всё время подписки</li>
-                  <li>• Помощь с настройкой и интеграцией</li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-3">Время работы</h3>
-                <ul className="text-gray-600 space-y-2">
-                  <li>• Понедельник - Пятница: 9:00 - 18:00 (МСК)</li>
-                  <li>• Суббота: 10:00 - 16:00 (МСК)</li>
-                  <li>• Воскресенье: выходной</li>
-                  <li>• Праздничные дни: по графику РФ</li>
-                </ul>
-              </div>
-            </div>
+            <ul className="text-gray-600 space-y-2">
+              <li>• Консультант на вашем сайте работает круглосуточно, без выходных.</li>
+              <li>• Вопросы по сервису пишите на почту в любое время — отвечаем в течение 24 часов в рабочие дни, обычно быстрее.</li>
+              <li>• Поможем с настройкой и установкой кода на сайт — всё по переписке.</li>
+            </ul>
           </CardContent>
         </Card>
 

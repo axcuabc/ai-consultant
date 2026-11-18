@@ -1,82 +1,93 @@
 "use client"
 
-import React, { useState } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import type { DemoConsultant as Demo } from "@/lib/demo"
 
-interface DemoConsultantProps {
-  name: string
-  specialty: string
-  avatar: string
-  type: "psychology" | "diet" | "business"
-  color: string
-}
+const LIMIT = 5
 
-export default function DemoConsultant({ name, specialty, avatar, type, color }: DemoConsultantProps) {
-  const [messages, setMessages] = useState([
-    { text: `Привет! Я ${name}. ${specialty}. Чем могу помочь?`, isUser: false },
-  ])
+type Msg = { role: "user" | "assistant"; content: string }
+
+export default function DemoConsultant({ demo }: { demo: Pick<Demo, "id" | "title" | "subtitle" | "avatar" | "color" | "welcome" | "suggestions"> }) {
+  const [messages, setMessages] = useState<Msg[]>([{ role: "assistant", content: demo.welcome }])
   const [input, setInput] = useState("")
   const [isTyping, setIsTyping] = useState(false)
-  const [messageCount, setMessageCount] = useState(0)
+  const sent = messages.filter((m) => m.role === "user").length
 
-  const sendMessage = async () => {
-    if (!input.trim() || messageCount >= 3) return
-
-    const newMessages = [...messages, { text: input, isUser: true }]
-    setMessages(newMessages)
+  const send = async (text: string) => {
+    const question = text.trim()
+    if (!question || isTyping || sent >= LIMIT) return
+    const next: Msg[] = [...messages, { role: "user", content: question }]
+    setMessages(next)
     setInput("")
     setIsTyping(true)
-    setMessageCount((prev) => prev + 1)
-
     try {
       const res = await fetch("/api/consultant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, message: input.trim() }),
+        // Приветствие не отправляем: модель видит только диалог
+        body: JSON.stringify({ type: demo.id, messages: next.slice(1) }),
       })
-      const data = await res.json()
-
-      setMessages((prev) => [...prev, { text: data.response, isUser: false }])
-    } catch (e) {
-      setMessages((prev) => [...prev, { text: "Ошибка при обращении к серверу.", isUser: false }])
+      const data = await res.json().catch(() => ({}))
+      setMessages((prev) => [...prev, { role: "assistant", content: data?.response || "Не получилось ответить. Попробуйте ещё раз." }])
+    } catch {
+      setMessages((prev) => [...prev, { role: "assistant", content: "Нет связи с сервером. Попробуйте ещё раз." }])
     } finally {
       setIsTyping(false)
     }
   }
 
   return (
-    <Card className="h-96 flex flex-col animate-fade-in-up shadow-xl rounded-2xl overflow-hidden">
-      <div className={`bg-gradient-to-r ${color} text-white p-4`}>
-        <div className="flex items-center space-x-3">
-          <div className="text-2xl">{avatar}</div>
+    <Card className="flex h-[26rem] flex-col overflow-hidden rounded-2xl shadow-xl">
+      <div className={`bg-gradient-to-r ${demo.color} p-4 text-white`}>
+        <div className="flex items-center gap-3">
+          <div className="text-2xl" aria-hidden>
+            {demo.avatar}
+          </div>
           <div>
-            <h3 className="font-bold">{name}</h3>
-            <p className="text-sm opacity-90">{specialty}</p>
+            <h3 className="font-bold leading-tight">{demo.title}</h3>
+            <p className="text-sm opacity-90">{demo.subtitle}</p>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 p-4 overflow-y-auto space-y-3">
-        {messages.map((msg, idx) => (
-          <div key={idx} className={`w-fit max-w-[80%] text-sm px-4 py-2 rounded-xl ${msg.isUser ? "ml-auto bg-blue-500 text-white" : "bg-gray-100 text-gray-800"}`}>
-            {msg.text}
+      <div className="flex-1 space-y-3 overflow-y-auto p-4">
+        {messages.map((m, i) => (
+          <div
+            key={i}
+            className={`w-fit max-w-[85%] whitespace-pre-line rounded-xl px-4 py-2 text-sm ${
+              m.role === "user" ? "ml-auto bg-blue-500 text-white" : "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {m.content}
           </div>
         ))}
         {isTyping && (
-          <div className="w-fit bg-gray-100 text-gray-800 text-sm px-4 py-2 rounded-xl">
-            <div className="flex space-x-1">
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
-            </div>
+          <div className="flex w-fit gap-1 rounded-xl bg-gray-100 px-4 py-3" aria-label="Печатает">
+            <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400" />
+            <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:0.1s]" />
+            <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:0.2s]" />
+          </div>
+        )}
+        {sent === 0 && !isTyping && (
+          <div className="flex flex-wrap gap-2 pt-1">
+            {demo.suggestions.map((s) => (
+              <button
+                key={s}
+                onClick={() => send(s)}
+                className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs text-gray-700 hover:border-blue-300 hover:bg-blue-50"
+              >
+                {s}
+              </button>
+            ))}
           </div>
         )}
       </div>
 
-      {messageCount >= 3 ? (
-        <div className="p-4 bg-amber-50 border-t">
-          <p className="text-sm text-amber-800 text-center mb-2">Лимит сообщений достигнут</p>
+      {sent >= LIMIT ? (
+        <div className="border-t bg-blue-50 p-4">
+          <p className="mb-2 text-center text-sm text-blue-900">Понравилось? Создайте такого же для себя — бесплатно.</p>
           <Button
             size="sm"
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600"
@@ -86,56 +97,26 @@ export default function DemoConsultant({ name, specialty, avatar, type, color }:
           </Button>
         </div>
       ) : (
-        <div className="p-4 border-t">
-          <div className="flex space-x-2">
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-              placeholder="Напишите сообщение..."
-              className="flex-1 px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isTyping}
-            />
-            <Button size="sm" onClick={sendMessage} disabled={!input.trim() || isTyping}>
-              →
-            </Button>
-          </div>
-          <p className="text-xs text-gray-500 mt-2 text-center">Осталось сообщений: {3 - messageCount}</p>
-        </div>
+        <form
+          className="flex gap-2 border-t p-4"
+          onSubmit={(e) => {
+            e.preventDefault()
+            send(input)
+          }}
+        >
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Задайте вопрос как клиент…"
+            maxLength={500}
+            className="min-w-0 flex-1 rounded-full border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isTyping}
+          />
+          <Button type="submit" size="sm" disabled={!input.trim() || isTyping} aria-label="Отправить">
+            →
+          </Button>
+        </form>
       )}
-
-      <style jsx>{`
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in-up {
-          animation: fade-in-up 0.6s ease-out forwards;
-        }
-        .animate-bounce {
-          animation: bounce 1s infinite;
-        }
-        .delay-100 {
-          animation-delay: 0.1s;
-        }
-        .delay-200 {
-          animation-delay: 0.2s;
-        }
-        @keyframes bounce {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-5px);
-          }
-        }
-      `}</style>
     </Card>
   )
 }
