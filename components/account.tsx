@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import type { User } from "@supabase/supabase-js"
-import { Bot, LogOut } from "lucide-react"
+import { Bot, LifeBuoy, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase"
 
@@ -65,10 +65,19 @@ export function AppShell({ children }: { children: ReactNode }) {
             </span>
             <span className="text-lg font-bold text-gray-900">ИИ Консультант</span>
           </button>
-          <Button variant="ghost" onClick={logout} className="gap-2">
-            <LogOut className="h-4 w-4" />
-            Выйти
-          </Button>
+          <div className="flex items-center gap-1">
+            <a
+              href="mailto:ai.consultant.site@gmail.com?subject=%D0%9F%D0%BE%D0%BC%D0%BE%D1%89%D1%8C%20%D1%81%20%D0%98%D0%98%20%D0%9A%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D0%BD%D1%82%D0%BE%D0%BC"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              <LifeBuoy className="h-4 w-4" />
+              <span className="hidden sm:inline">Помощь</span>
+            </a>
+            <Button variant="ghost" onClick={logout} className="gap-2">
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">Выйти</span>
+            </Button>
+          </div>
         </div>
       </nav>
       <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">{children}</main>

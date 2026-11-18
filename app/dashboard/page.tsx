@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { CalendarClock, Check, Pencil, Plus, Trash2 } from "lucide-react"
+import { CalendarClock, Check, MessageCircle, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { AppShell, Spinner, subscriptionStatus, useAccount } from "@/components/account"
@@ -21,6 +21,15 @@ export default function DashboardPage() {
   const { user, profile, loading } = useAccount()
   const [consultants, setConsultants] = useState<Consultant[]>([])
   const [listLoading, setListLoading] = useState(true)
+  const [tested, setTested] = useState(false)
+
+  useEffect(() => {
+    try {
+      setTested(consultants.some((c) => localStorage.getItem(`aic:tested:${c.id}`)))
+    } catch {
+      /* хранилище недоступно */
+    }
+  }, [consultants])
 
   useEffect(() => {
     if (!user) return
@@ -54,7 +63,7 @@ export default function DashboardPage() {
   const hasConsultant = consultants.length > 0
   const steps = [
     { title: "Создайте консультанта", text: "Выберите нишу и расскажите о своих услугах", done: hasConsultant },
-    { title: "Проверьте, как он отвечает", text: "Задайте ему вопросы прямо в конструкторе — это бесплатно", done: hasConsultant },
+    { title: "Проверьте, как он отвечает", text: "Задайте ему вопросы как клиент — это бесплатно", done: tested },
     {
       title: "Включите на сайте",
       text: `${formatRub(PLAN.startPrice)} за подключение и ${PLAN.periodDays} дней, дальше ${formatRub(PLAN.renewPrice)}`,
@@ -88,7 +97,15 @@ export default function DashboardPage() {
                 </li>
               ))}
             </ol>
-            {hasConsultant ? (
+            {hasConsultant && !tested ? (
+              <Button
+                onClick={() => router.push(`/template/edit/${consultants[0].id}?created=1`)}
+                className="mt-6 gap-2 bg-gradient-to-r from-blue-600 to-purple-600"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Проверить консультанта
+              </Button>
+            ) : hasConsultant ? (
               <Button onClick={() => router.push("/payment")} className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600">
                 Включить на сайте — {formatRub(PLAN.startPrice)}
               </Button>
@@ -132,8 +149,8 @@ export default function DashboardPage() {
 
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-900">Мои консультанты</h2>
-        {canCreate && (
-          <Button onClick={() => router.push("/template/create")} className="gap-2">
+        {canCreate && (hasConsultant || status !== "never") && (
+          <Button variant="outline" onClick={() => router.push("/template/create")} className="gap-2 border-blue-200 text-blue-700 hover:bg-blue-50">
             <Plus className="h-4 w-4" />
             Создать
           </Button>
@@ -145,7 +162,7 @@ export default function DashboardPage() {
       ) : consultants.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center text-gray-600">
-            Пока нет ни одного консультанта. Нажмите «Создать», выберите нишу и оформление.
+            Здесь появится ваш консультант. Нажмите «Создать консультанта» — это займёт 5 минут.
           </CardContent>
         </Card>
       ) : (
@@ -166,8 +183,8 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={() => router.push(`/template/edit/${c.id}`)} className="gap-1">
-                      <Pencil className="h-4 w-4" />
-                      Изменить
+                      <MessageCircle className="h-4 w-4" />
+                      Проверить и настроить
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => remove(c)} aria-label="Удалить">
                       <Trash2 className="h-4 w-4 text-red-600" />
@@ -178,7 +195,7 @@ export default function DashboardPage() {
                   <EmbedCode id={c.id} />
                 ) : (
                   <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
-                    Сейчас консультант отвечает только здесь, в кабинете: откройте «Изменить» и задайте ему вопросы. Код
+                    Сейчас консультант отвечает только в кабинете: нажмите «Проверить и настроить» и задайте ему вопросы. Код
                     для сайта появится после оплаты.
                   </p>
                 )}
