@@ -201,13 +201,18 @@
         return;
       }
 
-      fetch(apiBase + "/api/widget/chat", {
+      // options.demo — помощник на сайте самого сервиса (без записи в базе)
+      var url = options.demo ? apiBase + "/api/consultant" : apiBase + "/api/widget/chat";
+      var payload = options.demo
+        ? { type: options.demo, messages: history.slice(-6) }
+        : { id: config.id, messages: history.slice(-12) };
+      fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: config.id, messages: history.slice(-12) }),
+        body: JSON.stringify(payload),
       })
         .then(function (r) { return r.json().catch(function () { return {}; }); })
-        .then(function (data) { done((data && data.reply) || "Не получилось ответить. Попробуйте ещё раз."); })
+        .then(function (data) { done((data && (data.reply || data.response)) || "Не получилось ответить. Попробуйте ещё раз."); })
         .catch(function () { done("Нет связи с сервером. Попробуйте ещё раз."); });
     }
     $(".form").addEventListener("submit", submit);

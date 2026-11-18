@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ response: "Напишите вопрос." }, { status: 400 })
   }
 
-  if (rateLimited(`demo:${clientIp(request)}`, 15, 60 * 60_000)) {
+  if (rateLimited(`demo:${demo.id}:${clientIp(request)}`, 15, 60 * 60_000)) {
     return NextResponse.json({
       response: "Вы задали много вопросов в демо. Создайте своего консультанта — это бесплатно — и проверяйте сколько угодно.",
     })
