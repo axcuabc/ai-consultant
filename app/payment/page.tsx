@@ -166,6 +166,13 @@ function PaymentForm() {
                   </>
                 )}
               </Button>
+              <p className="mt-3 text-center text-xs text-gray-500">
+                Нажимая «Оплатить», вы принимаете условия{" "}
+                <a href="/terms" target="_blank" className="underline hover:text-gray-700">
+                  публичной оферты
+                </a>
+                .
+              </p>
             </CardContent>
           </Card>
 

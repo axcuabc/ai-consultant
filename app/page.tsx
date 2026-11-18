@@ -301,12 +301,11 @@ export default function AnimatedLandingPage() {
           <div className="flex items-center justify-between h-16">
  {/* Логотип */}
 <div className="flex items-center">
-  <Link href="/" className="inline-flex items-center" aria-label="FORMAII — КОНСУЛЬТАНТЫ">
-    <img
-      src="/branding/icononmysitec.svg"
-      alt="FORMAII — КОНСУЛЬТАНТЫ"
-      className="h-16 w-auto block"  // высота ≈ 40px; впишется в h-16 шапки
-    />
+  <Link href="/" className="inline-flex items-center space-x-2" aria-label="ИИ Консультант — на главную">
+    <span className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+      <Bot className="w-5 h-5 text-white" />
+    </span>
+    <span className="font-bold text-xl text-gray-900">ИИ Консультант</span>
   </Link>
 </div>
 
@@ -403,12 +402,11 @@ export default function AnimatedLandingPage() {
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                ИИ-консультант, который <span className="text-blue-600">увеличивает продажи на 40%</span> за 10 минут
-                установки
+                ИИ-консультант, который <span className="text-blue-600">отвечает вашим клиентам 24/7</span> и приводит их к записи
               </h1>
 
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Работает 24/7, заменяет живого сотрудника и экономит до 600,000₽ в год. Без программирования.
+                Выберите нишу, расскажите о своём бизнесе и вставьте одну строку кода на сайт. Работает на Tilda и любых сайтах, без программирования.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -436,10 +434,10 @@ export default function AnimatedLandingPage() {
               <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-3xl blur-3xl animate-pulse"></div>
               <img
                 src="/images/hero-programmer.png"
-                alt="Современный программист за работой"
+                alt="ИИ-консультант для сайта"
                 className="relative z-10 w-full h-auto rounded-2xl shadow-2xl"
               />
-              <div className="absolute -bottom-1 -left-6 bg-white rounded-2xl p-4 shadow-xl">
+              <div className="absolute -bottom-4 left-4 sm:-left-4 z-20 bg-white rounded-2xl p-4 shadow-xl">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                   <span className="text-sm font-medium text-gray-700">ИИ Ассистент активен</span>
@@ -455,21 +453,21 @@ export default function AnimatedLandingPage() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16 animate-fade-in-up">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Как это работает</h2>
-            <p className="text-xl text-gray-600">Запусти своего ИИ-консультанта в 3 простых шага</p>
+            <p className="text-xl text-gray-600">Запустите своего ИИ-консультанта в 3 простых шага</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 step: "01",
-                title: "Оплати - мгновенный доступ",
-                description: "Получите все материалы и инструкции сразу после оплаты",
+                title: "Оплатите — доступ сразу",
+                description: "Сразу после оплаты на почту придут логин и пароль от личного кабинета",
                 icon: CreditCard,
                 color: "from-blue-500 to-blue-600",
               },
               {
                 step: "02",
-                title: "Вставь код на сайт",
+                title: "Вставьте код на сайт",
                 description: "Скопируйте готовый код и вставьте на ваш сайт за 2 минуты",
                 icon: Code,
                 color: "from-purple-500 to-purple-600",
@@ -539,12 +537,12 @@ export default function AnimatedLandingPage() {
               {
                 icon: <Shield className="w-8 h-8" />,
                 title: "Повышает доверие",
-                desc: "Мгновенные ответы на вопросы увеличивают доверие клиентов и конверсию на 40%.",
+                desc: "Посетитель получает ответ сразу, а не уходит к конкуренту, пока ждёт менеджера.",
               },
               {
                 icon: <TrendingUp className="w-8 h-8" />,
-                title: "Умнеет со временем",
-                desc: "Анализирует диалоги и становится лучше. Постоянное обновление базы знаний.",
+                title: "Ведёт к записи",
+                desc: "Отвечает на вопросы о ваших услугах и ценах и предлагает записаться или оставить заявку.",
               },
               {
                 icon: <Settings className="w-8 h-8" />,
@@ -629,14 +627,13 @@ export default function AnimatedLandingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { name: "Психолог", icon: "🧠", desc: "Первичная поддержка, запись на терапию" },
-              { name: "Диетолог", icon: "🥗", desc: "Советы по питанию, составление меню" },
-              { name: "Бизнес-консультант", icon: "💼", desc: "Анализ бизнеса, стратегии роста" },
-              { name: "HR-консультант", icon: "👥", desc: "Подбор персонала, развитие команды" },
-              { name: "Финансовый помощник", icon: "💰", desc: "Планирование бюджета, инвестиции" },
-              { name: "Репетитор английского", icon: "🇬🇧", desc: "Обучение языку, проверка знаний" },
-              { name: "UX-исследователь", icon: "🎨", desc: "Анализ интерфейса, пользовательский опыт" },
-              { name: "Фитнес-тренер", icon: "💪", desc: "Программы тренировок, мотивация" },
+              { name: "Психолог", icon: "🧠", desc: "Рассказывает о консультациях и ведёт к записи" },
+              { name: "Финансовый консультант", icon: "💰", desc: "Объясняет услуги, без конкретных инвестсоветов" },
+              { name: "Нутрициолог", icon: "🥗", desc: "Рассказывает о программах, без планов питания" },
+              { name: "Дизайнер", icon: "🎨", desc: "Услуги, сроки, цены, приём заявок" },
+              { name: "Салон красоты", icon: "💅", desc: "Услуги и цены, направляет на запись" },
+              { name: "Онлайн-школа", icon: "🎓", desc: "Программа курса, формат и стоимость" },
+              { name: "Туры и экскурсии", icon: "🌴", desc: "Подбор тура и бронирование через вас" },
               { name: "Создать свой", icon: "➕", desc: "Настройте под любую специальность" },
             ].map((template, index) => (
               <Card
@@ -678,7 +675,7 @@ export default function AnimatedLandingPage() {
                     <tbody className="divide-y divide-gray-200">
                       <tr>
                         <td className="px-6 py-4 text-sm font-medium text-gray-900">Стоимость в год</td>
-                        <td className="px-6 py-4 text-center text-sm text-green-600 font-semibold">5,390₽</td>
+                        <td className="px-6 py-4 text-center text-sm text-green-600 font-semibold">{formatRub(PLAN.startPrice + 11 * PLAN.renewPrice)}</td>
                         <td className="px-6 py-4 text-center text-sm text-red-600 font-semibold">600,000₽+</td>
                       </tr>
                       <tr className="bg-gray-50">
@@ -693,13 +690,13 @@ export default function AnimatedLandingPage() {
                       </tr>
                       <tr className="bg-gray-50">
                         <td className="px-6 py-4 text-sm font-medium text-gray-900">Надёжность</td>
-                        <td className="px-6 py-4 text-center text-sm text-green-600">100% стабильно</td>
-                        <td className="px-6 py-4 text-center text-sm text-red-600">Зависит от настроения</td>
+                        <td className="px-6 py-4 text-center text-sm text-green-600">Одинаково вежлив всегда</td>
+                        <td className="px-6 py-4 text-center text-sm text-red-600">Устаёт, болеет, уходит в отпуск</td>
                       </tr>
                       <tr>
                         <td className="px-6 py-4 text-sm font-medium text-gray-900">Обучение</td>
-                        <td className="px-6 py-4 text-center text-sm text-green-600">Не требуется</td>
-                        <td className="px-6 py-4 text-center text-sm text-red-600">Месяцы обучения</td>
+                        <td className="px-6 py-4 text-center text-sm text-green-600">Заполнить форму за 10 минут</td>
+                        <td className="px-6 py-4 text-center text-sm text-red-600">Недели на обучение</td>
                       </tr>
                     </tbody>
                   </table>
@@ -710,7 +707,7 @@ export default function AnimatedLandingPage() {
                   {[
                     {
                       criterion: "Стоимость в год",
-                      ai: "5,390₽",
+                      ai: formatRub(PLAN.startPrice + 11 * PLAN.renewPrice),
                       human: "600,000₽+",
                       aiColor: "text-green-600",
                       humanColor: "text-red-600",
@@ -731,15 +728,15 @@ export default function AnimatedLandingPage() {
                     },
                     {
                       criterion: "Надёжность",
-                      ai: "100% стабильно",
-                      human: "Зависит от настроения",
+                      ai: "Одинаково вежлив всегда",
+                      human: "Устаёт, болеет, уходит в отпуск",
                       aiColor: "text-green-600",
                       humanColor: "text-red-600",
                     },
                     {
                       criterion: "Обучение",
-                      ai: "Не требуется",
-                      human: "Месяцы обучения",
+                      ai: "Заполнить форму за 10 минут",
+                      human: "Недели на обучение",
                       aiColor: "text-green-600",
                       humanColor: "text-red-600",
                     },
@@ -767,7 +764,7 @@ export default function AnimatedLandingPage() {
             <div className="mt-8 text-center">
               <Card className="bg-green-50 border-green-200 inline-block">
                 <CardContent className="p-6">
-                  <h3 className="text-2xl font-bold text-green-800 mb-2">Экономия: 594,610₽ в год!</h3>
+                  <h3 className="text-2xl font-bold text-green-800 mb-2">Дешевле одной зарплаты в месяц — за целый год</h3>
                   <p className="text-green-700">ИИ-консультант окупается уже в первый месяц</p>
                 </CardContent>
               </Card>
@@ -852,7 +849,7 @@ export default function AnimatedLandingPage() {
               <h4 className="font-bold mb-2">❗ Важно: что происходит, если не продлить подписку</h4>
               <div className="text-left text-sm text-amber-800">
                 <p>
-                  ⏸ <strong>Виджет на сайте скрывается</strong>, пока подписка не продлена
+                  ⚠️ <strong>Виджет на сайте скрывается</strong>, пока подписка не продлена
                 </p>
                 <p>
                   ✅ <strong>Все настройки сохраняются</strong>: после продления консультант сразу снова работает
@@ -876,7 +873,7 @@ export default function AnimatedLandingPage() {
               {
                 question: "Нужны ли мне навыки программирования для настройки?",
                 answer:
-                  "Совсем нет! Наше пошаговое руководство показывает точно, куда вставить код. Если умеешь копировать и вставлять, то сможешь это настроить.",
+                  "Нет. Всё настраивается формой в кабинете, а для сайта нужно лишь скопировать одну строку кода и вставить её — на Tilda это блок T123.",
               },
               {
                 question: "Будет ли это работать на моем сайте Tilda?",
@@ -888,9 +885,9 @@ export default function AnimatedLandingPage() {
                 answer: `Да, это подписка: ${formatRub(PLAN.startPrice)} за подключение и первые ${PLAN.periodDays} дней, дальше ${formatRub(PLAN.renewPrice)} за каждые ${PLAN.periodDays} дней. Ответы ИИ уже включены в цену — свои ключи и отдельные сервисы не нужны.`,
               },
               {
-                question: "Как быстро я получу материалы?",
+                question: "Как быстро я смогу начать?",
                 answer:
-                  "Сразу после оплаты на почту придут логин и пароль от кабинета. Там выбираешь нишу, заполняешь данные о бизнесе и копируешь код для сайта.",
+                  "Сразу после оплаты на почту придут логин и пароль от кабинета. Там вы выбираете нишу, заполняете данные о бизнесе и копируете код для сайта.",
               },
               {
                 question: "Могу ли я настроить внешний вид?",
@@ -931,23 +928,29 @@ export default function AnimatedLandingPage() {
               <MessageCircle className="w-10 h-10 text-white" />
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Нужна помощь?</h2>
-            <p className="text-xl text-gray-600 mb-8">Мы здесь, чтобы поддержать тебя на каждом шаге</p>
+            <p className="text-xl text-gray-600 mb-8">Напишите на почту — ответим в течение 24 часов</p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
+                asChild
                 size="lg"
                 className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
               >
-                <MessageCircle className="w-5 h-5 mr-2" />
-                Поддержка в Telegram
+                <a href="mailto:ai.consultant.site@gmail.com">
+                  <Mail className="w-5 h-5 mr-2" />
+                  Написать на почту
+                </a>
               </Button>
               <Button
+                asChild
                 size="lg"
                 variant="outline"
                 className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
               >
-                <Mail className="w-5 h-5 mr-2" />
-                Поддержка по Email
+                <a href="/contacts">
+                  <MessageCircle className="w-5 h-5 mr-2" />
+                  Все контакты
+                </a>
               </Button>
             </div>
           </div>
@@ -965,16 +968,16 @@ export default function AnimatedLandingPage() {
                 </div>
                 <span className="font-bold">ИИ Консультант</span>
               </div>
-              <p className="text-gray-400">&copy; 2025 Все права защищены</p>
+              <p className="text-gray-400">&copy; {new Date().getFullYear()} Все права защищены</p>
             </div>
             <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm">
               <a href="/terms" className="text-gray-400 hover:text-white transition-colors">
-                Пользовательское соглашение
+                Публичная оферта
               </a>
               <a href="/contacts" className="text-gray-400 hover:text-white transition-colors">
                 Контакты и реквизиты
               </a>
-              <span className="text-gray-400">Работает на ChatGPT API</span>
+              <span className="text-gray-400">Работает на современных ИИ-моделях</span>
             </div>
           </div>
         </div>

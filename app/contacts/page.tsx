@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Bot, ArrowLeft, Phone, MapPin, Mail, User, FileText, MessageCircle } from "lucide-react"
+import { Bot, ArrowLeft, MapPin, Mail, User, FileText, MessageCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export default function ContactsPage() {
@@ -50,19 +50,6 @@ export default function ContactsPage() {
 
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
-                  <Phone className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-gray-900">Телефон</p>
-                    <button
-                      onClick={() => copyToClipboard("89162731769")}
-                      className="text-blue-600 hover:text-blue-700 transition-colors"
-                    >
-                      8 (916) 273-17-69
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
                   <Mail className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
                   <div>
                     <p className="font-medium text-gray-900">Email</p>
@@ -99,8 +86,8 @@ export default function ContactsPage() {
                 <div className="flex items-start space-x-3">
                   <User className="w-5 h-5 text-purple-600 mt-1 flex-shrink-0" />
                   <div>
-                    <p className="font-medium text-gray-900">Индивидуальный предприниматель</p>
-                    <p className="text-gray-600">ТОКАРЕВА АНГЕЛИНА АЛЕКСЕЕВНА</p>
+                    <p className="font-medium text-gray-900">Самозанятая (плательщик налога на профессиональный доход)</p>
+                    <p className="text-gray-600">Токарева Ангелина Алексеевна</p>
                   </div>
                 </div>
 
@@ -120,7 +107,7 @@ export default function ContactsPage() {
 
               <div className="bg-purple-50 rounded-lg p-4 mt-6">
                 <p className="text-sm text-purple-800">
-                  <strong>Примечание:</strong> Все платежи обрабатываются через безопасную платежную систему ЮMoney.
+                  <strong>Примечание:</strong> Оплата проходит на защищённой странице платёжного сервиса, данные карты нам не передаются.
                   Чеки и документы об оплате отправляются автоматически на указанный email.
                 </p>
               </div>
@@ -139,7 +126,7 @@ export default function ContactsPage() {
                 <ul className="text-gray-600 space-y-2">
                   <li>• Email поддержка: круглосуточно</li>
                   <li>• Ответ в течение 24 часов</li>
-                  <li>• Поддержка включена на 30 дней</li>
+                  <li>• Поддержка на всё время подписки</li>
                   <li>• Помощь с настройкой и интеграцией</li>
                 </ul>
               </div>
@@ -158,15 +145,7 @@ export default function ContactsPage() {
         </Card>
 
         {/* Быстрые действия */}
-        <div className="grid md:grid-cols-3 gap-4">
-          <Button
-            onClick={() => window.open("tel:89162731769")}
-            className="bg-green-600 hover:bg-green-700 text-white p-4 h-auto flex flex-col items-center space-y-2"
-          >
-            <Phone className="w-6 h-6" />
-            <span>Позвонить</span>
-          </Button>
-
+        <div className="grid md:grid-cols-2 gap-4">
           <Button
             onClick={() => window.open("mailto:ai.consultant.site@gmail.com")}
             className="bg-blue-600 hover:bg-blue-700 text-white p-4 h-auto flex flex-col items-center space-y-2"
