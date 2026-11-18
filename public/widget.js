@@ -72,6 +72,7 @@
       "*{box-sizing:border-box}" +
       ".root{position:fixed;bottom:20px;" + side + ":20px;z-index:2147483000;font-family:" + (FONTS[c.font] || FONTS.system) + ";font-size:15px;line-height:1.45;color:#111827}" +
       ".root.inline{position:absolute}" +
+      ".root.inline .panel{max-width:calc(var(--aic-w,100vw) - 40px);max-height:calc(var(--aic-h,100vh) - 110px)}" +
       ".btn{width:60px;height:60px;border-radius:50%;border:0;cursor:pointer;background:" + c.color + ";color:" + fg + ";display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.18);transition:transform .15s}" +
       ".btn:hover{transform:scale(1.06)}" +
       ".btn:focus-visible,.send:focus-visible,.close:focus-visible{outline:3px solid " + c.color + "55;outline-offset:2px}" +
@@ -102,6 +103,15 @@
     var host = document.createElement("div");
     host.setAttribute("data-ai-consultant", config.id || "preview");
     (options.container || document.body).appendChild(host);
+    if (options.inline && options.container) {
+      // В предпросмотре окно чата подстраивается под размер контейнера, а не экрана
+      var fit = function () {
+        host.style.setProperty("--aic-w", options.container.clientWidth + "px");
+        host.style.setProperty("--aic-h", options.container.clientHeight + "px");
+      };
+      fit();
+      if (window.ResizeObserver) new ResizeObserver(fit).observe(options.container);
+    }
     var shadow = host.attachShadow ? host.attachShadow({ mode: "open" }) : host;
 
     var storeKey = "aic:" + (config.id || "preview");
@@ -150,7 +160,7 @@
     function setOpen(open) {
       root.classList.toggle("open", open);
       btn.setAttribute("aria-label", open ? "Закрыть чат" : "Открыть чат");
-      if (open) setTimeout(function () { input.focus(); }, 50);
+      if (open && !options.preview) setTimeout(function () { input.focus(); }, 50);
     }
 
     btn.addEventListener("click", function () { setOpen(!root.classList.contains("open")); });
@@ -167,6 +177,7 @@
       input.value = "";
       history.push({ role: "user", content: text });
       addBubble("user", text);
+      if (typeof options.onSend === "function") { try { options.onSend(text); } catch (err) { /* ignore */ } }
       busy = true;
       send.disabled = true;
       var typing = document.createElement("div");
@@ -207,6 +218,8 @@
     return {
       update: apply,
       open: function () { setOpen(true); },
+      ask: function (text) { input.value = text; submit({ preventDefault: function () {} }); },
+      reset: function () { history = []; redraw(); },
       destroy: function () { host.remove(); },
     };
   }

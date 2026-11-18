@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, type MutableRefObject } from "react"
 
 type PreviewConfig = {
   id?: string
@@ -12,7 +12,12 @@ type PreviewConfig = {
   font: string
 }
 
-type WidgetHandle = { update: (c: PreviewConfig) => void; destroy: () => void }
+export type WidgetHandle = {
+  update: (c: PreviewConfig) => void
+  destroy: () => void
+  ask?: (text: string) => void
+  reset?: () => void
+}
 
 declare global {
   interface Window {
@@ -38,7 +43,19 @@ function loadWidgetScript(): Promise<void> {
 }
 
 /** Живой предпросмотр: тот же widget.js, что будет на сайте клиента. */
-export default function WidgetPreview({ config }: { config: PreviewConfig }) {
+export default function WidgetPreview({
+  config,
+  apiRef,
+  onSend,
+  height = "h-[640px]",
+}: {
+  config: PreviewConfig
+  apiRef?: MutableRefObject<WidgetHandle | null>
+  onSend?: (text: string) => void
+  height?: string
+}) {
+  const onSendRef = useRef(onSend)
+  onSendRef.current = onSend
   const box = useRef<HTMLDivElement>(null)
   const handle = useRef<WidgetHandle | null>(null)
   const latest = useRef(config)
@@ -53,12 +70,15 @@ export default function WidgetPreview({ config }: { config: PreviewConfig }) {
         inline: true,
         preview: true,
         open: true,
+        onSend: (text: string) => onSendRef.current?.(text),
       })
+      if (apiRef) apiRef.current = handle.current
     })
     return () => {
       cancelled = true
       handle.current?.destroy()
       handle.current = null
+      if (apiRef) apiRef.current = null
     }
   }, [])
 
@@ -69,10 +89,9 @@ export default function WidgetPreview({ config }: { config: PreviewConfig }) {
   return (
     <div
       ref={box}
-      className="relative h-[640px] w-full overflow-hidden rounded-xl border border-dashed border-gray-300 bg-[linear-gradient(45deg,#f8fafc_25%,transparent_25%,transparent_75%,#f8fafc_75%),linear-gradient(45deg,#f8fafc_25%,transparent_25%,transparent_75%,#f8fafc_75%)] bg-[length:24px_24px] bg-[position:0_0,12px_12px]"
+      className={`relative ${height} w-full overflow-hidden rounded-xl border border-dashed border-gray-300 bg-[linear-gradient(45deg,#f8fafc_25%,transparent_25%,transparent_75%,#f8fafc_75%),linear-gradient(45deg,#f8fafc_25%,transparent_25%,transparent_75%,#f8fafc_75%)] bg-[length:24px_24px] bg-[position:0_0,12px_12px]`}
       aria-label="Предпросмотр виджета"
     >
-      <p className="absolute left-4 top-3 text-xs text-gray-400">Так виджет будет выглядеть на вашем сайте</p>
     </div>
   )
 }
