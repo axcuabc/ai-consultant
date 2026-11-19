@@ -98,6 +98,7 @@ export default function DemoConsultant({ demo }: { demo: Pick<Demo, "id" | "titl
         </div>
       ) : (
         <form
+          data-avoid-assistant
           className="flex gap-2 border-t p-4"
           onSubmit={(e) => {
             e.preventDefault()
