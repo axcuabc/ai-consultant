@@ -1,4 +1,5 @@
 "use client"
+import { formatDateRu } from "@/lib/date"
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
@@ -31,7 +32,7 @@ export default function PaymentSuccessPage() {
         const ends = data?.subscription_ends_at ? new Date(data.subscription_ends_at) : null
         // Платёж засчитан, если дата окончания сдвинулась вперёд
         if (ends && ends.getTime() > Math.max(prev, Date.now()) + 60_000 && alive) {
-          setUntil(ends.toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" }))
+          setUntil(formatDateRu(ends))
           setState("active")
           return
         }

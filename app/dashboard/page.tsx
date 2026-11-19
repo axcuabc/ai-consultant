@@ -1,4 +1,5 @@
 "use client"
+import { formatDateRu } from "@/lib/date"
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
@@ -13,7 +14,7 @@ import { getTemplate } from "@/lib/templates"
 import type { Consultant } from "@/lib/consultant"
 
 function formatDate(iso: string | null) {
-  return iso ? new Date(iso).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" }) : "—"
+  return iso ? formatDateRu(iso) : "—"
 }
 
 export default function DashboardPage() {
