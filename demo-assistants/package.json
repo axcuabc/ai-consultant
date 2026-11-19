@@ -1,0 +1,1 @@
+{ "name": "psy-demo-assistants", "private": true, "type": "module", "engines": { "node": ">=20" } }
