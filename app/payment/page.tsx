@@ -1,4 +1,5 @@
 "use client"
+import { formatDateRu } from "@/lib/date"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -10,7 +11,7 @@ import { supabase } from "@/lib/supabase"
 import { PLAN, formatRub } from "@/lib/plans"
 
 function formatDate(d: Date) {
-  return d.toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })
+  return formatDateRu(d)
 }
 
 export default function PaymentPage() {
@@ -121,7 +122,7 @@ export default function PaymentPage() {
                     Будет работать до {formatDate(until)}
                   </p>
                 </div>
-                <span className="text-2xl font-bold text-gray-900">{formatRub(amount)}</span>
+                <span className="shrink-0 whitespace-nowrap text-2xl font-bold text-gray-900">{formatRub(amount)}</span>
               </div>
               {!isRenew && (
                 <p className="mt-4 border-t pt-4 text-sm text-gray-600">

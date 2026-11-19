@@ -259,6 +259,12 @@ export default function ConsultantEditor({ id }: { id?: string }) {
                 <p className="text-xs text-gray-500">
                   Консультант отвечает только по этому описанию и не придумывает цены. Чем подробнее — тем лучше ответы.
                 </p>
+                {/\[[^\]\n]{1,40}\]/.test(draft.business_info) && (
+                  <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                    В описании остались подсказки в квадратных скобках, например{" "}
+                    <b>{draft.business_info.match(/\[[^\]\n]{1,40}\]/)?.[0]}</b>. Замените их на свои данные — иначе консультант покажет их клиентам.
+                  </p>
+                )}
               </div>
               <Field label="Как записаться или связаться" htmlFor="cta" hint="Сюда консультант будет приглашать клиентов: ссылка на запись, Telegram или телефон.">
                 <Input id="cta" maxLength={500} value={draft.contact_cta} onChange={(e) => set("contact_cta", e.target.value)} placeholder="Например: запись в Telegram @username" />

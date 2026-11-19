@@ -1,4 +1,4 @@
-import { modelFields } from "./models"
+import { modelList } from "./models"
 import { getAdmin } from "./supabase-admin"
 import type { Consultant } from "./consultant"
 
@@ -63,13 +63,30 @@ export function rateLimited(key: string, limit = 20, windowMs = 60_000): boolean
 export type ChatMessage = { role: "user" | "assistant"; content: string }
 
 export async function askModel(systemPrompt: string, messages: ChatMessage[]): Promise<string | null> {
+  // Бесплатные модели иногда возвращают пустой или оборванный ответ
+  // (например, когда рассуждения съели лимит токенов). Тогда пробуем ещё раз
+  // со следующей моделью из списка.
+  const models = modelList()
+  const attempts = models.length > 1 ? [models, [...models.slice(1), models[0]]] : [models, models]
+  for (let i = 0; i < attempts.length; i++) {
+    const result = await callModel(systemPrompt, messages, attempts[i])
+    if (result.ok) return result.text
+    if (!result.retry) return null
+    console.warn(`OpenRouter: попытка ${i + 1} без ответа (${result.reason})`)
+  }
+  return null
+}
+
+type ModelResult = { ok: true; text: string } | { ok: false; retry: boolean; reason: string }
+
+async function callModel(systemPrompt: string, messages: ChatMessage[], models: string[]): Promise<ModelResult> {
   const apiKey = process.env.OPENROUTER_API_KEY
   if (!apiKey) {
     console.error("OPENROUTER_API_KEY не задан")
-    return null
+    return { ok: false, retry: false, reason: "no_key" }
   }
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 25_000)
+  const timeout = setTimeout(() => controller.abort(), 20_000)
   try {
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -80,9 +97,10 @@ export async function askModel(systemPrompt: string, messages: ChatMessage[]): P
         "X-Title": "AI-Consultant",
       },
       body: JSON.stringify({
-        ...modelFields(),
+        ...(models.length === 1 ? { model: models[0] } : { models: models.slice(0, 3) }),
         messages: [{ role: "system", content: systemPrompt }, ...messages],
-        max_tokens: 800,
+        // С запасом: у «думающих» моделей рассуждения тоже расходуют этот лимит
+        max_tokens: 2000,
         temperature: 0.5,
         // У «думающих» моделей рассуждения не показываем и делаем короткими
         reasoning: { effort: "low", exclude: true },
@@ -90,14 +108,20 @@ export async function askModel(systemPrompt: string, messages: ChatMessage[]): P
     })
     if (!res.ok) {
       console.error("OpenRouter:", res.status, await res.text().catch(() => ""))
-      return null
+      return { ok: false, retry: res.status >= 500 || res.status === 429, reason: `http_${res.status}` }
     }
     const data = await res.json()
-    const reply = data?.choices?.[0]?.message?.content
-    return typeof reply === "string" && reply.trim() ? reply.trim() : null
+    const choice = data?.choices?.[0]
+    const reply = choice?.message?.content
+    const text = typeof reply === "string" ? reply.trim() : ""
+    if (!text) return { ok: false, retry: true, reason: `empty:${data?.model ?? "?"}:${choice?.finish_reason ?? "?"}` }
+    if (choice?.finish_reason === "length") {
+      return { ok: false, retry: true, reason: `length:${data?.model ?? "?"}` }
+    }
+    return { ok: true, text }
   } catch (err) {
     console.error("OpenRouter error:", err)
-    return null
+    return { ok: false, retry: true, reason: "network" }
   } finally {
     clearTimeout(timeout)
   }

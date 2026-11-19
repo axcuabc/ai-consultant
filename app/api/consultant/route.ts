@@ -1,3 +1,4 @@
+import { crisisReply } from "@/lib/crisis"
 import { NextResponse, type NextRequest } from "next/server"
 import { buildSystemPrompt } from "@/lib/consultant"
 import { getDemo } from "@/lib/demo"
@@ -6,7 +7,7 @@ import { clientIp } from "@/lib/auth-server"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
-export const maxDuration = 30
+export const maxDuration = 45
 
 // Демо на главной: те же правила и промпт, что у настоящих консультантов клиентов.
 export async function POST(request: NextRequest) {
@@ -33,6 +34,9 @@ export async function POST(request: NextRequest) {
       response: "Вы задали много вопросов в демо. Создайте своего консультанта — это бесплатно — и проверяйте сколько угодно.",
     })
   }
+
+  const crisis = crisisReply(history[history.length - 1].content)
+  if (crisis) return NextResponse.json({ response: crisis })
 
   const answer = await askModel(buildSystemPrompt(demo.consultant), history)
   return NextResponse.json({

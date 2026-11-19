@@ -1,3 +1,4 @@
+import { crisisReply } from "@/lib/crisis"
 import { NextResponse, type NextRequest } from "next/server"
 import { buildSystemPrompt } from "@/lib/consultant"
 import { siteUrl } from "@/lib/supabase-admin"
@@ -13,7 +14,7 @@ import {
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
-export const maxDuration = 30
+export const maxDuration = 45
 
 const MAX_MESSAGES = 12
 const MAX_MESSAGE_LENGTH = 1000
@@ -90,6 +91,9 @@ export async function POST(request: NextRequest) {
     } else if (!originAllowed(found.consultant.allowed_domain, request.headers.get("origin"))) {
       return reply({ error: "forbidden_origin" }, 403)
     }
+
+    const crisis = crisisReply(history[history.length - 1].content)
+    if (crisis) return reply({ reply: crisis })
 
     const answer = await askModel(buildSystemPrompt(found.consultant), history)
     if (!answer) {

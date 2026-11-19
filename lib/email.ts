@@ -1,3 +1,4 @@
+import { formatDateRu } from "./date"
 // Письма через Resend (https://resend.com). Ключ: EMAIL_API_KEY или RESEND_API_KEY.
 
 function escapeHtml(s: string) {
@@ -47,7 +48,7 @@ export function sendPaymentEmail(
   to: string,
   info: { until: Date; amount: number; kind: "start" | "renew"; dashboardUrl: string; authUrl: string; createdAccount: boolean },
 ) {
-  const date = info.until.toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" }).replace(/ г\.$/, " года")
+  const date = formatDateRu(info.until)
   const sum = new Intl.NumberFormat("ru-RU").format(info.amount)
   return send(
     to,
