@@ -259,7 +259,7 @@ export default function Landing() {
               </div>
             </div>
 
-            <div className="mt-6 flex flex-col gap-2 sm:mt-8 sm:flex-row sm:gap-3">
+            <div data-avoid-assistant className="mt-6 flex flex-col gap-2 sm:mt-8 sm:flex-row sm:gap-3">
               <Button asChild size="lg" className="h-12 bg-gradient-to-r from-blue-600 to-purple-600 px-7 text-base shadow-lg">
                 <Link href={SIGNUP}>
                   Создать бесплатно

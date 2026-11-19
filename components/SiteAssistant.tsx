@@ -8,7 +8,7 @@ export default function SiteAssistant() {
   useEffect(() => {
     let handle: { destroy: () => void } | null = null
     let cancelled = false
-    let observer: IntersectionObserver | null = null
+    let timer = 0
     let onScroll: (() => void) | null = null
     const mount = () => {
       const api = (window as unknown as { AIConsultantWidget?: { mount: (c: object, o: object) => { destroy: () => void } } })
@@ -26,29 +26,31 @@ export default function SiteAssistant() {
         },
         { demo: "product" },
       )
-      // Прячем кнопку помощника, пока на экране демо-чат (чтобы не закрывала поле ввода)
-      // и на телефоне на первом экране (чтобы не закрывала главную кнопку)
-      const demo = document.getElementById("demo")
+      // Кнопка помощника видна всегда. Прячем её, только пока она прямо накрывает
+      // поле ввода демо-чата или главные кнопки (на телефоне) — иначе на них не нажать.
       const host = document.querySelector<HTMLElement>('[data-ai-consultant="site-assistant"]')
       if (!host) return
-      let demoVisible = false
+      host.style.transition = "opacity .2s"
       const refresh = () => {
+        const launcher = host.shadowRoot?.querySelector<HTMLElement>('[aria-label="Открыть чат"]')
         const open = host.shadowRoot?.querySelector(".root.open")
-        const firstScreen = window.innerWidth < 640 && window.scrollY < 500
-        host.style.display = !open && (demoVisible || firstScreen) ? "none" : ""
-      }
-      if (demo && "IntersectionObserver" in window) {
-        observer = new IntersectionObserver(
-          ([entry]) => {
-            demoVisible = entry.isIntersecting
-            refresh()
-          },
-          { threshold: 0.25 },
-        )
-        observer.observe(demo)
+        if (!launcher || open) {
+          host.style.opacity = ""
+          host.style.pointerEvents = ""
+          return
+        }
+        const r = launcher.getBoundingClientRect()
+        const covers = Array.from(document.querySelectorAll<HTMLElement>("[data-avoid-assistant]")).some((el) => {
+          const e = el.getBoundingClientRect()
+          return e.width > 0 && r.left < e.right && r.right > e.left && r.top < e.bottom && r.bottom > e.top
+        })
+        host.style.opacity = covers ? "0" : ""
+        host.style.pointerEvents = covers ? "none" : ""
       }
       onScroll = refresh
       window.addEventListener("scroll", refresh, { passive: true })
+      window.addEventListener("resize", refresh)
+      timer = window.setInterval(refresh, 1000)
       refresh()
     }
     if ((window as unknown as { AIConsultantWidget?: unknown }).AIConsultantWidget) mount()
@@ -60,8 +62,11 @@ export default function SiteAssistant() {
     }
     return () => {
       cancelled = true
-      observer?.disconnect()
-      if (onScroll) window.removeEventListener("scroll", onScroll)
+      window.clearInterval(timer)
+      if (onScroll) {
+        window.removeEventListener("scroll", onScroll)
+        window.removeEventListener("resize", onScroll)
+      }
       handle?.destroy()
     }
   }, [])
