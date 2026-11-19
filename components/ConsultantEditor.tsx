@@ -1,4 +1,5 @@
 "use client"
+import { reachGoal } from "@/lib/metrika"
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
@@ -147,7 +148,10 @@ export default function ConsultantEditor({ id }: { id?: string }) {
     }
     setSaved(true)
     setSavedKey(contentKey(draft))
-    if (!id) router.replace(`/template/edit/${result.data.id}?created=1`)
+    if (!id) {
+      reachGoal("consultant_created")
+      router.replace(`/template/edit/${result.data.id}?created=1`)
+    }
   }
 
   if (loading || !loaded) {

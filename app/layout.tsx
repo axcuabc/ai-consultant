@@ -4,6 +4,8 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { SITE_URL } from "@/lib/site"
 import { Analytics } from "@vercel/analytics/react" // <= обязательно `react`, не `next`
+import { YandexMetrika } from "@/components/YandexMetrika"
+import { GoogleAnalytics } from "@/components/GoogleAnalytics"
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] })
 
@@ -34,7 +36,9 @@ export default function RootLayout({
     <html lang="ru">
       <body className={inter.className}>
         {children}
-        <Analytics /> {/* <-- вот это добавляем */}
+        <Analytics />
+        <YandexMetrika />
+        <GoogleAnalytics />
       </body>
     </html>
   )

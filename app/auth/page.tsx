@@ -1,4 +1,5 @@
 "use client"
+import { reachGoal } from "@/lib/metrika"
 import { useState, useEffect } from "react"
 import type React from "react"
 
@@ -86,6 +87,7 @@ export default function AuthPage() {
         if (!res.ok) throw new Error(data?.error || "Не удалось создать аккаунт")
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
+        reachGoal("signup")
         router.push("/dashboard?welcome=1")
       }
     } catch (error: any) {
