@@ -47,7 +47,7 @@ export function sendPaymentEmail(
   to: string,
   info: { until: Date; amount: number; kind: "start" | "renew"; dashboardUrl: string; authUrl: string; createdAccount: boolean },
 ) {
-  const date = info.until.toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })
+  const date = info.until.toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" }).replace(/ г\.$/, " года")
   const sum = new Intl.NumberFormat("ru-RU").format(info.amount)
   return send(
     to,
