@@ -1,4 +1,5 @@
 "use client"
+import { reachGoal } from "@/lib/metrika"
 import { formatDateRu } from "@/lib/date"
 
 import { useEffect, useState } from "react"
@@ -34,6 +35,7 @@ export default function PaymentSuccessPage() {
         if (ends && ends.getTime() > Math.max(prev, Date.now()) + 60_000 && alive) {
           setUntil(formatDateRu(ends))
           setState("active")
+          reachGoal("payment_success")
           return
         }
       }

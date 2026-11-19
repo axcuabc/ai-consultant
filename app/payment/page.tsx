@@ -1,4 +1,5 @@
 "use client"
+import { reachGoal } from "@/lib/metrika"
 import { formatDateRu } from "@/lib/date"
 
 import { useState } from "react"
@@ -57,6 +58,7 @@ export default function PaymentPage() {
         } catch {
           /* хранилище недоступно — не страшно */
         }
+        reachGoal("payment_start")
         window.location.href = result.paymentUrl
         return
       }
