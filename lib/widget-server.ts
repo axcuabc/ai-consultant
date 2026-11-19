@@ -104,11 +104,14 @@ async function callModel(systemPrompt: string, messages: ChatMessage[], models: 
         temperature: 0.5,
         // У «думающих» моделей рассуждения не показываем и делаем короткими
         reasoning: { effort: "low", exclude: true },
+        // Платные модели — только у поставщиков, которые не сохраняют переписку.
+        // Бесплатные (запасной вариант, если кончился баланс) без этого условия не работают.
+        ...(models[0].endsWith(":free") ? {} : { provider: { data_collection: "deny" } }),
       }),
     })
     if (!res.ok) {
       console.error("OpenRouter:", res.status, await res.text().catch(() => ""))
-      return { ok: false, retry: res.status >= 500 || res.status === 429, reason: `http_${res.status}` }
+      return { ok: false, retry: res.status >= 500 || res.status === 429 || res.status === 402, reason: `http_${res.status}` }
     }
     const data = await res.json()
     const choice = data?.choices?.[0]
