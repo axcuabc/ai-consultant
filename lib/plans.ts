@@ -10,7 +10,17 @@ export const PLAN = {
   periodDays: 30,
   /** Сколько консультантов можно создать на одном аккаунте */
   maxConsultants: 3,
+  /** Сколько ответов в месяц даёт один консультант (защита от использования как обычного ИИ-чата) */
+  monthlyAnswers: 1000,
+  /** Доля месячного лимита, которую можно израсходовать за один день */
+  dailyShare: 0.15,
 } as const
+
+/** Лимиты ответов консультанта: месячный и дневной. */
+export function answerLimits(monthlyLimit: number | null | undefined) {
+  const month = monthlyLimit ?? PLAN.monthlyAnswers
+  return { month, day: Math.max(30, Math.ceil(month * PLAN.dailyShare)) }
+}
 
 export type PaymentKind = "start" | "renew"
 

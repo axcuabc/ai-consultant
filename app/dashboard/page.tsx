@@ -23,6 +23,18 @@ export default function DashboardPage() {
   const [consultants, setConsultants] = useState<Consultant[]>([])
   const [listLoading, setListLoading] = useState(true)
   const [tested, setTested] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    if (!user) return
+    supabase.auth.getSession().then(({ data }) => {
+      const token = data.session?.access_token
+      if (!token) return
+      fetch("/api/admin", { headers: { Authorization: `Bearer ${token}` } })
+        .then((r) => setIsAdmin(r.ok))
+        .catch(() => {})
+    })
+  }, [user])
 
   useEffect(() => {
     try {
@@ -76,6 +88,11 @@ export default function DashboardPage() {
   return (
     <AppShell>
       <h1 className="mb-6 text-3xl font-bold text-gray-900">Личный кабинет</h1>
+      {isAdmin && (
+        <a href="/admin" className="mb-6 inline-block font-medium text-blue-700 underline">
+          Помощники клиентов с Кворка →
+        </a>
+      )}
 
       {status === "never" && (
         <Card className="mb-8">
