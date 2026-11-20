@@ -2,6 +2,8 @@ import { crisisReply } from "@/lib/crisis"
 import { NextResponse, type NextRequest } from "next/server"
 import { buildSystemPrompt } from "@/lib/consultant"
 import { siteUrl } from "@/lib/supabase-admin"
+import { answerLimits } from "@/lib/plans"
+import { recordAnswer, usageFor } from "@/lib/usage"
 import {
   CORS_HEADERS,
   askModel,
@@ -16,8 +18,8 @@ export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 export const maxDuration = 45
 
-const MAX_MESSAGES = 12
-const MAX_MESSAGE_LENGTH = 1000
+const MAX_MESSAGES = 10
+const MAX_MESSAGE_LENGTH = 500
 const PREVIEW_PER_DAY = 30
 
 /** Запрос пришёл со страниц самого сервиса (кабинет), а не с сайта клиента. */
@@ -72,7 +74,8 @@ export async function POST(request: NextRequest) {
   if (history.length === 0 || history[history.length - 1].role !== "user") return reply({ error: "bad_messages" }, 400)
 
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
-  if (rateLimited(`${id}:${ip}`) || rateLimited(`consultant:${id}`, 120)) {
+  // Один посетитель: не больше 8 сообщений в минуту и 40 в час
+  if (rateLimited(`${id}:${ip}`, 8) || rateLimited(`${id}:${ip}:h`, 40, 60 * 60_000) || rateLimited(`consultant:${id}`, 60)) {
     return reply({ reply: "Слишком много сообщений подряд. Подождите минуту и попробуйте снова." }, 429)
   }
 
@@ -95,7 +98,24 @@ export async function POST(request: NextRequest) {
     const crisis = crisisReply(history[history.length - 1].content)
     if (crisis) return reply({ reply: crisis })
 
+    // Лимит ответов в день и в месяц (только для включённых консультантов на сайтах клиентов)
+    const counted = found.active
+    if (counted) {
+      const limits = answerLimits(found.monthlyLimit)
+      const used = await usageFor(id)
+      if (used.month >= limits.month || used.today >= limits.day) {
+        const contact = found.consultant.contact_cta.trim()
+        return reply({
+          reply: contact
+            ? `Сейчас не могу ответить в чате. Пожалуйста, свяжитесь напрямую: ${contact}`
+            : "Сейчас не могу ответить в чате. Пожалуйста, оставьте заявку через форму на сайте.",
+          limited: true,
+        })
+      }
+    }
+
     const answer = await askModel(buildSystemPrompt(found.consultant), history)
+    if (answer && counted) await recordAnswer(id)
     if (!answer) {
       const contact = found.consultant.contact_cta.trim()
       return reply({

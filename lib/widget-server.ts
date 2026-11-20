@@ -15,8 +15,13 @@ export function isUuid(value: unknown): value is string {
   return typeof value === "string" && UUID.test(value)
 }
 
-/** Консультант + активна ли подписка его владельца. */
-export async function loadConsultant(id: string): Promise<{ consultant: Consultant; active: boolean } | null> {
+export type LoadedConsultant = { consultant: Consultant; active: boolean; monthlyLimit: number | null }
+
+/**
+ * Консультант и включён ли он. Если у консультанта задан срок active_until (продан через Кворк),
+ * решает только он; иначе — подписка владельца.
+ */
+export async function loadConsultant(id: string): Promise<LoadedConsultant | null> {
   const db = getAdmin()
   const { data: consultant, error } = await db.from("consultants").select("*").eq("id", id).maybeSingle()
   if (error) throw error
@@ -27,8 +32,13 @@ export async function loadConsultant(id: string): Promise<{ consultant: Consulta
     .eq("id", consultant.user_id)
     .maybeSingle()
   if (ownerError) throw ownerError
-  const active = Boolean(owner?.subscription_ends_at && new Date(owner.subscription_ends_at) > new Date())
-  return { consultant: consultant as Consultant, active }
+  const now = new Date()
+  const until = (consultant as { active_until?: string | null }).active_until
+  const active = until
+    ? new Date(until) > now
+    : Boolean(owner?.subscription_ends_at && new Date(owner.subscription_ends_at) > now)
+  const monthlyLimit = (consultant as { monthly_limit?: number | null }).monthly_limit ?? null
+  return { consultant: consultant as Consultant, active, monthlyLimit }
 }
 
 /** Разрешён ли сайт, с которого пришёл запрос. Пустое allowed_domain = любой сайт. */
